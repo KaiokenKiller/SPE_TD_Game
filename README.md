@@ -1,8 +1,9 @@
 # SPE TD Game
 
 ## Rollenverteilung
-- Producer: 
-- Programming-Lead: 
+- Producer: Alejandro
+- Programming-Lead: Frederik 
+- Art-Lead: Michael
 
 ## To-Do
 - Brainstorming
