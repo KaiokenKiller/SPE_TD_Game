@@ -7,5 +7,7 @@
 
 ## To-Do
 - Brainstorming
-- Features festlegen
+  - Features festlegen
+  - Towers ausdenken
+- Towers ausdenken
 - grobes UML erstellen
