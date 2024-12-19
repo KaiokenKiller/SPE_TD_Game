@@ -20,7 +20,7 @@
 
 #### Tower Typen
 - ~~ein Basetower Typ~~
-- mehrere Basetower Typen (Archer, Mage, ...)
+- mehrere Basetower Typen (Archer, Mage, Catapult, ...)
 
 #### Placement
 - ~~free~~
