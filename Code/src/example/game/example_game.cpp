@@ -10,10 +10,8 @@ namespace JanSordid::SDL_Example
 	{
 		AddStates<
 			IntroState,
-			PlasmaState,
-			SortState,
-			CameraState,
-			ShooterState>( *this );
+			TdState,
+			OverworldState>(*this );
 
 		// Set initial State
 		PushState( MyGS::Intro );
@@ -43,31 +41,12 @@ namespace JanSordid::SDL_Example
 				}
 				else if( what_key.scancode == SDL_SCANCODE_2 )
 				{
-					ReplaceState( MyGS::Plasma );
+					ReplaceState( MyGS::TdState );
 					return true;
 				}
 				else if( what_key.scancode == SDL_SCANCODE_3 )
 				{
-					ReplaceState( MyGS::Ball );
-					return true;
-				}
-				else if( what_key.scancode == SDL_SCANCODE_4 )
-				{
-					ReplaceState( MyGS::Parallax );
-					return true;
-				}
-				else if( what_key.scancode == SDL_SCANCODE_5 )
-				{
-					ReplaceState( MyGS::Shooter );
-					return true;
-				}
-				else if( what_key.scancode == SDL_SCANCODE_6 )
-				{
-					return false;
-				}
-				else if( what_key.scancode == SDL_SCANCODE_7 )
-				{
-					ReplaceState( MyGS::Invalid );
+					ReplaceState( MyGS::Overworld );
 					return true;
 				}
 				break;

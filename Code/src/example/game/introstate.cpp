@@ -2,6 +2,7 @@
 #include "hsnr64/palette.hpp"
 
 #include <hsnr64/offset.hpp>
+#include <iostream>
 //#include <tilefont.h>
 
 namespace JanSordid::SDL_Example
@@ -139,7 +140,7 @@ namespace JanSordid::SDL_Example
 	{
 		Point windowSize;
 		SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
-
+        std::cout << cash << std::endl;
 		{
 			const Rect dst_rect = { 0, 0, windowSize.x, windowSize.y };
 			SDL_RenderCopy( renderer(), _image, EntireRect, &dst_rect /* same result as EntireRect */ );
@@ -310,11 +311,11 @@ namespace JanSordid::SDL_Example
 			nfdwindowhandle_t nw;
 			NFD::GetNativeWindowFromSDLWindow( window(), &nw );
 
-			NFD::UniquePath path;
+			NFD::UniquePathN path;
 			const NFD::Result result = NFD::OpenDialog( path, NFD::EmptyFilter, 0, NFD::EmptyDefaultPath, nw );    // Freezes execution of the Game
 
-			if( result == NFD::Result::NFD_OKAY )
-				print( "Success! Path is {0}\n", path.get() );
+			//if( result == NFD::Result::NFD_OKAY )
+				//print( "Success! Path is {0}\n", path.get() );
 		}
 		ImGui::SameLine();
 		if( ImGui::Button( "OpenMultiple" ) )
@@ -329,21 +330,21 @@ namespace JanSordid::SDL_Example
 		ImGui::SameLine();
 		if( ImGui::Button( "Save" ) )
 		{
-			NFD::UniquePath path;
+			NFD::UniquePathN path;
 			const NFD::Result result = NFD::SaveDialog( path, NFD::EmptyFilter, 0, NFD::EmptyDefaultPath );     // Freezes execution of the Game
 			//	const NFD::Result result = NFD::SaveDialog();   // The same as above
 
-			if( result == NFD::Result::NFD_OKAY )
-				print( "Success! Path is {0}\n", path.get() );
+			//if( result == NFD::Result::NFD_OKAY )
+				//print( "Success! Path is {0}\n", path.get() );
 		}
 		ImGui::SameLine();
 		if( ImGui::Button( "PickFolder" ) )
 		{
-			NFD::UniquePath path;
+			NFD::UniquePathN path;
 			const NFD::Result result = NFD::PickFolder( path, NFD::EmptyDefaultPath );     // Freezes execution of the Game
 
-			if( result == NFD_OKAY )
-				print( "Success! Path is {0}\n", path.get() );
+			//if( result == NFD_OKAY )
+				//print( "Success! Path is {0}\n", path.get() );
 		}
 
 		ImGui::End();
