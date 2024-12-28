@@ -1,8 +1,9 @@
+#include <iostream>
 #include "example_game.hpp"
 
 namespace JanSordid::SDL_Example {
 
-void CameraState::Init()
+void OverworldState::Init()
 {
 	Base::Init();
 
@@ -20,13 +21,13 @@ void CameraState::Init()
 		SDL_QueryTexture( bg[2], nullptr, nullptr, &bgSize[2].x, &bgSize[2].y );
 		SDL_QueryTexture( bg[3], nullptr, nullptr, &bgSize[3].x, &bgSize[3].y );
 
-		SDL_SetTextureColorMod( bg[0], 163, 163, 163 );
-		SDL_SetTextureColorMod( bg[1], 191, 191, 191 );
-		SDL_SetTextureColorMod( bg[2], 191, 191, 191 );
-		SDL_SetTextureColorMod( bg[3], 225, 225, 255 );
+		//SDL_SetTextureColorMod( bg[0], 163, 163, 163 );
+		//SDL_SetTextureColorMod( bg[1], 191, 191, 191 );
+		//SDL_SetTextureColorMod( bg[2], 191, 191, 191 );
+		//SDL_SetTextureColorMod( bg[3], 225, 225, 255 );
 
-		SDL_SetTextureAlphaMod( bg[2], 210 );
-		SDL_SetTextureAlphaMod( bg[3], 127 );
+		//SDL_SetTextureAlphaMod( bg[2], 210 );
+		//SDL_SetTextureAlphaMod( bg[3], 127 );
 
 		SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "nearest" );
 	}
@@ -35,14 +36,14 @@ void CameraState::Init()
 	cam = { .x = 0, .y = 0 };
 }
 
-void CameraState::Destroy()
+void OverworldState::Destroy()
 {
 	// TODO
 
 	Base::Destroy();
 }
 
-bool CameraState::HandleEvent( const Event & event )
+bool OverworldState::HandleEvent(const Event & event )
 {
 	if( event.type == SDL_KEYDOWN && event.key.repeat == 0 )
 	{
@@ -88,7 +89,7 @@ bool CameraState::HandleEvent( const Event & event )
 	}
 }
 
-bool CameraState::Input()
+bool OverworldState::Input()
 {
 	const u8 *  key_array = SDL_GetKeyboardState( nullptr );
 	const float factor    = key_array[SDL_SCANCODE_RSHIFT]
@@ -106,10 +107,10 @@ bool CameraState::Input()
 	return false;
 }
 
-void CameraState::Update( const u64 frame, const u64 totalMSec, const f32 deltaT )
+void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
 {
-	cam += dir * deltaT;
-
+	//cam += dir * deltaT;
+/*
 	if( isEased )
 	{
 		SDL_FPoint diff = (mouseOffset - mouseOffsetEased);
@@ -127,10 +128,10 @@ void CameraState::Update( const u64 frame, const u64 totalMSec, const f32 deltaT
 	else
 	{
 		mouseOffsetEased = mouseOffset;
-	}
+	}*/
 }
 
-FPoint CameraState::CalcFluxCam( const u64 totalMSec ) const
+FPoint OverworldState::CalcFluxCam(const u64 totalMSec ) const
 {
 	const FPoint flux = isFlux
 		? FPoint {
@@ -143,41 +144,41 @@ FPoint CameraState::CalcFluxCam( const u64 totalMSec ) const
 	return fluxCam;
 }
 
-void CameraState::Render( const u64 frame, u64 totalMSec, const f32 deltaT )
+void OverworldState::Render(const u64 frame, u64 totalMSec, const f32 deltaT )
 {
 	// Try the limits, moments before wraparound
 	//totalMSec += 2147470000u + 2147480000u;
-
 	Point windowSize;
 	SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
-
-	const FPoint fluxCam = CalcFluxCam( totalMSec );
+    cash = 200;
+    std::cout << cash << std::endl;
+	//const FPoint fluxCam = CalcFluxCam( totalMSec );
 
 	for( int i = 0; i <= 3; ++i ) // The 4 layers, rendered back to front
 	{
-		RenderLayer( windowSize, fluxCam, i );
+		RenderLayer( windowSize, cam, i );
 	}
 }
 
-void CameraState::RenderLayer( const Point windowSize, const FPoint camPos, const int index ) const
+void OverworldState::RenderLayer(const Point windowSize, const FPoint camPos, const int index ) const
 {
 	if( !bgIsVisible[index] )
 		return;
+    SDL_RenderCopy( renderer(), bg[index], EntireRect, nullptr );
+	//const Point size = bgSize[index];
+	//const FPoint offset = bgStart[index] + camPos * bgFactor[index];
+	//for( float x = offset.x; x < windowSize.x; x += size.x * 2 )
+	//{
+	//	for( float y = offset.y; y < windowSize.y; y += size.y * 2 )
+	//	{
+	//		Rect off = { .x = (int)x, .y = (int)y, .w = size.x * 2, .h = size.y * 2 };
 
-	const Point size = bgSize[index];
-	const FPoint offset = bgStart[index] + camPos * bgFactor[index];
-	for( float x = offset.x; x < windowSize.x; x += size.x * 2 )
-	{
-		for( float y = offset.y; y < windowSize.y; y += size.y * 2 )
-		{
-			Rect off = { .x = (int)x, .y = (int)y, .w = size.x * 2, .h = size.y * 2 };
-			SDL_RenderCopy( renderer(), bg[index], EntireRect, &off );
 
 			// Makes only sense with texture hint == best
 			//FRect offset = { .x = x, .y = y, .w = size.x * 2.0f, .h = size.y * 2.0f };
 			//SDL_RenderCopyF( renderer, bg[i], EntireRect, &offset );
-		}
-	}
+	//	}
+	//}
 }
 
 } // namespace

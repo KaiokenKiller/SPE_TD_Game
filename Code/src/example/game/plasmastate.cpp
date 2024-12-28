@@ -1,155 +1,184 @@
+#include <iostream>
 #include "example_game.hpp"
-#include "hsnr64/palette.hpp"
-#include "hsnr64/offset.hpp"
 
 namespace JanSordid::SDL_Example {
 
-void PlasmaState::Init()
-{
-	Base::Init();
+    void TdState::Init()
+    {
+        Base::Init();
 
-	font = TTF_OpenFont( BasePath "asset/font/MonkeyIsland-1991-refined.ttf", 24 );
-	TTF_SetFontHinting( font, TTF_HINTING_NONE );
+        if( !bg[0] )
+        {
+            //SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "best" );
 
-	Point windowSize;
-	SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
+            bg[0] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-4.png" );
+            bg[1] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-3.png" );
+            bg[2] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-2.png" );
+            bg[3] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-1.png" );
 
-	const Point resolution = windowSize / Scale;
-	plasmaSrf = SDL_CreateRGBSurfaceWithFormat( 0, resolution.x, resolution.y, 32, SDL_PIXELFORMAT_RGBA32 );
+            SDL_QueryTexture( bg[0], nullptr, nullptr, &bgSize[0].x, &bgSize[0].y );
+            SDL_QueryTexture( bg[1], nullptr, nullptr, &bgSize[1].x, &bgSize[1].y );
+            SDL_QueryTexture( bg[2], nullptr, nullptr, &bgSize[2].x, &bgSize[2].y );
+            SDL_QueryTexture( bg[3], nullptr, nullptr, &bgSize[3].x, &bgSize[3].y );
 
-	// Set to smoothed rendering for the plasma texture
-	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "best" );
-	plasmaTex = SDL_CreateTexture( renderer(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, resolution.x, resolution.y );
-	// Reset to "pixelated" for further textures
-	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "nearest" );
-}
+            //SDL_SetTextureColorMod( bg[0], 163, 163, 163 );
+            //SDL_SetTextureColorMod( bg[1], 191, 191, 191 );
+            //SDL_SetTextureColorMod( bg[2], 191, 191, 191 );
+            //SDL_SetTextureColorMod( bg[3], 225, 225, 255 );
 
-void PlasmaState::Destroy()
-{
-	SDL_FreeSurface( plasmaSrf );
-	SDL_DestroyTexture( plasmaTex );
-	plasmaSrf = nullptr;
-	plasmaTex = nullptr;
+            //SDL_SetTextureAlphaMod( bg[2], 210 );
+            //SDL_SetTextureAlphaMod( bg[3], 127 );
 
-	Base::Destroy();
-}
+            SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "nearest" );
+        }
 
-bool PlasmaState::HandleEvent( const Event & event )
-{
-	switch( event.type )
+        // Reinit on reenter
+        cam = { .x = 0, .y = 0 };
+    }
+
+    void TdState::Destroy()
+    {
+        // TODO
+
+        Base::Destroy();
+    }
+
+    bool TdState::HandleEvent(const Event & event )
+    {
+        if( event.type == SDL_KEYDOWN && event.key.repeat == 0 )
+        {
+            if( event.key.keysym.scancode == SDL_SCANCODE_F1 ) bgIsVisible[0] = !bgIsVisible[0];
+            if( event.key.keysym.scancode == SDL_SCANCODE_F2 ) bgIsVisible[1] = !bgIsVisible[1];
+            if( event.key.keysym.scancode == SDL_SCANCODE_F3 ) bgIsVisible[2] = !bgIsVisible[2];
+            if( event.key.keysym.scancode == SDL_SCANCODE_F4 ) bgIsVisible[3] = !bgIsVisible[3];
+
+            // Toggle all
+            if( event.key.keysym.scancode == SDL_SCANCODE_F5 )
+                bgIsVisible[0] = bgIsVisible[1] = bgIsVisible[2] = bgIsVisible[3] = !bgIsVisible[0];
+
+            if( event.key.keysym.scancode == SDL_SCANCODE_F6 ) isInverted = !isInverted;
+            if( event.key.keysym.scancode == SDL_SCANCODE_F7 ) isEased    = !isEased;
+            if( event.key.keysym.scancode == SDL_SCANCODE_F8 ) isFlux     = !isFlux;
+
+            return true; // Not 100% correct
+        }
+        else if( (event.type == SDL_MOUSEBUTTONDOWN)
+                 || (event.type == SDL_MOUSEMOTION && event.motion.state != 0) )
+        {
+            Point windowSize;
+            SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
+
+            const FPoint halfWinSize = toF( windowSize / 2 );
+            const FPoint mousePos    = { (float) event.motion.x, (float) event.motion.y };
+
+            mouseOffset = isInverted
+                          ? halfWinSize - mousePos
+                          : mousePos - halfWinSize;
+
+            return true;
+        }
+        else if( event.type == SDL_MOUSEBUTTONUP )
+        {
+            mouseOffset = { 0, 0 };
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool TdState::Input()
+    {
+        const u8 *  key_array = SDL_GetKeyboardState( nullptr );
+        const float factor    = key_array[SDL_SCANCODE_RSHIFT]
+                                ? 600.f
+                                : 80.0f;
+
+        // Reset direction
+        dir = { 0, 0 };
+        if( key_array[SDL_SCANCODE_LEFT]  ) dir.x += factor;
+        if( key_array[SDL_SCANCODE_RIGHT] )	dir.x -= factor;
+
+        if( key_array[SDL_SCANCODE_UP]    ) dir.y += factor;
+        if( key_array[SDL_SCANCODE_DOWN]  ) dir.y -= factor;
+
+        return false;
+    }
+
+    void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
+    {
+        //cam += dir * deltaT;
+/*
+	if( isEased )
 	{
-		case SDL_MOUSEWHEEL:
-			brightness += event.wheel.y*3;
-			return true;
+		SDL_FPoint diff = (mouseOffset - mouseOffsetEased);
+
+		//constexpr const float thresh = 20.0f; // 1.2f;
+		//if( -thresh < diff.x && diff.x < thresh ) diff.x = 0;
+		//if( -thresh < diff.y && diff.y < thresh ) diff.y = 0;
+
+		//constexpr const float thresh = 2.2f;
+		//if( -thresh < diff.x && diff.x < thresh ) { mouseOffsetEased.x = mouseOffset.x; diff.x = 0; }
+		//if( -thresh < diff.y && diff.y < thresh ) { mouseOffsetEased.y = mouseOffset.y; diff.y = 0; }
+
+		mouseOffsetEased += diff * max( 0.1f, min( 0.4f, deltaT * 10.0f ) );
 	}
-
-	return false;
-}
-
-bool PlasmaState::Input()
-{
-	// Is not supressed during ImGui input
-	const u8 * key_array = SDL_GetKeyboardState( nullptr );
-	if( key_array[SDL_SCANCODE_DOWN] )
+	else
 	{
-		brightness -= 1;
-	}
-	if( key_array[SDL_SCANCODE_UP] ) // Not an else-if, as both buttons can be held at the same time
-	{
-		brightness += 1;
-	}
+		mouseOffsetEased = mouseOffset;
+	}*/
+    }
 
-	return false;
-}
+    FPoint TdState::CalcFluxCam(const u64 totalMSec ) const
+    {
+        const FPoint flux = isFlux
+                            ? FPoint {
+                        .x = (float)sin( totalMSec / 650.0f ) * 5.0f,
+                        .y = (float)sin( totalMSec / 500.0f ) * 10.0f
+                             + (float)sin( totalMSec / 850.0f ) * 5.0f
+                             + (float)cos( totalMSec / 1333.0f ) * 5.0f }
+                            : FPoint { 0, 0 };
+        const FPoint fluxCam = cam + flux + mouseOffsetEased;
+        return fluxCam;
+    }
 
-static inline float plasma(float x, float y, float time)
-{
-	const float cx = x * 0.1f + 0.5f * sin( time / 5.0f );
-	const float cy = y * 0.1f + 0.5f * cos( time / 3.0f );
-	float v = 0.0f;
-	v += sin( (x + time) );
-	v += sin( (y + time) / 2.0f );
-	v += sin( (x + y + time) / 2.0f );
-	v += sin( sqrt( (cx * cx + cy * cy) * 100.0f + 1.0f ) + time );
-	v = v / 2.0f;
-	return v;
-}
+    void TdState::Render(const u64 frame, u64 totalMSec, const f32 deltaT )
+    {
+        // Try the limits, moments before wraparound
+        //totalMSec += 2147470000u + 2147480000u;
+        Point windowSize;
+        SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
+        cash = 400;
+        std::cout << cash << std::endl;
+        //const FPoint fluxCam = CalcFluxCam( totalMSec );
 
-void PlasmaState::Update( const u64 frame, const u64 totalMSec, const f32 deltaT )
-{
-	u8 *        px       = (u8 *)plasmaSrf->pixels;
-	const int   pitch    = plasmaSrf->pitch;
-	const int   h        = plasmaSrf->h;
-	const int   w        = plasmaSrf->w;
-	const float xy_scale = Scale * 0.015f;
-	const float xy_frame = (float)frame * 0.05f;
-#pragma omp parallel
-#pragma omp for
-	for( int y = 0; y < h; ++y )
-	{
-		for( int x = 0; x < w; ++x )
-		{
-			const float v = plasma( (x - w / 2) * xy_scale, (y - h / 2) * xy_scale, xy_frame );
-			const int offset = x * 4 + y * pitch;
-			px[offset + 0] = std::max<int>( 0, std::min<int>( 255, 4 * brightness * (.5f + .5f * sin( M_PI * v )) + brightness - 64 ) );
-			px[offset + 1] = std::max<int>( 0, std::min<int>( 255, 4 * brightness * (.5f + .5f * cos( M_PI * v )) + brightness - 64 ) );
-			px[offset + 2] = std::max<int>( 0, std::min<int>( 255, 4 * brightness - 255 ) );
-			px[offset + 3] = 255;
-		}
-	}
-}
+        for( int i = 0; i <= 3; ++i ) // The 4 layers, rendered back to front
+        {
+            RenderLayer( windowSize, cam, i );
+        }
+    }
 
-void PlasmaState::Render( const u64 frame, const u64 totalMSec, const f32 deltaT )
-{
-	// Draw the plasma
-	{
-		SDL_UpdateTexture( plasmaTex, EntireRect, plasmaSrf->pixels, plasmaSrf->pitch );
-		const Rect dst_rect { 0, 0, plasmaSrf->w * Scale, plasmaSrf->h * Scale };
-		SDL_RenderCopy( renderer(), plasmaTex, EntireRect, &dst_rect );
-	}
+    void TdState::RenderLayer(const Point windowSize, const FPoint camPos, const int index ) const
+    {
+        if( !bgIsVisible[index] )
+            return;
+        SDL_RenderCopy( renderer(), bg[index], EntireRect, nullptr );
+        //const Point size = bgSize[index];
+        //const FPoint offset = bgStart[index] + camPos * bgFactor[index];
+        //for( float x = offset.x; x < windowSize.x; x += size.x * 2 )
+        //{
+        //	for( float y = offset.y; y < windowSize.y; y += size.y * 2 )
+        //	{
+        //		Rect off = { .x = (int)x, .y = (int)y, .w = size.x * 2, .h = size.y * 2 };
 
-	Point windowSize;
-	SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
 
-	// Prepare the text as Texture
-	if( blendedText == nullptr )
-	{
-		constexpr const char * text =
-			"Use mouse-wheel or [DOWN] and [UP] arrow keys\n"
-			"                to change the brightness\n"
-			"                  of the plasma effect!";
-
-		if( blendedText != nullptr )
-			SDL_DestroyTexture( blendedText );
-
-		constexpr const Color white = HSNR64::Palette( HSNR64::NamedColorIndex::White );
-		Surface * surf = TTF_RenderUTF8_Blended_Wrapped( font, text, white, windowSize.x - 30 );
-		blendedText = SDL_CreateTextureFromSurface( renderer(), surf );
-		SDL_FreeSurface( surf );
-
-		u32 fmt;
-		int access;
-		SDL_QueryTexture( blendedText, &fmt, &access, &blendedTextSize.x, &blendedTextSize.y );
-	}
-
-	// Draw the text on top
-	{
-		const Point p {
-			windowSize.x / 5,
-			windowSize.y - 150
-		};
-
-		SDL_SetTextureColorMod( blendedText, 0, 0, 0 );
-		for( const Point & offset : HSNR64::ShadowOffset::Rhombus )
-		{
-			const Rect dst_rect = Rect{p.x, p.y, blendedTextSize.x, blendedTextSize.y } + (offset * 2);
-			SDL_RenderCopy( renderer(), blendedText, EntireRect, &dst_rect );
-		}
-
-		SDL_SetTextureColorMod( blendedText, 255, 255, 255 );
-		const Rect dst_rect = p + Rect{ 0, 0, blendedTextSize.x, blendedTextSize.y };
-		SDL_RenderCopy( renderer(), blendedText, EntireRect, &dst_rect );
-	}
-}
+        // Makes only sense with texture hint == best
+        //FRect offset = { .x = x, .y = y, .w = size.x * 2.0f, .h = size.y * 2.0f };
+        //SDL_RenderCopyF( renderer, bg[i], EntireRect, &offset );
+        //	}
+        //}
+    }
 
 } // namespace
