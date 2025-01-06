@@ -39,6 +39,46 @@ namespace JanSordid::SDL_Example
 		// ctor
 		using Base::Base;
         int cash;
+
+		class Tower {
+			public:
+				Rect * _placement = nullptr;
+				Texture * _texture = nullptr;
+
+				Tower(Rect * placement, Texture * texture);
+				void shoot();
+		};
+
+		class Projectile {
+			public:
+				int _damage;
+				int _velocity;
+				bool _isVisible;
+
+				Projectile(Rect * position, Texture * texture, int damage, int velocity);
+
+				Rect * _position = nullptr;
+				Texture * _texture = nullptr;
+
+				void move();
+		};
+
+		class Enemy {
+			int _hp;
+			int _speed;
+			bool _isAlive;
+
+			Rect * _position = nullptr;
+			Texture * _texture = nullptr;
+
+			Enemy(Rect * position, Texture * texture, int damage, int velocity);
+			void move();
+			bool isHit(Projectile projectile);
+		};
+
+		std::vector<Tower> _towers;
+		std::vector<Projectile> _projectiles;
+		std::vector<Enemy> _enemies;
 	};
 
 	class MyGame final : public SDL::Game<MyGameState,MyGS>
@@ -127,6 +167,19 @@ namespace JanSordid::SDL_Example
         bool isFlux     = true;
         FPoint dir      = { 0, 0 };
         FPoint cam      = { 0, 0 };
+
+    	//Eigener Stuff:
+    	Texture * enemyPathTile = nullptr;
+    	Texture * grasTile = nullptr;
+    	Texture * towerSlot = nullptr;
+    	Texture * towerTexture = nullptr;
+    	Texture * enemy = nullptr;
+
+    	static constexpr int gridWidth = 40;
+    	static constexpr int gridHeight = 22;
+    	static constexpr int tileSize = 16;
+
+    	Rect * map[gridHeight][gridWidth];
 
     public:
         // ctor

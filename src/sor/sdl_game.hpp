@@ -78,6 +78,7 @@ namespace JanSordid::SDL
 		/// Getters & Setters: non-virtual first, followed by (pure) virtual/override
 		[[nodiscard]] Window   * window()   const noexcept { return _game.window();   }
 		[[nodiscard]] Renderer * renderer() const noexcept { return _game.renderer(); }
+		[[nodiscard]] f32 scalingFactor() const noexcept { return _game.scalingFactor(); }
 	};
 
 	// abstract, pseudo interface (contains fields)

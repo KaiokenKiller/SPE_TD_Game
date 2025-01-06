@@ -3,6 +3,27 @@
 
 namespace JanSordid::SDL_Example {
 
+    MyGameState::Projectile::Projectile(Rect * position, Texture * texture, int damage, int velocity) {
+        _isVisible = true;
+        _position = position;
+        _texture = texture;
+        _damage = damage;
+        _velocity = velocity;
+    }
+
+   MyGameState::Tower::Tower(Rect *placement, Texture *texture) {
+        _placement = placement;
+        _texture = texture;
+   }
+
+    MyGameState::Enemy::Enemy(Rect *position, Texture *texture, int hp, int speed) {
+        _isAlive = true;
+        _position = position;
+        _texture = texture;
+        _hp = hp;
+        _speed = speed;
+    }
+
     void TdState::Init()
     {
         Base::Init();
@@ -15,6 +36,8 @@ namespace JanSordid::SDL_Example {
             bg[1] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-3.png" );
             bg[2] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-2.png" );
             bg[3] = IMG_LoadTexture( renderer(), BasePathGraphic "bg-layer-1.png" );
+
+
 
             SDL_QueryTexture( bg[0], nullptr, nullptr, &bgSize[0].x, &bgSize[0].y );
             SDL_QueryTexture( bg[1], nullptr, nullptr, &bgSize[1].x, &bgSize[1].y );
@@ -32,8 +55,42 @@ namespace JanSordid::SDL_Example {
             SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "nearest" );
         }
 
+        if( !enemyPathTile ) {
+            enemyPathTile = IMG_LoadTexture( renderer(), BasePathGraphic "/Floor/enemy_path_tile.png" );
+        }
+        if( !grasTile ) {
+            grasTile = IMG_LoadTexture( renderer(), BasePathGraphic "/Floor/grass_tile.png" );
+        }
+        if( !towerTexture ) {
+            towerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png" );
+        }
+        if( !enemy ) {
+            enemy = IMG_LoadTexture( renderer(), BasePathGraphic "/Enemies/slime_walk.png" );
+        }
+
+        for( int i = 0; i < gridHeight; i++ ) {
+            for ( int j = 0; j < gridWidth; j++ ) {
+                Rect * temp = new Rect(
+                    j * tileSize * scalingFactor(),
+                    i * tileSize * scalingFactor(),
+                    tileSize * scalingFactor(),
+                    tileSize * scalingFactor()
+                    );
+                map[i][j] = temp;
+            }
+        }
+
         // Reinit on reenter
         cam = { .x = 0, .y = 0 };
+
+        Rect * temp = new Rect(
+            20 * tileSize * scalingFactor(),
+            9 * tileSize * scalingFactor(),
+            tileSize * scalingFactor(),
+            tileSize * scalingFactor()
+            );
+
+        Tower tempTower = Tower(temp, towerTexture);
     }
 
     void TdState::Destroy()
@@ -150,13 +207,24 @@ namespace JanSordid::SDL_Example {
         //totalMSec += 2147470000u + 2147480000u;
         Point windowSize;
         SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
-        cash = 400;
-        std::cout << cash << std::endl;
         //const FPoint fluxCam = CalcFluxCam( totalMSec );
 
         for( int i = 0; i <= 3; ++i ) // The 4 layers, rendered back to front
         {
-            RenderLayer( windowSize, cam, i );
+            //RenderLayer( windowSize, cam, i );
+        }
+
+        for( int i = 0; i < gridHeight; i++ ) {
+            for ( int j = 0; j < gridWidth; j++ ) {
+
+                if( i == gridHeight / 2 ) {
+                    SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, map[i][j] );
+                }
+            }
+        }
+
+        for (auto element: _towers) {
+            SDL_RenderCopy(renderer(), element._texture, )
         }
     }
 
