@@ -29,7 +29,26 @@ namespace JanSordid::SDL_Example
         Invalid
 	};
 
+    struct BuildingGUI {
+        SDL_Window* window = nullptr;
+        SDL_Renderer* renderer = nullptr;
+        TTF_Font* font = nullptr;
 
+        SDL_Texture* textTexture;
+        SDL_Rect textRect = {};
+        SDL_Texture* goldTexture;
+        SDL_Rect goldRect = {};
+
+        SDL_Rect exitButton = {10, 10, 60, 30};
+        bool shouldClose = false;
+
+        const char* title;
+    };
+
+    struct GameData {
+        int gold = 0;
+        //TODO Add Tower Data
+    };
 	// abstract
 	class MyGameState : public SDL::GameState<MyGame>
 	{
@@ -38,6 +57,7 @@ namespace JanSordid::SDL_Example
 	public:
 		// ctor
 		using Base::Base;
+
         int cash;
 
 class Projectile {
@@ -101,6 +121,7 @@ class Projectile {
 		std::vector<Tower*> _towers;
 		std::vector<Projectile*> _projectiles;
 		std::vector<Enemy*> _enemies;
+
 	};
 
 	class MyGame final : public SDL::Game<MyGameState,MyGS>
@@ -109,7 +130,7 @@ class Projectile {
 
 	public:
 		MyGame();
-
+        GameData data;
 		bool HandleEvent( const Event & event ) override;
 	};
 
@@ -231,33 +252,19 @@ class Projectile {
 	protected:
 		Texture *    bg[4]      = { nullptr };
 		Point        bgSize[4]; // Is initialized in Init()
-		const FPoint bgStart[4] = {
-			{ 0,    -330 },
-			{ -350, -330 },
-			{ -450, -900 },
-			{ -800, -1500 },
-		};
-		const FPoint bgFactor[4] = {
-			{ 0.2f, 0.3f },
-			{ 0.4f, 0.45f },
-			{ 0.8f, 0.8f },
-			{ 1.2f, 1.2f },
-		};
 		bool bgIsVisible[4] = {
 			true,
 			true,
 			true,
 			true,
 		};
-		FPoint mouseOffset      = { 0, 0 };
-		FPoint mouseOffsetEased = { 0, 0 };
-
-		bool isInverted = false;
-		bool isEased    = true;
-		bool isFlux     = true;
-		FPoint dir      = { 0, 0 };
-		FPoint cam      = { 0, 0 };
-
+        SDL_Rect buildings[3];
+        const char* buildingTitles[3] = {
+                "Castle",
+                "Research",
+                "Mine"
+        };
+        BuildingGUI* gui = nullptr;
 	public:
 		// ctor
 		using Base::Base;
@@ -270,7 +277,12 @@ class Projectile {
 		void Update( u64 frame, u64 totalMSec, f32 deltaT ) override;
 		void Render( u64 frame, u64 totalMSec, f32 deltaT ) override;
 
-		FPoint CalcFluxCam(const u64 totalMSec) const;
-		void RenderLayer( const Point windowSize, const FPoint camPos, const int index) const;
+        void RenderLayer(const Point windowSize, int index) const;
+        void RenderBuildings(SDL_Renderer* renderer);
+        bool IsMouseOver (const SDL_Rect& rect, Point mouse);
+        BuildingGUI* OpenBuildingGUI(const char* windowTitle);
+        void HandleGUIEvent(const Event & event);
+        void UpdateGUI();
+        void RenderGUI();
 	};
 }

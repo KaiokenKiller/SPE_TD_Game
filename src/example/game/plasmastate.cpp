@@ -156,6 +156,30 @@ namespace JanSordid::SDL_Example {
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
     {
 
+        std::cout << _game.data.gold << std::endl;
+        //cam += dir * deltaT;
+/*
+	if( isEased )
+	{
+		SDL_FPoint diff = (mouseOffset - mouseOffsetEased);
+
+		//constexpr const float thresh = 20.0f; // 1.2f;
+		//if( -thresh < diff.x && diff.x < thresh ) diff.x = 0;
+		//if( -thresh < diff.y && diff.y < thresh ) diff.y = 0;
+
+		//constexpr const float thresh = 2.2f;
+		//if( -thresh < diff.x && diff.x < thresh ) { mouseOffsetEased.x = mouseOffset.x; diff.x = 0; }
+		//if( -thresh < diff.y && diff.y < thresh ) { mouseOffsetEased.y = mouseOffset.y; diff.y = 0; }
+
+		mouseOffsetEased += diff * max( 0.1f, min( 0.4f, deltaT * 10.0f ) );
+	}
+	else
+	{
+		mouseOffsetEased = mouseOffset;
+	}*/
+    }
+
+
     }
 
 

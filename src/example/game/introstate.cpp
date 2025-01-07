@@ -140,7 +140,6 @@ namespace JanSordid::SDL_Example
 	{
 		Point windowSize;
 		SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
-        std::cout << cash << std::endl;
 		{
 			const Rect dst_rect = { 0, 0, windowSize.x, windowSize.y };
 			SDL_RenderCopy( renderer(), _image, EntireRect, &dst_rect /* same result as EntireRect */ );
