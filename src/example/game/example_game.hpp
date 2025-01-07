@@ -7,194 +7,208 @@
 //#include <autocast_ptr.h>
 //#include <sor/tiles.h>
 
-namespace JanSordid::SDL_Example
-{
-	using namespace JanSordid;
-	using namespace JanSordid::SDL;
+namespace JanSordid::SDL_Example {
+    using namespace JanSordid;
+    using namespace JanSordid::SDL;
 
-	class MyGame;
-	class MyGameState;
+    class MyGame;
 
-	class IntroState;
-	class TdState;
-	class OverworldState;
+    class MyGameState;
 
-	// MyGameState-Index
-	// Why not in the classes themselves? For reusability!
-	enum class MyGS : u8
-	{
-		Intro = 0,
-		TdState,
-		Overworld,
+    class IntroState;
+
+    class TdState;
+
+    class OverworldState;
+
+    // MyGameState-Index
+    // Why not in the classes themselves? For reusability!
+    enum class MyGS : u8 {
+        Intro = 0,
+        TdState,
+        Overworld,
         Invalid
-	};
+    };
 
     struct BuildingGUI {
-        SDL_Window* window = nullptr;
-        SDL_Renderer* renderer = nullptr;
-        TTF_Font* font = nullptr;
+        SDL_Window *window = nullptr;
+        SDL_Renderer *renderer = nullptr;
+        TTF_Font *font = nullptr;
 
-        SDL_Texture* textTexture;
+        SDL_Texture *textTexture;
         SDL_Rect textRect = {};
-        SDL_Texture* goldTexture;
+        SDL_Texture *goldTexture;
         SDL_Rect goldRect = {};
 
         SDL_Rect exitButton = {10, 10, 60, 30};
         bool shouldClose = false;
 
-        const char* title;
+        const char *title;
     };
 
     struct GameData {
         int gold = 0;
         //TODO Add Tower Data
     };
-	// abstract
-	class MyGameState : public SDL::GameState<MyGame>
-	{
-		using Base = GameState;
 
-	public:
-		// ctor
-		using Base::Base;
+    // abstract
+    class MyGameState : public SDL::GameState<MyGame> {
+        using Base = GameState;
+
+    public:
+        // ctor
+        using Base::Base;
 
         int cash;
 
-class Projectile {
-			public:
-				int _damage;
-				int _velocity_x;
-				int _velocity_y;
-				bool _isVisible;
+        class Projectile {
+        public:
+            int _damage;
+            int _velocity_x;
+            int _velocity_y;
+            bool _isVisible;
 
-				Projectile(Rect * position, Texture * texture, int damage, int velocity_X, int velocity_Y);
+            Projectile(Rect *position, Texture *texture, int damage, int velocity_X, int velocity_Y);
 
-				Rect * _position = nullptr;
-				Texture * _texture = nullptr;
+            Rect *_position = nullptr;
+            Texture *_texture = nullptr;
 
-				void move();
-		};
+            void move();
+        };
 
-		class Enemy {
-		public:
+        class Enemy {
+        public:
 
-			int _hp;
-			int _speed;
-			bool _isAlive;
+            int _hp;
+            int _speed;
+            bool _isAlive;
 
-			Rect * _position = nullptr;
-			Rect * _textureSrcRect = nullptr;
-			Texture * _texture = nullptr;
+            Rect *_position = nullptr;
+            Rect *_textureSrcRect = nullptr;
+            Texture *_texture = nullptr;
 
-			Enemy(Rect * position, Texture * texture, int hp, int speed);
-			void move();
-			bool isHit(Projectile projectile);
-		};
+            Enemy(Rect *position, Texture *texture, int hp, int speed);
 
-		class Tower {
-			public:
-				enum class TowerType	{Archer1,Archer2_P1,Archer2_P2,Archer3_P1,Archer3_P2,
-										Mage1,Mage2_P1,Mage2_P2,Mage3_P1,Mage3_P2,
-										Catapult1,Catapult2_P1,Catapult2_P2,Catapult3_P1,Catapult3_P2};
-				TowerType type = TowerType::Archer1;
-				Rect * _position = nullptr;
-				Texture * _texture = nullptr;
-				int _attackDamage = 0;
-				int _attackSpeed = 0;
-				int _attackRange = 0;
-				int _cooldown = 0;
+            void move();
 
-				Tower(Rect * placement, Texture * texture);
-				virtual ~Tower() = default;
-				virtual void shoot(Rect * enemyPosition) = 0;
-		};
+            bool isHit(Projectile projectile);
+        };
 
-		class TowerArcher1 : public Tower {
-			public:
+        class Tower {
+        public:
+            enum class TowerType {
+                Archer1, Archer2_P1, Archer2_P2, Archer3_P1, Archer3_P2,
+                Mage1, Mage2_P1, Mage2_P2, Mage3_P1, Mage3_P2,
+                Catapult1, Catapult2_P1, Catapult2_P2, Catapult3_P1, Catapult3_P2
+            };
+            TowerType type = TowerType::Archer1;
+            Rect *_position = nullptr;
+            Texture *_texture = nullptr;
+            int _attackDamage = 0;
+            int _attackSpeed = 0;
+            int _attackRange = 0;
+            int _cooldown = 0;
 
-			TowerArcher1(Rect * placement, Texture * texture);
-			void shoot(Rect * enemyPosition) override;
-		};
+            Tower(Rect *placement, Texture *texture);
+
+            virtual ~Tower() = default;
+
+            virtual void shoot(Rect *enemyPosition) = 0;
+        };
+
+        class TowerArcher1 : public Tower {
+        public:
+
+            TowerArcher1(Rect *placement, Texture *texture);
+
+            void shoot(Rect *enemyPosition) override;
+        };
 
 
+        std::vector<Tower *> _towers;
+        std::vector<Projectile *> _projectiles;
+        std::vector<Enemy *> _enemies;
 
-		std::vector<Tower*> _towers;
-		std::vector<Projectile*> _projectiles;
-		std::vector<Enemy*> _enemies;
+    };
 
-	};
+    class MyGame final : public SDL::Game<MyGameState, MyGS> {
+        using Base = Game;
 
-	class MyGame final : public SDL::Game<MyGameState,MyGS>
-	{
-		using Base = Game;
+    public:
+        MyGame();
 
-	public:
-		MyGame();
         GameData data;
-		bool HandleEvent( const Event & event ) override;
-	};
+
+        bool HandleEvent(const Event &event) override;
+    };
 
 
-	class IntroState final : public MyGameState
-	{
-		using Base = MyGameState;
-
-	protected:
-		Owned<Font>    _font        = nullptr;
-		Owned<Texture> _image       = nullptr;
-		Owned<Music>   _music       = nullptr;
-		Owned<Chunk>   _sound       = nullptr;
-		Owned<Texture> _blendedText = nullptr;
-
-		Point _blendedTextSize = { 0, 0 };
-		u8    _textmode        = 0;
-
-		// Testvars controlled by ImGui
-		Point _p             = { 32, 50 };
-		int   _colorIndex    = 9;
-		bool  _isDarkOutline = true;
-
-		static constexpr const Color white { 255, 255, 255, SDL_ALPHA_OPAQUE };
-		static constexpr const Color black {   0,   0,   0, SDL_ALPHA_OPAQUE };
-
-	public:
-		/// Ctors & Dtor
-		using Base::Base;
-
-		/// Getters & Setters: non-virtual first, followed by (pure) virtual/override
-		[[nodiscard]] constexpr Color clearColor() const noexcept override { return Color { 255, 255, 255, SDL_ALPHA_OPAQUE }; }
-
-		/// Methods: non-virtual first, followed by (pure) virtual/override
-		void Init()                     override;
-		void Enter( bool isStacking )   override;
-		void Exit( bool isStackedUpon ) override;
-		void Destroy()                  override;
-
-		bool HandleEvent( const Event & event ) override;
-		void Update( u64 frame, u64 totalMSec, f32 deltaT ) override;
-		void Render( u64 frame, u64 totalMSec, f32 deltaT ) override;
-		ImGuiOnly(
-			void RenderUI( u64 framesSinceStart, u64 msSinceStart, f32 deltaTNeeded ) override;)
-	};
-
-    class TdState : public MyGameState
-    {
+    class IntroState final : public MyGameState {
         using Base = MyGameState;
 
     protected:
-        Texture *    bg[4]      = { nullptr };
-        Point        bgSize[4]; // Is initialized in Init()
+        Owned<Font> _font = nullptr;
+        Owned<Texture> _image = nullptr;
+        Owned<Music> _music = nullptr;
+        Owned<Chunk> _sound = nullptr;
+        Owned<Texture> _blendedText = nullptr;
+
+        Point _blendedTextSize = {0, 0};
+        u8 _textmode = 0;
+
+        // Testvars controlled by ImGui
+        Point _p = {32, 50};
+        int _colorIndex = 9;
+        bool _isDarkOutline = true;
+
+        static constexpr const Color white{255, 255, 255, SDL_ALPHA_OPAQUE};
+        static constexpr const Color black{0, 0, 0, SDL_ALPHA_OPAQUE};
+
+    public:
+        /// Ctors & Dtor
+        using Base::Base;
+
+        /// Getters & Setters: non-virtual first, followed by (pure) virtual/override
+        [[nodiscard]] constexpr Color clearColor() const noexcept override {
+            return Color{255, 255, 255, SDL_ALPHA_OPAQUE};
+        }
+
+        /// Methods: non-virtual first, followed by (pure) virtual/override
+        void Init() override;
+
+        void Enter(bool isStacking) override;
+
+        void Exit(bool isStackedUpon) override;
+
+        void Destroy() override;
+
+        bool HandleEvent(const Event &event) override;
+
+        void Update(u64 frame, u64 totalMSec, f32 deltaT) override;
+
+        void Render(u64 frame, u64 totalMSec, f32 deltaT) override;
+
+        ImGuiOnly(
+                void RenderUI(u64 framesSinceStart, u64 msSinceStart, f32 deltaTNeeded) override;)
+    };
+
+    class TdState : public MyGameState {
+        using Base = MyGameState;
+
+    protected:
+        Texture *bg[4] = {nullptr};
+        Point bgSize[4]; // Is initialized in Init()
         const FPoint bgStart[4] = {
-                { 0,    -330 },
-                { -350, -330 },
-                { -450, -900 },
-                { -800, -1500 },
+                {0,    -330},
+                {-350, -330},
+                {-450, -900},
+                {-800, -1500},
         };
         const FPoint bgFactor[4] = {
-                { 0.2f, 0.3f },
-                { 0.4f, 0.45f },
-                { 0.8f, 0.8f },
-                { 1.2f, 1.2f },
+                {0.2f, 0.3f},
+                {0.4f, 0.45f},
+                {0.8f, 0.8f},
+                {1.2f, 1.2f},
         };
         bool bgIsVisible[4] = {
                 true,
@@ -202,34 +216,33 @@ class Projectile {
                 true,
                 true,
         };
-        FPoint mouseOffset      = { 0, 0 };
-        FPoint mouseOffsetEased = { 0, 0 };
+        FPoint mouseOffset = {0, 0};
+        FPoint mouseOffsetEased = {0, 0};
 
         bool isInverted = false;
-        bool isEased    = true;
-        bool isFlux     = true;
-        FPoint dir      = { 0, 0 };
-        FPoint cam      = { 0, 0 };
+        bool isEased = true;
+        bool isFlux = true;
+        FPoint dir = {0, 0};
+        FPoint cam = {0, 0};
 
-    	//Eigener Stuff:
+        //Eigener Stuff:
 
 
 
-    	Texture * enemyPathTile	= nullptr;
-    	Texture * grassTile		= nullptr;
-    	Texture * towerSlot		= nullptr;
-    	Texture * towerTexture	= nullptr;
-    	Texture * enemyTexture			= nullptr;
+        Texture *enemyPathTile = nullptr;
+        Texture *grassTile = nullptr;
+        Texture *towerSlot = nullptr;
+        Texture *towerTexture = nullptr;
+        Texture *enemyTexture = nullptr;
 
-    	static constexpr int gridWidth	= 40;
-    	static constexpr int gridHeight	= 22;
-    	static constexpr int tileSize	= 16;
-    	static constexpr int towerWidth	= 70;
-    	static constexpr int towerHeight	= 130;
+        static constexpr int gridWidth = 40;
+        static constexpr int gridHeight = 22;
+        static constexpr int tileSize = 16;
+        static constexpr int towerWidth = 70;
+        static constexpr int towerHeight = 130;
 
-    	Rect * tileMap[gridHeight][gridWidth]	= {nullptr};
-    	std::unordered_map<Tower::TowerType,Rect*> towerSrcRectMap;
-
+        Rect *tileMap[gridHeight][gridWidth] = {nullptr};
+        std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 
 
     public:
@@ -237,52 +250,65 @@ class Projectile {
         using Base::Base;
 
         void Init() override;
+
         void Destroy() override;
 
         bool Input() override;
-        bool HandleEvent( const Event & event ) override;
-        void Update( u64 frame, u64 totalMSec, f32 deltaT ) override;
-        void Render( u64 frame, u64 totalMSec, f32 deltaT ) override;
+
+        bool HandleEvent(const Event &event) override;
+
+        void Update(u64 frame, u64 totalMSec, f32 deltaT) override;
+
+        void Render(u64 frame, u64 totalMSec, f32 deltaT) override;
     };
 
-	class OverworldState : public MyGameState
-	{
-		using Base = MyGameState;
+    class OverworldState : public MyGameState {
+        using Base = MyGameState;
 
-	protected:
-		Texture *    bg[4]      = { nullptr };
-		Point        bgSize[4]; // Is initialized in Init()
-		bool bgIsVisible[4] = {
-			true,
-			true,
-			true,
-			true,
-		};
+    protected:
+        Texture *bg[4] = {nullptr};
+        Point bgSize[4]; // Is initialized in Init()
+        bool bgIsVisible[4] = {
+                true,
+                true,
+                true,
+                true,
+        };
         SDL_Rect buildings[3];
-        const char* buildingTitles[3] = {
+        const char *buildingTitles[3] = {
                 "Castle",
                 "Research",
                 "Mine"
         };
-        BuildingGUI* gui = nullptr;
-	public:
-		// ctor
-		using Base::Base;
+        BuildingGUI *gui = nullptr;
+    public:
+        // ctor
+        using Base::Base;
 
-		void Init() override;
-		void Destroy() override;
+        void Init() override;
 
-		bool Input() override;
-		bool HandleEvent( const Event & event ) override;
-		void Update( u64 frame, u64 totalMSec, f32 deltaT ) override;
-		void Render( u64 frame, u64 totalMSec, f32 deltaT ) override;
+        void Destroy() override;
+
+        bool Input() override;
+
+        bool HandleEvent(const Event &event) override;
+
+        void Update(u64 frame, u64 totalMSec, f32 deltaT) override;
+
+        void Render(u64 frame, u64 totalMSec, f32 deltaT) override;
 
         void RenderLayer(const Point windowSize, int index) const;
-        void RenderBuildings(SDL_Renderer* renderer);
-        bool IsMouseOver (const SDL_Rect& rect, Point mouse);
-        BuildingGUI* OpenBuildingGUI(const char* windowTitle);
-        void HandleGUIEvent(const Event & event);
+
+        void RenderBuildings(SDL_Renderer *renderer);
+
+        bool IsMouseOver(const SDL_Rect &rect, Point mouse);
+
+        BuildingGUI *OpenBuildingGUI(const char *windowTitle);
+
+        void HandleGUIEvent(const Event &event);
+
         void UpdateGUI();
+
         void RenderGUI();
-	};
+    };
 }
