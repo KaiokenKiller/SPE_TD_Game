@@ -39,6 +39,68 @@ namespace JanSordid::SDL_Example
 		// ctor
 		using Base::Base;
         int cash;
+
+class Projectile {
+			public:
+				int _damage;
+				int _velocity_x;
+				int _velocity_y;
+				bool _isVisible;
+
+				Projectile(Rect * position, Texture * texture, int damage, int velocity_X, int velocity_Y);
+
+				Rect * _position = nullptr;
+				Texture * _texture = nullptr;
+
+				void move();
+		};
+
+		class Enemy {
+		public:
+
+			int _hp;
+			int _speed;
+			bool _isAlive;
+
+			Rect * _position = nullptr;
+			Rect * _textureSrcRect = nullptr;
+			Texture * _texture = nullptr;
+
+			Enemy(Rect * position, Texture * texture, int hp, int speed);
+			void move();
+			bool isHit(Projectile projectile);
+		};
+
+		class Tower {
+			public:
+				enum class TowerType	{Archer1,Archer2_P1,Archer2_P2,Archer3_P1,Archer3_P2,
+										Mage1,Mage2_P1,Mage2_P2,Mage3_P1,Mage3_P2,
+										Catapult1,Catapult2_P1,Catapult2_P2,Catapult3_P1,Catapult3_P2};
+				TowerType type = TowerType::Archer1;
+				Rect * _position = nullptr;
+				Texture * _texture = nullptr;
+				int _attackDamage = 0;
+				int _attackSpeed = 0;
+				int _attackRange = 0;
+				int _cooldown = 0;
+
+				Tower(Rect * placement, Texture * texture);
+				virtual ~Tower() = default;
+				virtual void shoot(Rect * enemyPosition) = 0;
+		};
+
+		class TowerArcher1 : public Tower {
+			public:
+
+			TowerArcher1(Rect * placement, Texture * texture);
+			void shoot(Rect * enemyPosition) override;
+		};
+
+
+
+		std::vector<Tower*> _towers;
+		std::vector<Projectile*> _projectiles;
+		std::vector<Enemy*> _enemies;
 	};
 
 	class MyGame final : public SDL::Game<MyGameState,MyGS>
@@ -128,6 +190,27 @@ namespace JanSordid::SDL_Example
         FPoint dir      = { 0, 0 };
         FPoint cam      = { 0, 0 };
 
+    	//Eigener Stuff:
+
+
+
+    	Texture * enemyPathTile	= nullptr;
+    	Texture * grassTile		= nullptr;
+    	Texture * towerSlot		= nullptr;
+    	Texture * towerTexture	= nullptr;
+    	Texture * enemyTexture			= nullptr;
+
+    	static constexpr int gridWidth	= 40;
+    	static constexpr int gridHeight	= 22;
+    	static constexpr int tileSize	= 16;
+    	static constexpr int towerWidth	= 70;
+    	static constexpr int towerHeight	= 130;
+
+    	Rect * tileMap[gridHeight][gridWidth]	= {nullptr};
+    	std::unordered_map<Tower::TowerType,Rect*> towerSrcRectMap;
+
+
+
     public:
         // ctor
         using Base::Base;
@@ -139,9 +222,6 @@ namespace JanSordid::SDL_Example
         bool HandleEvent( const Event & event ) override;
         void Update( u64 frame, u64 totalMSec, f32 deltaT ) override;
         void Render( u64 frame, u64 totalMSec, f32 deltaT ) override;
-
-        FPoint CalcFluxCam(const u64 totalMSec) const;
-        void RenderLayer( const Point windowSize, const FPoint camPos, const int index) const;
     };
 
 	class OverworldState : public MyGameState
