@@ -109,6 +109,7 @@ namespace JanSordid::SDL_Example {
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
     {
+        std::cout << _game.data.gold << std::endl;
         //cam += dir * deltaT;
 /*
 	if( isEased )
@@ -150,8 +151,6 @@ namespace JanSordid::SDL_Example {
         //totalMSec += 2147470000u + 2147480000u;
         Point windowSize;
         SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
-        cash = 400;
-        std::cout << cash << std::endl;
         //const FPoint fluxCam = CalcFluxCam( totalMSec );
 
         for( int i = 0; i <= 3; ++i ) // The 4 layers, rendered back to front
