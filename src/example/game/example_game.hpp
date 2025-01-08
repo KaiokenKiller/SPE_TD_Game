@@ -100,7 +100,7 @@ namespace JanSordid::SDL_Example {
 
         virtual ~Tower() = default;
 
-        virtual void shoot(Rect *enemyPosition) = 0;
+        virtual Projectile * shoot(Rect *enemyPosition) = 0;
     };
 
     class TowerArcher1 : public Tower {
@@ -108,7 +108,7 @@ namespace JanSordid::SDL_Example {
 
         TowerArcher1(Rect *placement, Texture *texture);
 
-        void shoot(Rect *enemyPosition) override;
+        Projectile * shoot(Rect *enemyPosition) override;
     };
 
     struct GameData {

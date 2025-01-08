@@ -5,9 +5,9 @@
 
 namespace JanSordid::SDL_Example {
 
-    Projectile::Projectile(Rect * position, Texture * texture, int damage, int velocity_X, int velocity_Y) {
+    Projectile::Projectile(Rect * startPosition, Texture * texture, int damage, int velocity_X, int velocity_Y) {
         _isVisible = true;
-        _position = position;
+        _position = startPosition;
         _texture = texture;
         _damage = damage;
         _velocity_x = velocity_X;
@@ -24,9 +24,9 @@ namespace JanSordid::SDL_Example {
         _attackRange = 2;
         _attackSpeed = 5;
     }
-    void TowerArcher1::shoot(Rect * enemyPosition) {
+    Projectile * TowerArcher1::shoot(Rect * enemyPosition) {
         //ToDo
-        //Projectile *projectile = new Projectile()
+		//Projectile * newProjectile = new Projectile(enemyPosition, );
     }
 
     Enemy::Enemy(Rect *position, Texture *texture, int hp, int speed) {
