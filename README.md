@@ -9,13 +9,25 @@
 - ~~Brainstorming~~
 - ~~Towers ausdenken~~
 - ~~grobes UML erstellen~~
-- Tower State implementieren
+Tower State implementieren
   - Basic Tower
+    - Schießen
   - Dummy Gegner
-  - Map
+    - move function
+  - Placement
+  - Projectiles
+  - Path
+  - ~~Map~~
 - Overworld State implementieren
   - Gebäude + GUI
-  - Ressourcen
+    - Burg macht nichts
+    - Researchbuilding 
+      - Liste alle locked Tower mit button zum "Kaufen"
+    - Mine
+      - Upgradebutton
+        - +1 gold pro level pro update tic
+  - ~~Ressourcen~~
+    - ~~Gold~~
 - Menu State implementieren
 
 ## Meetings

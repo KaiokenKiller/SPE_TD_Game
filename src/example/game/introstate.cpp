@@ -39,6 +39,8 @@ namespace JanSordid::SDL_Example
 			if( !_sound )
 				print( stderr, "Mix_LoadWAV failed: {}\n", Mix_GetError() );
 		}
+
+        _game.data.unlocks.insert(Tower::TowerType::Archer1);
 	}
 
 	void IntroState::Enter( bool stacking )
