@@ -39,8 +39,12 @@ namespace JanSordid::SDL_Example {
         SDL_Rect textRect = {};
         SDL_Texture *goldTexture;
         SDL_Rect goldRect = {};
+        SDL_Texture *upgradeTexture;
+        SDL_Rect upgradeRect = {};
+
 
         SDL_Rect exitButton = {10, 10, 60, 30};
+        SDL_Rect upgradeButton = {10, 170, 60, 30};
         bool shouldClose = false;
 
         const char *title;
@@ -112,6 +116,7 @@ namespace JanSordid::SDL_Example {
 
     struct GameData {
         int gold = 0;
+        int mineLevel = 1;
         std::unordered_set<Tower::TowerType> unlocks;
         std::vector<Tower *> _towers;
     };

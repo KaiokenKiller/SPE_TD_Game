@@ -31,9 +31,9 @@ namespace JanSordid::SDL_Example {
         Point windowSize;
         SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
 
-        buildings[0] = {50, windowSize.y - 300, 400, 200};
-        buildings[1] = {500, windowSize.y - 300, 300, 200};
-        buildings[2] = {1000, windowSize.y - 300, 200, 200};
+        buildings[0] = {50, windowSize.y - 250, 400, 200};
+        buildings[1] = {500, windowSize.y - 230, 300, 200};
+        buildings[2] = {1000, windowSize.y - 250, 200, 200};
     }
 
     void OverworldState::Destroy() {
@@ -76,7 +76,7 @@ namespace JanSordid::SDL_Example {
 
     void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
         std::cout << _game.data.gold << std::endl;
-        _game.data.gold += 1;
+        _game.data.gold += _game.data.mineLevel;
         if (gui != nullptr)
             UpdateGUI();
     }
@@ -180,6 +180,17 @@ namespace JanSordid::SDL_Example {
                     bgui->goldRect = {20, 120, goldSurf->w, goldSurf->h}; // place the text
                     SDL_FreeSurface(goldSurf);
                 }
+                std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
+                const char *c_upgradeString = upgradeString.c_str();
+                SDL_Surface *upgradeSurf = TTF_RenderText_Blended(bgui->font, c_upgradeString, white);
+                if (!upgradeSurf) {
+                    std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
+                } else {
+                    std::cout << "saving rects" << std::endl;
+                    bgui->upgradeTexture = SDL_CreateTextureFromSurface(bgui->renderer, upgradeSurf);
+                    bgui->upgradeRect = {20, 240, upgradeSurf->w, upgradeSurf->h}; // place the text
+                    SDL_FreeSurface(upgradeSurf);
+                }
             }
 
         }
@@ -199,8 +210,11 @@ namespace JanSordid::SDL_Example {
             if (event.button.windowID == SDL_GetWindowID(gui->window)) {
                 Point mouse = {event.button.x, event.button.y};
                 SDL_Rect & button = gui->exitButton;
+                SDL_Rect & upgradeButton = gui->upgradeButton;
                 if (IsMouseOver(button, mouse)) {
                     gui->shouldClose = true;
+                } else if (IsMouseOver(upgradeButton, mouse)){
+                    _game.data.mineLevel += 1;
                 }
             }
         }
@@ -212,6 +226,8 @@ namespace JanSordid::SDL_Example {
                 SDL_DestroyTexture(gui->textTexture);
             if (gui->goldTexture)
                 SDL_DestroyTexture(gui->goldTexture);
+            if (gui->upgradeTexture)
+                SDL_DestroyTexture(gui->upgradeTexture);
             if (gui->font)
                 TTF_CloseFont(gui->font);
             if (gui->renderer)
@@ -249,10 +265,28 @@ namespace JanSordid::SDL_Example {
                     SDL_FreeSurface(goldSurf);
                 }
 
-                // Now render the new gold texture
-                if (gui->goldTexture) {
-                    SDL_RenderCopy(gui->renderer, gui->goldTexture, nullptr, &gui->goldRect);
+                SDL_RenderCopy(gui->renderer, gui->goldTexture, nullptr, &gui->goldRect);
+
+            }
+
+            if (gui->upgradeTexture) {
+                SDL_DestroyTexture(gui->upgradeTexture);
+                gui->upgradeTexture = nullptr;
+                std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
+                const char *c_upgradeString = upgradeString.c_str();
+                SDL_Color white = {255, 255, 255, 255};
+                SDL_Surface *upgradeSurf = TTF_RenderText_Blended(gui->font, c_upgradeString, white);
+                if (!upgradeSurf) {
+                    std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
+                } else {
+                    gui->upgradeTexture = SDL_CreateTextureFromSurface(gui->renderer, upgradeSurf);
+                    gui->upgradeRect = {20, 240, upgradeSurf->w, upgradeSurf->h}; // place the text
+                    SDL_FreeSurface(upgradeSurf);
                 }
+
+
+                SDL_RenderCopy(gui->renderer, gui->upgradeTexture, nullptr, &gui->upgradeRect);
+
             }
 
             SDL_Rect button = gui->exitButton;
@@ -262,6 +296,15 @@ namespace JanSordid::SDL_Example {
             SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
             SDL_RenderDrawRect(gui->renderer, &button);
 
+
+            if (std::string(gui->title) == "Mine") {
+                SDL_Rect upgradeButton = gui->upgradeButton;
+                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+                SDL_RenderFillRect(gui->renderer, &upgradeButton);
+
+                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+                SDL_RenderDrawRect(gui->renderer, &upgradeButton);
+            }
             SDL_RenderPresent(gui->renderer);
         }
     }
