@@ -47,7 +47,6 @@ namespace JanSordid::SDL_Example {
     };
 
 
-
     class Projectile {
     public:
         int _damage;
@@ -232,6 +231,7 @@ namespace JanSordid::SDL_Example {
 
     protected:
         Texture *bg[4] = {nullptr};
+        Texture *buildingSprites[4] = {nullptr};
         Point bgSize[4]; // Is initialized in Init()
         bool bgIsVisible[4] = {
                 true,

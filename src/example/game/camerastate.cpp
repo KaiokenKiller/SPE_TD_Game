@@ -3,13 +3,11 @@
 
 namespace JanSordid::SDL_Example {
 
-    void OverworldState::Init()
-    {
+    void OverworldState::Init() {
         Base::Init();
         TTF_Init();
 
-        if (!bg[0])
-        {
+        if (!bg[0]) {
             bg[0] = IMG_LoadTexture(renderer(), BasePathGraphic "bg-layer-4.png");
             bg[1] = IMG_LoadTexture(renderer(), BasePathGraphic "bg-layer-3.png");
             bg[2] = IMG_LoadTexture(renderer(), BasePathGraphic "bg-layer-2.png");
@@ -23,25 +21,29 @@ namespace JanSordid::SDL_Example {
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
         }
 
+        if (!buildingSprites[0]) {
+            buildingSprites[0] = IMG_LoadTexture(renderer(), BasePathGraphic "Buildings/House_Hay_1.png");
+            buildingSprites[1] = IMG_LoadTexture(renderer(), BasePathGraphic "Buildings/House_Hay_2.png");
+            buildingSprites[2] = IMG_LoadTexture(renderer(), BasePathGraphic "Buildings/House_Hay_3.png");
+            buildingSprites[3] = IMG_LoadTexture(renderer(), BasePathGraphic "Buildings/House_Hay_4_Purple.png");
+        }
+
         Point windowSize;
         SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
 
-        buildings[0] = { 50, windowSize.y - 300, 400, 200 };
-        buildings[1] = { 500, windowSize.y - 300, 300, 200 };
-        buildings[2] = { 1000, windowSize.y - 300, 200, 200 };
+        buildings[0] = {50, windowSize.y - 300, 400, 200};
+        buildings[1] = {500, windowSize.y - 300, 300, 200};
+        buildings[2] = {1000, windowSize.y - 300, 200, 200};
     }
 
-    void OverworldState::Destroy()
-    {
+    void OverworldState::Destroy() {
         // TODO
         Base::Destroy();
         TTF_Quit();
     }
 
-    bool OverworldState::HandleEvent(const Event & event)
-    {
-        if (event.type == SDL_KEYDOWN && event.key.repeat == 0)
-        {
+    bool OverworldState::HandleEvent(const Event &event) {
+        if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
             if (event.key.keysym.scancode == SDL_SCANCODE_F1) bgIsVisible[0] = !bgIsVisible[0];
             if (event.key.keysym.scancode == SDL_SCANCODE_F2) bgIsVisible[1] = !bgIsVisible[1];
             if (event.key.keysym.scancode == SDL_SCANCODE_F3) bgIsVisible[2] = !bgIsVisible[2];
@@ -51,49 +53,41 @@ namespace JanSordid::SDL_Example {
                 bgIsVisible[0] = bgIsVisible[1] = bgIsVisible[2] = bgIsVisible[3] = !bgIsVisible[0];
 
             return true;
-        }  else if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            if (event.button.button == SDL_BUTTON_LEFT)
-            {
+        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
                 Point mouse = {event.button.x, event.button.y};
-                for (int i = 0; i < 3; ++i){
-                    if(IsMouseOver(buildings[i], mouse)){
-                        if(gui == nullptr)
+                for (int i = 0; i < 3; ++i) {
+                    if (IsMouseOver(buildings[i], mouse)) {
+                        if (gui == nullptr)
                             gui = OpenBuildingGUI(buildingTitles[i]);
                     }
                 }
             }
         }
-        if(gui != nullptr)
-        {
+        if (gui != nullptr) {
             HandleGUIEvent(event);
         }
         return false;
     }
 
-    bool OverworldState::Input()
-    {
+    bool OverworldState::Input() {
         return false;
     }
 
-    void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT)
-    {
+    void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
         std::cout << _game.data.gold << std::endl;
         _game.data.gold += 1;
-        if(gui != nullptr)
+        if (gui != nullptr)
             UpdateGUI();
     }
 
-    void OverworldState::Render(const u64 frame, u64 totalMSec, const f32 deltaT)
-    {
+    void OverworldState::Render(const u64 frame, u64 totalMSec, const f32 deltaT) {
         Point windowSize;
         SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
 
 
-        for (int i = 0; i < 4; ++i)
-        {
-            if (bgIsVisible[i])
-            {
+        for (int i = 0; i < 4; ++i) {
+            if (bgIsVisible[i]) {
                 RenderLayer(windowSize, i);
             }
         }
@@ -101,45 +95,37 @@ namespace JanSordid::SDL_Example {
         RenderBuildings(renderer());
         // Present the updated frame
         SDL_RenderPresent(renderer());
-        if(gui != nullptr){
+        if (gui != nullptr) {
             RenderGUI();
         }
     }
 
-    void OverworldState::RenderLayer(const Point /*windowSize*/, const int index) const
-    {
+    void OverworldState::RenderLayer(const Point /*windowSize*/, const int index) const {
         SDL_RenderCopy(renderer(), bg[index], EntireRect, nullptr);
     }
 
-    bool OverworldState::IsMouseOver (const SDL_Rect& rect, Point mouse){
+    bool OverworldState::IsMouseOver(const SDL_Rect &rect, Point mouse) {
         return mouse.x >= rect.x && mouse.x < (rect.x + rect.w) &&
                mouse.y >= rect.y && mouse.y < (rect.y + rect.h);
     }
 
-    void OverworldState::RenderBuildings(SDL_Renderer *renderer)
-    {
+    void OverworldState::RenderBuildings(SDL_Renderer *renderer) {
         Point mouse;
         SDL_GetMouseState(&mouse.x, &mouse.y);
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &buildings[0]);
-
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderFillRect(renderer, &buildings[1]);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        SDL_RenderFillRect(renderer, &buildings[2]);
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        for (int i= 0; i < 3; ++i){
-            if (IsMouseOver(buildings[i],mouse))
+        for (int i = 0; i < 3; ++i) {
+
+            SDL_RenderCopy(renderer, buildingSprites[i], nullptr, &buildings[i]);
+            
+            if (IsMouseOver(buildings[i], mouse))
                 SDL_RenderDrawRect(renderer, &buildings[i]);
         }
     }
 
-    BuildingGUI* OverworldState::OpenBuildingGUI(const char* windowTitle){
+    BuildingGUI *OverworldState::OpenBuildingGUI(const char *windowTitle) {
 
-        BuildingGUI* bgui = new BuildingGUI();
+        BuildingGUI *bgui = new BuildingGUI();
         bgui->title = windowTitle;
         bgui->shouldClose = false;
         bgui->window = SDL_CreateWindow(
@@ -149,7 +135,7 @@ namespace JanSordid::SDL_Example {
                 400,
                 300,
                 SDL_WINDOW_SHOWN
-                );
+        );
 
         if (!bgui->window) {
             std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
@@ -174,24 +160,24 @@ namespace JanSordid::SDL_Example {
         } else {
             // Render the title text as a texture
             SDL_Color white = {255, 255, 255, 255};
-            SDL_Surface* surf = TTF_RenderText_Blended(bgui->font, windowTitle, white);
+            SDL_Surface *surf = TTF_RenderText_Blended(bgui->font, windowTitle, white);
             if (!surf) {
                 std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
             } else {
                 bgui->textTexture = SDL_CreateTextureFromSurface(bgui->renderer, surf);
-                bgui->textRect = { 20, 60, surf->w, surf->h }; // place the text
+                bgui->textRect = {20, 60, surf->w, surf->h}; // place the text
                 SDL_FreeSurface(surf);
             }
-            if (std::string(windowTitle) == "Mine"){
+            if (std::string(windowTitle) == "Mine") {
                 std::cout << _game.data.gold << std::endl;
                 std::string goldString = "Current Gold: " + std::to_string(_game.data.gold);
-                const char* c_goldString = goldString.c_str();
-                SDL_Surface* goldSurf = TTF_RenderText_Blended(bgui->font, c_goldString, white);
+                const char *c_goldString = goldString.c_str();
+                SDL_Surface *goldSurf = TTF_RenderText_Blended(bgui->font, c_goldString, white);
                 if (!goldSurf) {
                     std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
                 } else {
                     bgui->goldTexture = SDL_CreateTextureFromSurface(bgui->renderer, goldSurf);
-                    bgui->goldRect = { 20, 120, goldSurf->w, goldSurf->h }; // place the text
+                    bgui->goldRect = {20, 120, goldSurf->w, goldSurf->h}; // place the text
                     SDL_FreeSurface(goldSurf);
                 }
             }
@@ -202,22 +188,18 @@ namespace JanSordid::SDL_Example {
     }
 
     void OverworldState::HandleGUIEvent(const JanSordid::SDL::Event &event) {
-        if(gui == nullptr || gui->shouldClose)
+        if (gui == nullptr || gui->shouldClose)
             return;
 
-        if(event.type == SDL_WINDOWEVENT){
-            if(event.window.event == SDL_WINDOWEVENT_CLOSE)
-            {
+        if (event.type == SDL_WINDOWEVENT) {
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
                 gui->shouldClose = true;
             }
-        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
-        {
-            if(event.button.windowID == SDL_GetWindowID(gui->window))
-            {
+        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+            if (event.button.windowID == SDL_GetWindowID(gui->window)) {
                 Point mouse = {event.button.x, event.button.y};
-                SDL_Rect& button = gui->exitButton;
-                if(IsMouseOver(button,mouse))
-                {
+                SDL_Rect & button = gui->exitButton;
+                if (IsMouseOver(button, mouse)) {
                     gui->shouldClose = true;
                 }
             }
@@ -225,11 +207,10 @@ namespace JanSordid::SDL_Example {
     }
 
     void OverworldState::UpdateGUI() {
-        if(gui->shouldClose)
-        {
-            if(gui->textTexture)
+        if (gui->shouldClose) {
+            if (gui->textTexture)
                 SDL_DestroyTexture(gui->textTexture);
-            if(gui->goldTexture)
+            if (gui->goldTexture)
                 SDL_DestroyTexture(gui->goldTexture);
             if (gui->font)
                 TTF_CloseFont(gui->font);
@@ -243,43 +224,39 @@ namespace JanSordid::SDL_Example {
     }
 
     void OverworldState::RenderGUI() {
-        if(!gui->shouldClose)
-        {
+        if (!gui->shouldClose) {
             SDL_SetRenderDrawColor(gui->renderer, 40, 40, 40, 255);
             SDL_RenderClear(gui->renderer);
 
-            if(gui->textTexture)
-            {
+            if (gui->textTexture) {
                 SDL_RenderCopy(gui->renderer, gui->textTexture, nullptr, &gui->textRect);
             }
 
-            if(gui->goldTexture)
-            {
+            if (gui->goldTexture) {
                 SDL_DestroyTexture(gui->goldTexture);
                 gui->goldTexture = nullptr;
 
                 std::string goldString = "Current Gold: " + std::to_string(_game.data.gold);
-                const char* c_goldString = goldString.c_str();
+                const char *c_goldString = goldString.c_str();
 
                 SDL_Color white = {255, 255, 255, 255};
-                SDL_Surface* goldSurf = TTF_RenderText_Blended(gui->font, c_goldString, white);
+                SDL_Surface *goldSurf = TTF_RenderText_Blended(gui->font, c_goldString, white);
                 if (!goldSurf) {
                     std::cerr << "Failed to create gold text surface: " << TTF_GetError() << std::endl;
                 } else {
                     gui->goldTexture = SDL_CreateTextureFromSurface(gui->renderer, goldSurf);
-                    gui->goldRect = { 20, 120, goldSurf->w, goldSurf->h };
+                    gui->goldRect = {20, 120, goldSurf->w, goldSurf->h};
                     SDL_FreeSurface(goldSurf);
                 }
 
                 // Now render the new gold texture
-                if (gui->goldTexture)
-                {
+                if (gui->goldTexture) {
                     SDL_RenderCopy(gui->renderer, gui->goldTexture, nullptr, &gui->goldRect);
                 }
             }
 
             SDL_Rect button = gui->exitButton;
-            SDL_SetRenderDrawColor(gui->renderer, 80,80,80,255);
+            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
             SDL_RenderFillRect(gui->renderer, &button);
 
             SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
