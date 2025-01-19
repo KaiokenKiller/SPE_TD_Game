@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 
 #include "example_game.hpp"
 #include "example_game.hpp"
@@ -29,14 +30,52 @@ namespace JanSordid::SDL_Example {
 		//Projectile * newProjectile = new Projectile(enemyPosition, );
     }
 
-    Enemy::Enemy(Rect *position, Texture *texture, int hp, int speed) {
+    Enemy::Enemy(Rect *position, Texture *texture, Vector<FPoint> path,int hp, int speed) {
         _isAlive = true;
         _position = position;
         _texture = texture;
         _hp = hp;
         _speed = speed;
         _textureSrcRect = new Rect(46*5,0,46,46);
+		_path = path;
     }
+
+	bool Enemy::takeDamage(int damage) {
+		_hp -= damage;
+		if (_hp<=0)
+			_isAlive = false;
+		return _isAlive;
+	}
+
+	void Enemy::move(const f32 deltaT ) {
+		int movement = deltaT * 100 * _speed;
+
+		while(movement>0) {
+			if (_path[_currentPath].x > 0) {
+				if (_path[_currentPath].x - movement < 0) {
+					_position->x += _path[_currentPath].x;
+					movement -= _path[_currentPath].x;
+					_path[_currentPath].x = 0;
+					_currentPath++;
+				} else {
+					_position->x += movement;
+					_path[_currentPath].x -= movement;
+					movement = 0;
+				}
+			} else if (_path[_currentPath].y > 0) {
+				if (_path[_currentPath].y - movement < 0) {
+					_position->y += _path[_currentPath].y;
+					movement -= _path[_currentPath].y;
+					_path[_currentPath].y = 0;
+					_currentPath++;
+				} else {
+					_position->y += movement;
+					_path[_currentPath].y -= movement;
+					movement = 0;
+				}
+			}
+		}
+	}
 
     void TdState::Init()
     {
@@ -85,7 +124,10 @@ namespace JanSordid::SDL_Example {
         _game.data._towers.push_back(tempTower);
 
         tempRect = new Rect(gridWidth/2 * tileSize * scalingFactor(),gridHeight /2 * tileSize * scalingFactor(),46,46);
-        Enemy *tempEnemy = new Enemy(tempRect,enemyTexture,10,5);
+		Vector<FPoint> path;
+		path.push_back(FPoint(200,0));
+		path.push_back(FPoint(-200,0));
+        Enemy *tempEnemy = new Enemy(tempRect,enemyTexture,path,10,1);
         _enemies.push_back(tempEnemy);
     }
 
@@ -109,6 +151,9 @@ namespace JanSordid::SDL_Example {
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
     {
         std::cout << _game.data.gold << std::endl;
+		for (auto enemy:_enemies) {
+			enemy->move(deltaT);
+		}
     }
 
 

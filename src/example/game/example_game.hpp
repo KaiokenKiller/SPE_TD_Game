@@ -72,12 +72,14 @@ namespace JanSordid::SDL_Example {
         Rect *_position = nullptr;
         Rect *_textureSrcRect = nullptr;
         Texture *_texture = nullptr;
+		Vector<FPoint> _path;
+		int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, int hp, int speed);
+        Enemy(Rect *position, Texture *texture, Vector<FPoint> path, int hp, int speed);
 
-        void move();
+        void move(f32 deltaT );
 
-        bool isHit(Projectile projectile);
+        bool takeDamage(int damage);
     };
 
     class Tower {
