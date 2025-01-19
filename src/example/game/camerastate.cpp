@@ -34,6 +34,20 @@ namespace JanSordid::SDL_Example {
         buildings[0] = {50, windowSize.y - 250, 400, 200};
         buildings[1] = {500, windowSize.y - 230, 300, 200};
         buildings[2] = {1000, windowSize.y - 250, 200, 200};
+
+        if (!tdButtonTexture) {
+            TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
+            if (buttonFont) {
+                SDL_Color white = {255, 255, 255, 255};
+                SDL_Surface *btnSurf = TTF_RenderText_Blended(buttonFont, "Enter TD", white);
+                if (btnSurf) {
+                    tdButtonTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(buttonFont);
+            }
+        }
+
     }
 
     void OverworldState::Destroy() {
@@ -61,6 +75,10 @@ namespace JanSordid::SDL_Example {
                         if (gui == nullptr)
                             gui = OpenBuildingGUI(buildingTitles[i]);
                     }
+                }
+                if (IsMouseOver(tdButton, mouse)) {
+                    _game.PushState(MyGS::TdState);
+                    return true;
                 }
             }
         }
@@ -93,7 +111,25 @@ namespace JanSordid::SDL_Example {
         }
 
         RenderBuildings(renderer());
-        // Present the updated frame
+
+        SDL_SetRenderDrawColor(renderer(), 80, 80, 80, 255);
+        SDL_RenderFillRect(renderer(), &tdButton);
+
+        SDL_SetRenderDrawColor(renderer(), 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer(), &tdButton);
+
+        if (tdButtonTexture) {
+            int texW, texH;
+            SDL_QueryTexture(tdButtonTexture, nullptr, nullptr, &texW, &texH);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = tdButton.x + (tdButton.w - texW) / 2;
+            destRect.y = tdButton.y + (tdButton.h - texH) / 2;
+            SDL_RenderCopy(renderer(), tdButtonTexture, nullptr, &destRect);
+        }
+
         SDL_RenderPresent(renderer());
         if (gui != nullptr) {
             RenderGUI();
@@ -117,7 +153,7 @@ namespace JanSordid::SDL_Example {
         for (int i = 0; i < 3; ++i) {
 
             SDL_RenderCopy(renderer, buildingSprites[i], nullptr, &buildings[i]);
-            
+
             if (IsMouseOver(buildings[i], mouse))
                 SDL_RenderDrawRect(renderer, &buildings[i]);
         }
@@ -156,11 +192,10 @@ namespace JanSordid::SDL_Example {
         bgui->font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
         if (!bgui->font) {
             std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
-            // handle error, but let's just keep going or cleanup
         } else {
-            // Render the title text as a texture
             SDL_Color white = {255, 255, 255, 255};
             SDL_Surface *surf = TTF_RenderText_Blended(bgui->font, windowTitle, white);
+
             if (!surf) {
                 std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
             } else {
@@ -168,6 +203,7 @@ namespace JanSordid::SDL_Example {
                 bgui->textRect = {20, 60, surf->w, surf->h}; // place the text
                 SDL_FreeSurface(surf);
             }
+
             if (std::string(windowTitle) == "Mine") {
                 std::cout << _game.data.gold << std::endl;
                 std::string goldString = "Current Gold: " + std::to_string(_game.data.gold);
@@ -183,13 +219,24 @@ namespace JanSordid::SDL_Example {
                 std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
                 const char *c_upgradeString = upgradeString.c_str();
                 SDL_Surface *upgradeSurf = TTF_RenderText_Blended(bgui->font, c_upgradeString, white);
-                if (!upgradeSurf) {
-                    std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
-                } else {
-                    std::cout << "saving rects" << std::endl;
+                if (upgradeSurf) {
                     bgui->upgradeTexture = SDL_CreateTextureFromSurface(bgui->renderer, upgradeSurf);
                     bgui->upgradeRect = {20, 240, upgradeSurf->w, upgradeSurf->h}; // place the text
                     SDL_FreeSurface(upgradeSurf);
+                }
+            } else if (std::string(windowTitle) == "Research") {
+                SDL_Surface *mageSurf = TTF_RenderText_Blended(bgui->font, "Mage", white);
+                if (mageSurf) {
+                    bgui->mageTexture = SDL_CreateTextureFromSurface(bgui->renderer, mageSurf);
+                    bgui->mageRect = {20, 120, mageSurf->w, mageSurf->h};
+                    SDL_FreeSurface(mageSurf);
+                }
+
+                SDL_Surface *catapultSurf = TTF_RenderText_Blended(bgui->font, "Catapult", white);
+                if (catapultSurf) {
+                    bgui->catapultTexture = SDL_CreateTextureFromSurface(bgui->renderer, catapultSurf);
+                    bgui->catapultRect = {100, 120, catapultSurf->w, catapultSurf->h};
+                    SDL_FreeSurface(catapultSurf);
                 }
             }
 
@@ -211,10 +258,25 @@ namespace JanSordid::SDL_Example {
                 Point mouse = {event.button.x, event.button.y};
                 SDL_Rect & button = gui->exitButton;
                 SDL_Rect & upgradeButton = gui->upgradeButton;
-                if (IsMouseOver(button, mouse)) {
+                if (IsMouseOver(button, mouse))
                     gui->shouldClose = true;
-                } else if (IsMouseOver(upgradeButton, mouse)){
-                    _game.data.mineLevel += 1;
+
+                if (std::string(gui->title) == "Mine") {
+                    //dummy upgrade cost
+                    if (IsMouseOver(upgradeButton, mouse)) {
+                        if (_game.data.gold >= _game.data.mineLevel * 10) {
+                            _game.data.gold -= _game.data.mineLevel * 10;
+                            _game.data.mineLevel += 1;
+                        }
+                    }
+                } else if (std::string(gui->title) == "Research") {
+                    if (IsMouseOver(gui->mageButton, mouse)) {
+                        _game.data.unlocks.insert(Tower::TowerType::Mage1);
+                        std::cout << "Unlocked Mage tower.\n";
+                    } else if (IsMouseOver(gui->catapultButton, mouse)) {
+                        _game.data.unlocks.insert(Tower::TowerType::Catapult1);
+                        std::cout << "Unlocked Catapult tower.\n";
+                    }
                 }
             }
         }
@@ -222,32 +284,30 @@ namespace JanSordid::SDL_Example {
 
     void OverworldState::UpdateGUI() {
         if (gui->shouldClose) {
-            if (gui->textTexture)
-                SDL_DestroyTexture(gui->textTexture);
-            if (gui->goldTexture)
-                SDL_DestroyTexture(gui->goldTexture);
-            if (gui->upgradeTexture)
-                SDL_DestroyTexture(gui->upgradeTexture);
-            if (gui->font)
-                TTF_CloseFont(gui->font);
-            if (gui->renderer)
-                SDL_DestroyRenderer(gui->renderer);
-            if (gui->window)
-                SDL_DestroyWindow(gui->window);
+            if (gui->textTexture) SDL_DestroyTexture(gui->textTexture);
+            if (gui->goldTexture) SDL_DestroyTexture(gui->goldTexture);
+            if (gui->upgradeTexture) SDL_DestroyTexture(gui->upgradeTexture);
+            if (gui->mageTexture) SDL_DestroyTexture(gui->mageTexture);
+            if (gui->catapultTexture) SDL_DestroyTexture(gui->catapultTexture);
+            if (gui->font) TTF_CloseFont(gui->font);
+            if (gui->renderer) SDL_DestroyRenderer(gui->renderer);
+            if (gui->window) SDL_DestroyWindow(gui->window);
             delete gui;
             gui = nullptr;
         }
     }
 
     void OverworldState::RenderGUI() {
-        if (!gui->shouldClose) {
-            SDL_SetRenderDrawColor(gui->renderer, 40, 40, 40, 255);
-            SDL_RenderClear(gui->renderer);
+        if (!gui || gui->shouldClose) return;
 
-            if (gui->textTexture) {
-                SDL_RenderCopy(gui->renderer, gui->textTexture, nullptr, &gui->textRect);
-            }
+        SDL_SetRenderDrawColor(gui->renderer, 40, 40, 40, 255);
+        SDL_RenderClear(gui->renderer);
 
+        if (gui->textTexture) {
+            SDL_RenderCopy(gui->renderer, gui->textTexture, nullptr, &gui->textRect);
+        }
+
+        if (std::string(gui->title) == "Mine") {
             if (gui->goldTexture) {
                 SDL_DestroyTexture(gui->goldTexture);
                 gui->goldTexture = nullptr;
@@ -289,24 +349,45 @@ namespace JanSordid::SDL_Example {
 
             }
 
-            SDL_Rect button = gui->exitButton;
+            SDL_Rect upgradeButton = gui->upgradeButton;
             SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-            SDL_RenderFillRect(gui->renderer, &button);
+            SDL_RenderFillRect(gui->renderer, &upgradeButton);
 
             SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-            SDL_RenderDrawRect(gui->renderer, &button);
+            SDL_RenderDrawRect(gui->renderer, &upgradeButton);
 
-
-            if (std::string(gui->title) == "Mine") {
-                SDL_Rect upgradeButton = gui->upgradeButton;
-                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-                SDL_RenderFillRect(gui->renderer, &upgradeButton);
-
-                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-                SDL_RenderDrawRect(gui->renderer, &upgradeButton);
+        } else if (std::string(gui->title) == "Research") {
+            if (gui->mageTexture) {
+                SDL_RenderCopy(gui->renderer, gui->mageTexture, nullptr, &gui->mageRect);
             }
-            SDL_RenderPresent(gui->renderer);
+            if (gui->catapultTexture) {
+                SDL_RenderCopy(gui->renderer, gui->catapultTexture, nullptr, &gui->catapultRect);
+            }
+
+            // Mage Button
+            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+            SDL_RenderFillRect(gui->renderer, &gui->mageButton);
+
+            SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(gui->renderer, &gui->mageButton);
+
+            // Catapult Button
+            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+            SDL_RenderFillRect(gui->renderer, &gui->catapultButton);
+
+            SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(gui->renderer, &gui->catapultButton);
         }
+
+
+        SDL_Rect button = gui->exitButton;
+        SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+        SDL_RenderFillRect(gui->renderer, &button);
+
+        SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(gui->renderer, &button);
+
+        SDL_RenderPresent(gui->renderer);
     }
 
 

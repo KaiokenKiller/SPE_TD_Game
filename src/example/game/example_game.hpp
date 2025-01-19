@@ -37,14 +37,24 @@ namespace JanSordid::SDL_Example {
 
         SDL_Texture *textTexture;
         SDL_Rect textRect = {};
+
         SDL_Texture *goldTexture;
         SDL_Rect goldRect = {};
+
         SDL_Texture *upgradeTexture;
         SDL_Rect upgradeRect = {};
+        SDL_Rect upgradeButton = {20, 170, 60, 30};
 
+        SDL_Texture *mageTexture;
+        SDL_Rect mageRect = {};
+        SDL_Rect mageButton = {20, 170, 60, 30};
 
-        SDL_Rect exitButton = {10, 10, 60, 30};
-        SDL_Rect upgradeButton = {10, 170, 60, 30};
+        SDL_Texture *catapultTexture;
+        SDL_Rect catapultRect = {};
+        SDL_Rect catapultButton = {100, 170, 60, 30};
+
+        SDL_Rect exitButton = {20, 10, 60, 30};
+
         bool shouldClose = false;
 
         const char *title;
@@ -251,6 +261,8 @@ namespace JanSordid::SDL_Example {
                 "Mine"
         };
         BuildingGUI *gui = nullptr;
+        SDL_Rect tdButton = {50, 50, 120, 40};
+        Texture *tdButtonTexture = nullptr;
     public:
         // ctor
         using Base::Base;
