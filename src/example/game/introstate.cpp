@@ -13,7 +13,7 @@ namespace JanSordid::SDL_Example
 
 		if( !_font )
 		{
-			_font = TTF_OpenFont( BasePath "asset/font/RobotoSlab-Bold.ttf", 8.0f * _game.scalingFactor() );
+			_font = TTF_OpenFont( BasePath "asset/font/KellyAnnGothic.ttf", 8.0f * _game.scalingFactor() );
 			TTF_SetFontHinting( _font, TTF_HINTING_LIGHT );
 			if( !_font )
 				print( stderr, "TTF_OpenFont failed: {}\n", TTF_GetError() );
@@ -21,23 +21,22 @@ namespace JanSordid::SDL_Example
 
 		if( !_image )
 		{
-			_image = IMG_LoadTexture( renderer(), BasePath "asset/graphic/background.png" );
+			_image = IMG_LoadTexture( renderer(), BasePath "asset/graphic/Main-Menu/background.png" );
 			if( !_image )
-				print( stderr, "IMG_LoadTexture failed: {}\n", IMG_GetError() );
+				print( stderr, "IMG_LoadTexture Background failed: {}\n", IMG_GetError() );
+		}
+
+		if( !_logo ) {
+			_logo = IMG_LoadTexture( renderer(), BasePath "asset/graphic/Main-Menu/logo.png" );
+			if( !_logo )
+				print( stderr, "IMG_LoadTexture Logo failed: {}\n", IMG_GetError() );
 		}
 
 		if( !_music )
 		{
-			_music = Mix_LoadMUS( BasePath "asset/music/severance.ogg" );
+			_music = Mix_LoadMUS( BasePath "asset/music/The True Story of Beelzebub.ogg" );
 			if( !_music )
 				print( stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError() );
-		}
-
-		if( !_sound )
-		{
-			_sound = Mix_LoadWAV( BasePath "asset/sound/pew.wav" );
-			if( !_sound )
-				print( stderr, "Mix_LoadWAV failed: {}\n", Mix_GetError() );
 		}
 
         _game.data.unlocks.insert(Tower::TowerType::Archer1);
@@ -151,29 +150,24 @@ namespace JanSordid::SDL_Example
 		//for (uint x = 0; x < 100; ++x)
 		{
 			constexpr const char * text =
-				"                                          --== Introscreen of my Super Mega Gamey Game 3000 ==--\n\n"
-				"Dies ist ein Typoblindtext. An ihm kann man sehen, ob alle Buchstaben da sind und wie sie aussehen. "
+				"                                          --== Introscreen Tower Defense ==--\n\n"
+				"Dies ist ein Typoblindtext."
 				"Manchmal benutzt man Worte wie Hamburgefonts, Rafgenduks oder Handgloves, um Schriften zu testen. "
 				"Manchmal Sätze, die alle Buchstaben des Alphabets enthalten - man nennt diese Sätze »Pangrams«. "
-				"Sehr bekannt ist dieser: The quick brown fox jumps over the lazy old dog. "
-				"Oft werden in Typoblindtexte auch fremdsprachige Satzteile eingebaut (AVAIL® and Wefox™ are testing aussi la Kerning), um die Wirkung in anderen Sprachen zu testen. "
-				"In Lateinisch sieht zum Beispiel fast jede Schrift gut aus. Quod erat demonstrandum. "
-				"Seit 1975 fehlen in den meisten Testtexten die Zahlen, weswegen nach TypoGb. §.204 ab dem Jahr 2034 Zahlen in 86 der Texte zur Pflicht werden. "
-				"Nichteinhaltung wird mit bis zu 245 € oder 368 $ bestraft. Genauso wichtig in sind mittlerweile auch Âçcèñtë, die in neueren Schriften aber fast immer enthalten sind. "
-				"Ein wichtiges aber schwierig zu integrierendes Feld sind OpenType-Funktionalitäten. "
-				"Je nach Software und Voreinstellungen können eingebaute Kapitälchen, Kerning oder Ligaturen (sehr pfiffig) nicht richtig dargestellt werden."
-				"\n\nRoyality free music by Karl Casey @ White Bat Audio"
+				"The quick brown fox jumps over the lazy old dog. "
+				"(AVAIL® and Wefox™ are testing aussi la Kerning), um die Wirkung in anderen Sprachen zu testen. "
+				"Genauso wichtig in sind mittlerweile auch Âçcèñtë, die in neueren Schriften aber fast immer enthalten sind. "
+				"\n\nRoyality free music by Patrick de Arteaga "
 				"\n  - Press [F1] to (un)pause music."
 				"\n  - Press [F2] to (un)mute music."
-				"\nSource: https://www.youtube.com/watch?v=aFITtvK64B4"
+				"\nSource: https://patrickdearteaga.com"
 				"\n\nPress any key to continue!"
 				"\n\n!\"#$%&'()*+,-./0123456789:;<=>? c*8 uzu"
 				"\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 				"\n`abcdefghijklmnopqrstuvwxyz{|}~"
 				"\n\u00A0!¡c¢E£¤Y¥¦S§¨©ª«¬\u00AD®¯°C±n²³´uµ¶·¸¹º»¼½¾?¿"
 				"\nAÀÁÂÃÄ¨ÅÆCÇEÈÉÊËÌÍÎÏIDÐÑNOÒÓÔÕÖ×OØUÙÚÛÜYÝÞß"
-				"\naàáâãäåæcçeèéêëiìíîïdðnñoòóôõö÷oøuùúûüyýþyÿ"
-				"\ninjektion! enjoy major Heij project Stobject farbe kd aes real tw";
+				"\naàáâãäåæcçeèéêëiìíîïdðnñoòóôõö÷oøuùúûüyýþyÿ";
 
 			const Color outlineColor = _isDarkOutline
 				? Color {   0,   0,   0, SDL_ALPHA_OPAQUE }
@@ -222,12 +216,34 @@ namespace JanSordid::SDL_Example
 				*/
 			}
 		}
+
+		if (_logo)
+		{
+			SDL_Rect logoRect;
+			SDL_QueryTexture(_logo, NULL, NULL, &logoRect.w, &logoRect.h);
+			logoRect.x = (windowSize.x - logoRect.w) / 2;
+			logoRect.y = (windowSize.y - logoRect.h) / 8;
+			SDL_RenderCopy(renderer(), _logo, EntireRect, &logoRect);
+		}
+
+		int buttonWidth = windowSize.x / 4;
+		int buttonHeight = windowSize.x / 8;
+		Rect startButtonRect = {(windowSize.x - buttonWidth) / 2, windowSize.y / 2, buttonWidth, buttonHeight};
+		Rect exitButtonRect = {(windowSize.x - buttonWidth) / 2, windowSize.y / 2 + buttonHeight * 2, buttonWidth, buttonHeight};
+
+		//Texte für Buttons erstellen
+		constexpr const char * startText = "Start";
+		constexpr const char * exitText = "Exit";
+
+
 	}
 
-#ifdef IMGUI
 
+
+#ifdef IMGUI
 	void IntroState::RenderUI( const u64 frame, const u64 totalMSec, const f32 deltaTNeeded )
 	{
+		/*
 		// ImGui Demo
 		static bool show_demo_window = true;
 		ImGui::SetNextWindowCollapsed( true, ImGuiCond_Once );
@@ -267,7 +283,7 @@ namespace JanSordid::SDL_Example
 		ImGui::SliderScalarN( "cavity left", ImGuiDataType_U8, m.left, 8, &min, &max );
 		ImGui::SliderScalarN( "cavity right", ImGuiDataType_U8, m.right, 8, &min, &max );
 		*/
-
+		/*
 		ImGui::Checkbox( "Draw Color Number", &drawColorNumber );
 
 		ImGui::PushID( "fg color" );
@@ -349,6 +365,7 @@ namespace JanSordid::SDL_Example
 		}
 
 		ImGui::End();
+		*/
 	}
 
 #endif

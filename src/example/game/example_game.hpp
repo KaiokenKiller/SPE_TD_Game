@@ -176,6 +176,7 @@ namespace JanSordid::SDL_Example {
     protected:
         Owned<Font> _font = nullptr;
         Owned<Texture> _image = nullptr;
+        Owned<Texture> _logo = nullptr;
         Owned<Music> _music = nullptr;
         Owned<Chunk> _sound = nullptr;
         Owned<Texture> _blendedText = nullptr;
