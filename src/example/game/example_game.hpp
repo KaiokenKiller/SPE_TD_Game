@@ -175,17 +175,24 @@ namespace JanSordid::SDL_Example {
 
     protected:
         Owned<Font> _font = nullptr;
+        Owned<Font> _fontButtons = nullptr;
         Owned<Texture> _image = nullptr;
         Owned<Texture> _logo = nullptr;
+        Owned<Texture> _UISprite = nullptr;
+        Owned<Texture> _blendedText = nullptr;
+        Owned<Texture> _blendedStartText = nullptr;
+        Owned<Texture> _blendedExitText = nullptr;
         Owned<Music> _music = nullptr;
         Owned<Chunk> _sound = nullptr;
-        Owned<Texture> _blendedText = nullptr;
 
-        Point _blendedTextSize = {0, 0};
+        Point _blendedTextSize = {100, 100};
+        Point _blendedStartTextSize = {100, 100};
+        Point _blendedExitTextSize = {100, 100};
+
         u8 _textmode = 0;
 
         // Testvars controlled by ImGui
-        Point _p = {32, 50};
+        Point _p = {0, 0};
         int _colorIndex = 9;
         bool _isDarkOutline = true;
 

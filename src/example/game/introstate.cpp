@@ -13,10 +13,24 @@ namespace JanSordid::SDL_Example
 
 		if( !_font )
 		{
-			_font = TTF_OpenFont( BasePath "asset/font/KellyAnnGothic.ttf", 8.0f * _game.scalingFactor() );
+			_font = TTF_OpenFont( BasePath "asset/font/RobotoSlab-Bold.ttf", 4.0f * _game.scalingFactor() );
 			TTF_SetFontHinting( _font, TTF_HINTING_LIGHT );
 			if( !_font )
 				print( stderr, "TTF_OpenFont failed: {}\n", TTF_GetError() );
+		}
+
+		if( !_fontButtons )
+		{
+			_fontButtons = TTF_OpenFont( BasePath "asset/font/KellyAnnGothic.ttf", 8.0f * _game.scalingFactor() );
+			TTF_SetFontHinting( _fontButtons, TTF_HINTING_LIGHT );
+			if( !_fontButtons )
+				print( stderr, "TTF_OpenFont failed: {}\n", TTF_GetError() );
+		}
+
+		if( !_UISprite ) {
+			_UISprite = IMG_LoadTexture( renderer(), BasePath "asset/graphic/ui-elements.png" );
+			if( !_UISprite )
+				print( stderr, "IMG_LoadTexture UI Elements failed: {}\n", SDL_GetError() );
 		}
 
 		if( !_image )
@@ -150,24 +164,10 @@ namespace JanSordid::SDL_Example
 		//for (uint x = 0; x < 100; ++x)
 		{
 			constexpr const char * text =
-				"                                          --== Introscreen Tower Defense ==--\n\n"
-				"Dies ist ein Typoblindtext."
-				"Manchmal benutzt man Worte wie Hamburgefonts, Rafgenduks oder Handgloves, um Schriften zu testen. "
-				"Manchmal Sätze, die alle Buchstaben des Alphabets enthalten - man nennt diese Sätze »Pangrams«. "
-				"The quick brown fox jumps over the lazy old dog. "
-				"(AVAIL® and Wefox™ are testing aussi la Kerning), um die Wirkung in anderen Sprachen zu testen. "
-				"Genauso wichtig in sind mittlerweile auch Âçcèñtë, die in neueren Schriften aber fast immer enthalten sind. "
-				"\n\nRoyality free music by Patrick de Arteaga "
+				"Music by Patrick de Arteaga"
 				"\n  - Press [F1] to (un)pause music."
 				"\n  - Press [F2] to (un)mute music."
-				"\nSource: https://patrickdearteaga.com"
-				"\n\nPress any key to continue!"
-				"\n\n!\"#$%&'()*+,-./0123456789:;<=>? c*8 uzu"
-				"\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-				"\n`abcdefghijklmnopqrstuvwxyz{|}~"
-				"\n\u00A0!¡c¢E£¤Y¥¦S§¨©ª«¬\u00AD®¯°C±n²³´uµ¶·¸¹º»¼½¾?¿"
-				"\nAÀÁÂÃÄ¨ÅÆCÇEÈÉÊËÌÍÎÏIDÐÑNOÒÓÔÕÖ×OØUÙÚÛÜYÝÞß"
-				"\naàáâãäåæcçeèéêëiìíîïdðnñoòóôõö÷oøuùúûüyýþyÿ";
+				"\nSource: https://patrickdearteaga.com";
 
 			const Color outlineColor = _isDarkOutline
 				? Color {   0,   0,   0, SDL_ALPHA_OPAQUE }
@@ -178,64 +178,117 @@ namespace JanSordid::SDL_Example
 			// _textmode == 1 is Bitmap Font (currently uncached)
 			if( _textmode == 0 )
 			{
-				// Comment out to disable the cache. Uses 5ms without / 20 ms with harfbuzz
 				if( _blendedText == nullptr )
 				{
-					if( _blendedText != nullptr )
-						SDL_DestroyTexture( _blendedText );
-
 					Surface * surf = TTF_RenderUTF8_Blended_Wrapped( _font, text, white, windowSize.x - _p.x );
 					_blendedText = SDL_CreateTextureFromSurface( renderer(), surf );
 					SDL_FreeSurface( surf );
 
 					u32 fmt;
 					int access;
-					SDL_QueryTexture( _blendedText, &fmt, &access, &_blendedTextSize.x, &_blendedTextSize.y );
+					SDL_QueryTexture( _blendedText, &fmt, &access, &_blendedTextSize.x, &_blendedTextSize.y);
 				}
 
 				SDL_SetTextureColorMod( _blendedText, outlineColor.r, outlineColor.g, outlineColor.b );
 
 				for( const Point & offset : HSNR64::ShadowOffset::Rhombus )
 				{
-					const Rect dst_rect = Rect {_p.x, _p.y, _blendedTextSize.x, _blendedTextSize.y } + offset;
+					const Rect dst_rect = Rect {
+						windowSize.x - _blendedTextSize.x,
+						windowSize.y - _blendedTextSize.y,
+						_blendedTextSize.x,
+						_blendedTextSize.y
+					} + offset;
+
 					SDL_RenderCopy( renderer(), _blendedText, EntireRect, &dst_rect );
 				}
 
 				const Color & color = HSNR64::Palette( _colorIndex );
 				SDL_SetTextureColorMod( _blendedText, color.r, color.g, color.b );
-				const Rect dst_rect = { _p.x, _p.y, _blendedTextSize.x, _blendedTextSize.y };
-				SDL_RenderCopy( renderer(), _blendedText, EntireRect, &dst_rect );
-			}
-			else
-			{
-				/*
-				TileFont::TF_Init( renderer() );
 
-				Rect dimension { _p.x, _p.y, winSize.x - (32 + _p.x), 9999 };
-				TileFont::TF_Render( renderer(), text, dimension, HSNR64::Palette( _colorIndex ), outlineColor );
-				*/
+				const Rect dst_rect = {
+					windowSize.x - _blendedTextSize.x,
+					windowSize.y - _blendedTextSize.y,
+					_blendedTextSize.x,
+					_blendedTextSize.y
+				};
+
+				SDL_RenderCopy( renderer(), _blendedText, EntireRect, &dst_rect );
 			}
 		}
 
 		if (_logo)
 		{
 			SDL_Rect logoRect;
-			SDL_QueryTexture(_logo, NULL, NULL, &logoRect.w, &logoRect.h);
+			SDL_QueryTexture(_logo, nullptr, nullptr, &logoRect.w, &logoRect.h);
 			logoRect.x = (windowSize.x - logoRect.w) / 2;
 			logoRect.y = (windowSize.y - logoRect.h) / 8;
 			SDL_RenderCopy(renderer(), _logo, EntireRect, &logoRect);
 		}
 
 		int buttonWidth = windowSize.x / 4;
-		int buttonHeight = windowSize.x / 8;
-		Rect startButtonRect = {(windowSize.x - buttonWidth) / 2, windowSize.y / 2, buttonWidth, buttonHeight};
-		Rect exitButtonRect = {(windowSize.x - buttonWidth) / 2, windowSize.y / 2 + buttonHeight * 2, buttonWidth, buttonHeight};
+		int buttonHeight = windowSize.y / 12;
 
-		//Texte für Buttons erstellen
-		constexpr const char * startText = "Start";
-		constexpr const char * exitText = "Exit";
+		Rect startButtonRect = {
+			(windowSize.x - buttonWidth) / 2,
+			windowSize.y / 2 + buttonHeight,
+			buttonWidth,
+			buttonHeight
+		};
 
+		Rect exitButtonRect = {
+			(windowSize.x - buttonWidth) / 2,
+			startButtonRect.y + buttonHeight * 2,
+			buttonWidth,
+			buttonHeight
+		};
 
+		Rect srcRect = {33, 0, 32, 32};
+
+		// Buttons rendern
+		SDL_RenderDrawRect(renderer(), &startButtonRect);
+		SDL_RenderCopy(renderer(), _UISprite, &srcRect, &startButtonRect);
+		SDL_RenderDrawRect(renderer(), &exitButtonRect);
+		SDL_RenderCopy(renderer(), _UISprite, &srcRect, &exitButtonRect);
+
+		// Buttons Text rendern
+		// Poor persons benchmark
+		//for (uint x = 0; x < 100; ++x)
+		{
+			constexpr const char * startText = "Start";
+			constexpr const char * exitText = "Exit";
+
+			const Color outlineColor = _isDarkOutline
+				? Color {   0,   0,   0, SDL_ALPHA_OPAQUE }
+				: Color { 255, 255, 255, SDL_ALPHA_OPAQUE };
+
+			if( _textmode == 0 ) {
+				if( _blendedStartText == nullptr )
+				{
+					Surface * surf = TTF_RenderUTF8_Blended_Wrapped( _fontButtons, startText, white, windowSize.x - _p.x );
+					_blendedStartText = SDL_CreateTextureFromSurface( renderer(), surf );
+					SDL_FreeSurface( surf );
+
+					u32 fmt;
+					int access;
+					SDL_QueryTexture( _blendedStartText, &fmt, &access, &_blendedStartTextSize.x, &_blendedStartTextSize.y);
+				}
+
+				SDL_SetTextureColorMod( _blendedStartText, outlineColor.r, outlineColor.g, outlineColor.b );
+
+				for( const Point & offset : HSNR64::ShadowOffset::Rhombus )
+				{
+					const Rect dst_rect = Rect {
+						startButtonRect.x - _blendedStartTextSize.x,
+						startButtonRect.y - _blendedStartTextSize.y,
+						_blendedStartTextSize.x,
+						_blendedStartTextSize.y
+					} + offset;
+
+					SDL_RenderCopy( renderer(), _blendedStartText, EntireRect, &dst_rect );
+				}
+			}
+		}
 	}
 
 
