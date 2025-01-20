@@ -5,13 +5,12 @@
 
 namespace JanSordid::SDL_Example {
 
-    Projectile::Projectile(Rect * position, Texture * texture, int damage, int velocity_X, int velocity_Y) {
+    Projectile::Projectile(Rect * position, Texture * texture, int damage, Enemy* target) {
         _isVisible = true;
         _position = position;
         _texture = texture;
         _damage = damage;
-        _velocity_x = velocity_X;
-        _velocity_y = velocity_Y;
+        _target = target;
     }
 
     Tower::Tower(Rect *placement, Texture *texture) {
@@ -20,13 +19,34 @@ namespace JanSordid::SDL_Example {
     }
 
     TowerArcher1::TowerArcher1(Rect *placement, Texture *texture) : Tower(placement, texture) {
+        _type = TowerType::Archer1;
         _attackDamage = 5;
         _attackRange = 2;
         _attackSpeed = 5;
     }
-    void TowerArcher1::shoot(Rect * enemyPosition) {
+
+    Mage1::Mage1(Rect *placement, Texture *texture) : Tower(placement, texture) {
+        _type = TowerType::Mage1;
+        _attackDamage = 7;
+        _attackRange = 2;
+        _attackSpeed = 3;
+    }
+
+    void Mage1::shoot(Enemy* target) {
         //ToDo
-        //Projectile *projectile = new Projectile()
+        //Projectile *projectile = new Projectile();
+    }
+
+    Catapult1::Catapult1(Rect *placement, Texture *texture) : Tower(placement, texture) {
+        _type = TowerType::Catapult1;
+        _attackDamage = 10;
+        _attackRange = 4;
+        _attackSpeed = 2;
+    }
+
+    void Catapult1::shoot(Enemy* target) {
+        //ToDo
+        //Projectile *projectile = new Projectile();
     }
 
     Enemy::Enemy(Rect *position, Texture *texture, int hp, int speed) {
@@ -48,8 +68,14 @@ namespace JanSordid::SDL_Example {
         if( !grassTile ) {
             grassTile = IMG_LoadTexture( renderer(), BasePathGraphic "/Floor/grass_tile.png" );
         }
-        if( !towerTexture ) {
-            towerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png" );
+        if( !archerTowerTexture ) {
+            archerTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png" );
+        }
+        if( !mageTowerTexture ) {
+            mageTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Mage-Tower/mage-tower.png" );
+        }
+        if( !catapultTowerTexture ) {
+            catapultTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
         }
         if( !enemyTexture ) {
             enemyTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Enemies/slime_walk.png" );
@@ -81,12 +107,43 @@ namespace JanSordid::SDL_Example {
             towerHeight / 2 * scalingFactor()
             );
 
-        TowerArcher1 *tempTower = new TowerArcher1(tempRect, towerTexture);
+        TowerArcher1 *tempTower = new TowerArcher1(tempRect, archerTowerTexture);
         _game.data._towers.push_back(tempTower);
 
-        tempRect = new Rect(gridWidth/2 * tileSize * scalingFactor(),gridHeight /2 * tileSize * scalingFactor(),46,46);
+        tempRect = new Rect(
+            25 * tileSize * scalingFactor(),
+            11 * tileSize * scalingFactor(),
+            towerWidth / 1.5 * scalingFactor(),
+            towerHeight / 1.5 * scalingFactor()
+            );
+
+        Mage1 *tempMageTower = new Mage1(tempRect, mageTowerTexture);
+        _game.data._towers.push_back(tempMageTower);
+
+        tempRect = new Rect(
+            15 * tileSize * scalingFactor(),
+            11 * tileSize * scalingFactor(),
+            towerWidth / 1.5 * scalingFactor(),
+            towerHeight / 1.5 * scalingFactor()
+            );
+
+        Catapult1 *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture);
+        _game.data._towers.push_back(tempCatapultTower);
+
+        tempRect = new Rect(
+            gridWidth/2 * tileSize * scalingFactor(),
+            gridHeight /2 * tileSize * scalingFactor(),
+            46,
+            46
+            );
+
         Enemy *tempEnemy = new Enemy(tempRect,enemyTexture,10,5);
         _enemies.push_back(tempEnemy);
+    }
+
+    void TowerArcher1::shoot(Enemy * target) {
+        //Rect * startPosition = new Rect( _position->x, _position->y, _position->w, _position->h );
+        //Projectile *projectile = new Projectile(startPosition, texture, _attackDamage, target);
     }
 
     void TdState::Destroy()
@@ -111,8 +168,6 @@ namespace JanSordid::SDL_Example {
         std::cout << _game.data.gold << std::endl;
     }
 
-
-
     void TdState::Render(const u64 frame, u64 totalMSec, const f32 deltaT )
     {
         // Try the limits, moments before wraparound
@@ -134,7 +189,7 @@ namespace JanSordid::SDL_Example {
         }
 
         for (const auto& element: _game.data._towers) {
-            SDL_RenderCopy(renderer(), element->_texture,towerSrcRectMap[element->type],element->_position );
+            SDL_RenderCopy(renderer(), element->_texture,towerSrcRectMap[element->_type],element->_position );
         }
         for (const auto& element: _enemies) {
             SDL_RenderCopy(renderer(), element->_texture,element->_textureSrcRect,element->_position );

@@ -60,22 +60,6 @@ namespace JanSordid::SDL_Example {
         const char *title;
     };
 
-
-    class Projectile {
-    public:
-        int _damage;
-        int _velocity_x;
-        int _velocity_y;
-        bool _isVisible;
-
-        Projectile(Rect *position, Texture *texture, int damage, int velocity_X, int velocity_Y);
-
-        Rect *_position = nullptr;
-        Texture *_texture = nullptr;
-
-        void move();
-    };
-
     class Enemy {
     public:
 
@@ -91,8 +75,24 @@ namespace JanSordid::SDL_Example {
 
         void move();
 
-        bool isHit(Projectile projectile);
+        bool isHit(int damage);
     };
+
+
+    class Projectile {
+    public:
+        int _damage;
+        bool _isVisible;
+        Enemy* _target;
+
+        Projectile(Rect *position, Texture *texture, int damage, Enemy* target);
+
+        Rect *_position = nullptr;
+        Texture *_texture = nullptr;
+
+        void move();
+    };
+
 
     class Tower {
     public:
@@ -101,7 +101,7 @@ namespace JanSordid::SDL_Example {
             Mage1, Mage2_P1, Mage2_P2, Mage3_P1, Mage3_P2,
             Catapult1, Catapult2_P1, Catapult2_P2, Catapult3_P1, Catapult3_P2
         };
-        TowerType type = TowerType::Archer1;
+        TowerType _type;
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
         int _attackDamage = 0;
@@ -113,7 +113,7 @@ namespace JanSordid::SDL_Example {
 
         virtual ~Tower() = default;
 
-        virtual void shoot(Rect *enemyPosition) = 0;
+        virtual void shoot(Enemy *target) = 0;
     };
 
     class TowerArcher1 : public Tower {
@@ -121,11 +121,28 @@ namespace JanSordid::SDL_Example {
 
         TowerArcher1(Rect *placement, Texture *texture);
 
-        void shoot(Rect *enemyPosition) override;
+        void shoot(Enemy *target) override;
+    };
+
+    class Mage1 : public Tower {
+    public:
+
+        Mage1(Rect *placement, Texture *texture);
+
+        void shoot(Enemy* target) override;
+    };
+
+    class Catapult1 : public Tower {
+    public:
+
+        Catapult1(Rect *placement, Texture *texture);
+
+        void shoot(Enemy* target) override;
     };
 
     struct GameData {
         int gold = 0;
+
         int mineLevel = 1;
         std::unordered_set<Tower::TowerType> unlocks;
         std::vector<Tower *> _towers;
@@ -210,7 +227,9 @@ namespace JanSordid::SDL_Example {
         Texture *enemyPathTile = nullptr;
         Texture *grassTile = nullptr;
         Texture *towerSlot = nullptr;
-        Texture *towerTexture = nullptr;
+        Texture *archerTowerTexture = nullptr;
+        Texture *mageTowerTexture = nullptr;
+        Texture *catapultTowerTexture = nullptr;
         Texture *enemyTexture = nullptr;
 
         static constexpr int gridWidth = 40;
