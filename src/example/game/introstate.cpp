@@ -184,7 +184,7 @@ namespace JanSordid::SDL_Example {
         // Draw the text on top
         // _textmode == 0 is True Type (currently cached)
         // _textmode == 1 is Bitmap Font (currently uncached)
-        /*
+
         if (_textmode == 0) {
             if (_blendedText == nullptr) {
                 Surface *surf = TTF_RenderUTF8_Blended_Wrapped(_font, text, white, windowSize.x - _p.x);
@@ -221,7 +221,7 @@ namespace JanSordid::SDL_Example {
 
             SDL_RenderCopy(renderer(), _blendedText, EntireRect, &dst_rect);
         }
-        */
+        
 
         if (_logo) {
             SDL_Rect logoRect;
