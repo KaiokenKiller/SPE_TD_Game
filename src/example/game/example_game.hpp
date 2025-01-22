@@ -83,9 +83,9 @@ namespace JanSordid::SDL_Example {
     public:
         int _damage;
         bool _isVisible;
-        Enemy* _target;
+        Enemy *_target;
 
-        Projectile(Rect *position, Texture *texture, int damage, Enemy* target);
+        Projectile(Rect *position, Texture *texture, int damage, Enemy *target);
 
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
@@ -129,7 +129,7 @@ namespace JanSordid::SDL_Example {
 
         Mage1(Rect *placement, Texture *texture);
 
-        void shoot(Enemy* target) override;
+        void shoot(Enemy *target) override;
     };
 
     class Catapult1 : public Tower {
@@ -137,13 +137,14 @@ namespace JanSordid::SDL_Example {
 
         Catapult1(Rect *placement, Texture *texture);
 
-        void shoot(Enemy* target) override;
+        void shoot(Enemy *target) override;
     };
 
     struct GameData {
-        int gold = 0;
+        int gold = 100;
 
         int mineLevel = 1;
+        int day = 0;
         std::unordered_set<Tower::TowerType> unlocks;
         std::vector<Tower *> _towers;
     };
@@ -198,6 +199,10 @@ namespace JanSordid::SDL_Example {
 
         static constexpr const Color white{255, 255, 255, SDL_ALPHA_OPAQUE};
         static constexpr const Color black{0, 0, 0, SDL_ALPHA_OPAQUE};
+        SDL_Rect startButton = {50, 50, 120, 40};
+        Texture *startButtonTexture = nullptr;
+        SDL_Rect exitButton = {50, 50, 120, 40};
+        Texture *exitButtonTexture = nullptr;
 
     public:
         /// Ctors & Dtor
@@ -232,6 +237,8 @@ namespace JanSordid::SDL_Example {
 
     protected:
         //Eigener Stuff:
+        SDL_Rect overworldButton = {50, 50, 120, 40};
+        Texture *overworldButtonTexture = nullptr;
         Texture *enemyPathTile = nullptr;
         Texture *grassTile = nullptr;
         Texture *towerSlot = nullptr;
@@ -251,6 +258,7 @@ namespace JanSordid::SDL_Example {
 
         std::vector<Projectile *> _projectiles;
         std::vector<Enemy *> _enemies;
+
     public:
         // ctor
         using Base::Base;
@@ -310,7 +318,7 @@ namespace JanSordid::SDL_Example {
 
         void RenderBuildings(SDL_Renderer *renderer);
 
-        bool IsMouseOver(const SDL_Rect &rect, Point mouse);
+        static bool IsMouseOver(const SDL_Rect &rect, Point mouse);
 
         BuildingGUI *OpenBuildingGUI(const char *windowTitle);
 

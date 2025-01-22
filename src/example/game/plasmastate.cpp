@@ -5,7 +5,7 @@
 
 namespace JanSordid::SDL_Example {
 
-    Projectile::Projectile(Rect * position, Texture * texture, int damage, Enemy* target) {
+    Projectile::Projectile(Rect *position, Texture *texture, int damage, Enemy *target) {
         _isVisible = true;
         _position = position;
         _texture = texture;
@@ -32,7 +32,7 @@ namespace JanSordid::SDL_Example {
         _attackSpeed = 3;
     }
 
-    void Mage1::shoot(Enemy* target) {
+    void Mage1::shoot(Enemy *target) {
         //ToDo
         //Projectile *projectile = new Projectile();
     }
@@ -44,7 +44,7 @@ namespace JanSordid::SDL_Example {
         _attackSpeed = 2;
     }
 
-    void Catapult1::shoot(Enemy* target) {
+    void Catapult1::shoot(Enemy *target) {
         //ToDo
         //Projectile *projectile = new Projectile();
     }
@@ -55,41 +55,40 @@ namespace JanSordid::SDL_Example {
         _texture = texture;
         _hp = hp;
         _speed = speed;
-        _textureSrcRect = new Rect(46*5,0,46,46);
+        _textureSrcRect = new Rect(46 * 5, 0, 46, 46);
     }
 
-    void TdState::Init()
-    {
+    void TdState::Init() {
         Base::Init();
 
-        if( !enemyPathTile ) {
-            enemyPathTile = IMG_LoadTexture( renderer(), BasePathGraphic "/Floor/enemy_path_tile.png" );
+        if (!enemyPathTile) {
+            enemyPathTile = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/enemy_path_tile.png");
         }
-        if( !grassTile ) {
-            grassTile = IMG_LoadTexture( renderer(), BasePathGraphic "/Floor/grass_tile.png" );
+        if (!grassTile) {
+            grassTile = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/grass_tile.png");
         }
-        if( !archerTowerTexture ) {
-            archerTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png" );
+        if (!archerTowerTexture) {
+            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png");
         }
-        if( !mageTowerTexture ) {
-            mageTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Mage-Tower/mage-tower.png" );
+        if (!mageTowerTexture) {
+            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage-tower.png");
         }
-        if( !catapultTowerTexture ) {
-            catapultTowerTexture = IMG_LoadTexture( renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
+        if (!catapultTowerTexture) {
+            catapultTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
         }
-        if( !enemyTexture ) {
-            enemyTexture = IMG_LoadTexture( renderer(), BasePathGraphic "/Enemies/slime_walk.png" );
+        if (!enemyTexture) {
+            enemyTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Enemies/slime_walk.png");
         }
 
         if (tileMap[0][0] == nullptr) {
-            for( int i = 0; i < gridHeight; i++ ) {
-                for ( int j = 0; j < gridWidth; j++ ) {
-                    Rect * temp = new Rect(
-                        j * tileSize * scalingFactor(),
-                        i * tileSize * scalingFactor(),
-                        tileSize * scalingFactor(),
-                        tileSize * scalingFactor()
-                        );
+            for (int i = 0; i < gridHeight; i++) {
+                for (int j = 0; j < gridWidth; j++) {
+                    Rect *temp = new Rect(
+                            j * tileSize * scalingFactor(),
+                            i * tileSize * scalingFactor(),
+                            tileSize * scalingFactor(),
+                            tileSize * scalingFactor()
+                    );
                     tileMap[i][j] = temp;
                 }
             }
@@ -97,102 +96,133 @@ namespace JanSordid::SDL_Example {
 
         // Spawning temporary Dummies
 
-        Rect* tempRect = new Rect(0, 0, towerWidth, towerHeight);
+        Rect *tempRect = new Rect(0, 0, towerWidth, towerHeight);
         towerSrcRectMap[Tower::TowerType::Archer1] = tempRect;
 
         tempRect = new Rect(
-            20 * tileSize * scalingFactor(),
-            11 * tileSize * scalingFactor(),
-            towerWidth / 2 * scalingFactor(),
-            towerHeight / 2 * scalingFactor()
-            );
+                20 * tileSize * scalingFactor(),
+                11 * tileSize * scalingFactor(),
+                towerWidth / 2 * scalingFactor(),
+                towerHeight / 2 * scalingFactor()
+        );
 
         TowerArcher1 *tempTower = new TowerArcher1(tempRect, archerTowerTexture);
         _game.data._towers.push_back(tempTower);
 
         tempRect = new Rect(
-            25 * tileSize * scalingFactor(),
-            11 * tileSize * scalingFactor(),
-            towerWidth / 1.5 * scalingFactor(),
-            towerHeight / 1.5 * scalingFactor()
-            );
+                25 * tileSize * scalingFactor(),
+                11 * tileSize * scalingFactor(),
+                towerWidth / 1.5 * scalingFactor(),
+                towerHeight / 1.5 * scalingFactor()
+        );
 
         Mage1 *tempMageTower = new Mage1(tempRect, mageTowerTexture);
         _game.data._towers.push_back(tempMageTower);
 
         tempRect = new Rect(
-            15 * tileSize * scalingFactor(),
-            11 * tileSize * scalingFactor(),
-            towerWidth / 1.5 * scalingFactor(),
-            towerHeight / 1.5 * scalingFactor()
-            );
+                15 * tileSize * scalingFactor(),
+                11 * tileSize * scalingFactor(),
+                towerWidth / 1.5 * scalingFactor(),
+                towerHeight / 1.5 * scalingFactor()
+        );
 
         Catapult1 *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture);
         _game.data._towers.push_back(tempCatapultTower);
 
         tempRect = new Rect(
-            gridWidth/2 * tileSize * scalingFactor(),
-            gridHeight /2 * tileSize * scalingFactor(),
-            46,
-            46
-            );
+                gridWidth / 2 * tileSize * scalingFactor(),
+                gridHeight / 2 * tileSize * scalingFactor(),
+                46,
+                46
+        );
 
-        Enemy *tempEnemy = new Enemy(tempRect,enemyTexture,10,5);
+        Enemy *tempEnemy = new Enemy(tempRect, enemyTexture, 10, 5);
         _enemies.push_back(tempEnemy);
+
+        if (!overworldButtonTexture) {
+            TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
+            if (buttonFont) {
+                SDL_Color white = {255, 255, 255, 255};
+                SDL_Surface *btnSurf = TTF_RenderText_Blended(buttonFont, "Enter Overworld", white);
+                if (btnSurf) {
+                    overworldButtonTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(buttonFont);
+            }
+        }
     }
 
-    void TowerArcher1::shoot(Enemy * target) {
+    void TowerArcher1::shoot(Enemy *target) {
         //Rect * startPosition = new Rect( _position->x, _position->y, _position->w, _position->h );
         //Projectile *projectile = new Projectile(startPosition, texture, _attackDamage, target);
     }
 
-    void TdState::Destroy()
-    {
+    void TdState::Destroy() {
         // TODO
 
         Base::Destroy();
     }
 
-    bool TdState::HandleEvent(const Event & event )
-    {
-        return true;
+    bool TdState::HandleEvent(const Event &event) {
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                Point mouse = {event.button.x, event.button.y};
+                if (OverworldState::IsMouseOver(overworldButton, mouse)) {
+                    _game.PushState(MyGS::Overworld);
+                    return true;
+                }
+            }
+        }
     }
 
-    bool TdState::Input()
-    {
+    bool TdState::Input() {
         return false;
     }
 
-    void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT )
-    {
-        std::cout << _game.data.gold << std::endl;
+    void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
+
     }
 
-    void TdState::Render(const u64 frame, u64 totalMSec, const f32 deltaT )
-    {
+
+    void TdState::Render(const u64 frame, u64 totalMSec, const f32 deltaT) {
         // Try the limits, moments before wraparound
         //totalMSec += 2147470000u + 2147480000u;
         Point windowSize;
-        SDL_GetWindowSize( window(), &windowSize.x, &windowSize.y );
+        SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
 
 
-        for( int i = 0; i < gridHeight; i++ ) {
-            for ( int j = 0; j < gridWidth; j++ ) {
+        for (int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
 
-                if( i == gridHeight / 2 || i == (gridHeight / 2) +1) {
-                    SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j] );
-                }
-                else {
-                    SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j] );
+                if (i == gridHeight / 2 || i == (gridHeight / 2) + 1) {
+                    SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
+                } else {
+                    SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                 }
             }
         }
 
-        for (const auto& element: _game.data._towers) {
-            SDL_RenderCopy(renderer(), element->_texture,towerSrcRectMap[element->_type],element->_position );
+        for (const auto &element: _game.data._towers) {
+            SDL_RenderCopy(renderer(), element->_texture, towerSrcRectMap[element->_type], element->_position);
         }
-        for (const auto& element: _enemies) {
-            SDL_RenderCopy(renderer(), element->_texture,element->_textureSrcRect,element->_position );
+        for (const auto &element: _enemies) {
+            SDL_RenderCopy(renderer(), element->_texture, element->_textureSrcRect, element->_position);
         }
+        if (overworldButtonTexture) {
+            int texW, texH;
+            SDL_QueryTexture(overworldButtonTexture, nullptr, nullptr, &texW, &texH);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = overworldButton.x + (overworldButton.w - texW) / 2;
+            destRect.y = overworldButton.y + (overworldButton.h - texH) / 2;
+            SDL_RenderCopy(renderer(), overworldButtonTexture, nullptr, &destRect);
+        }
+
+
+        SDL_RenderPresent(renderer());
+
     }
 } // namespace

@@ -47,7 +47,9 @@ namespace JanSordid::SDL_Example {
                 TTF_CloseFont(buttonFont);
             }
         }
-
+        _game.data.day += 1;
+        _game.data.gold += _game.data.mineLevel * 10;
+        std::cout << _game.data.gold << std::endl;
     }
 
     void OverworldState::Destroy() {
@@ -93,8 +95,7 @@ namespace JanSordid::SDL_Example {
     }
 
     void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
-        std::cout << _game.data.gold << std::endl;
-        _game.data.gold += _game.data.mineLevel;
+
         if (gui != nullptr)
             UpdateGUI();
     }
@@ -225,21 +226,24 @@ namespace JanSordid::SDL_Example {
                     SDL_FreeSurface(upgradeSurf);
                 }
             } else if (std::string(windowTitle) == "Research") {
-                SDL_Surface *mageSurf = TTF_RenderText_Blended(bgui->font, "Mage", white);
-                if (mageSurf) {
-                    bgui->mageTexture = SDL_CreateTextureFromSurface(bgui->renderer, mageSurf);
-                    bgui->mageRect = {20, 120, mageSurf->w, mageSurf->h};
-                    SDL_FreeSurface(mageSurf);
+                if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
+                    SDL_Surface *mageSurf = TTF_RenderText_Blended(bgui->font, "Mage", white);
+                    if (mageSurf) {
+                        bgui->mageTexture = SDL_CreateTextureFromSurface(bgui->renderer, mageSurf);
+                        bgui->mageRect = {20, 120, mageSurf->w, mageSurf->h};
+                        SDL_FreeSurface(mageSurf);
+                    }
                 }
 
-                SDL_Surface *catapultSurf = TTF_RenderText_Blended(bgui->font, "Catapult", white);
-                if (catapultSurf) {
-                    bgui->catapultTexture = SDL_CreateTextureFromSurface(bgui->renderer, catapultSurf);
-                    bgui->catapultRect = {100, 120, catapultSurf->w, catapultSurf->h};
-                    SDL_FreeSurface(catapultSurf);
+                if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
+                    SDL_Surface *catapultSurf = TTF_RenderText_Blended(bgui->font, "Catapult", white);
+                    if (catapultSurf) {
+                        bgui->catapultTexture = SDL_CreateTextureFromSurface(bgui->renderer, catapultSurf);
+                        bgui->catapultRect = {100, 120, catapultSurf->w, catapultSurf->h};
+                        SDL_FreeSurface(catapultSurf);
+                    }
                 }
             }
-
         }
 
         return bgui;
@@ -264,18 +268,27 @@ namespace JanSordid::SDL_Example {
                 if (std::string(gui->title) == "Mine") {
                     //dummy upgrade cost
                     if (IsMouseOver(upgradeButton, mouse)) {
-                        if (_game.data.gold >= _game.data.mineLevel * 10) {
-                            _game.data.gold -= _game.data.mineLevel * 10;
+                        if (_game.data.gold >= _game.data.mineLevel * 3) {
+                            _game.data.gold -= _game.data.mineLevel * 3;
                             _game.data.mineLevel += 1;
                         }
                     }
                 } else if (std::string(gui->title) == "Research") {
-                    if (IsMouseOver(gui->mageButton, mouse)) {
-                        _game.data.unlocks.insert(Tower::TowerType::Mage1);
-                        std::cout << "Unlocked Mage tower.\n";
-                    } else if (IsMouseOver(gui->catapultButton, mouse)) {
-                        _game.data.unlocks.insert(Tower::TowerType::Catapult1);
-                        std::cout << "Unlocked Catapult tower.\n";
+                    if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
+                        if (IsMouseOver(gui->mageButton, mouse)) {
+                            if (_game.data.gold >= 100) {
+                                _game.data.unlocks.insert(Tower::TowerType::Mage1);
+                                std::cout << "Unlocked Mage tower" << std::endl;
+                            }
+                        }
+                    }
+                    if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
+                        if (IsMouseOver(gui->catapultButton, mouse)) {
+                            if (_game.data.gold >= 500) {
+                                _game.data.unlocks.insert(Tower::TowerType::Catapult1);
+                                std::cout << "Unlocked Catapult tower." << std::endl;
+                            }
+                        }
                     }
                 }
             }
@@ -357,28 +370,30 @@ namespace JanSordid::SDL_Example {
             SDL_RenderDrawRect(gui->renderer, &upgradeButton);
 
         } else if (std::string(gui->title) == "Research") {
-            if (gui->mageTexture) {
-                SDL_RenderCopy(gui->renderer, gui->mageTexture, nullptr, &gui->mageRect);
+            if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
+                if (gui->mageTexture) {
+                    SDL_RenderCopy(gui->renderer, gui->mageTexture, nullptr, &gui->mageRect);
+                }
+                // Mage Button
+                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+                SDL_RenderFillRect(gui->renderer, &gui->mageButton);
+
+                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+                SDL_RenderDrawRect(gui->renderer, &gui->mageButton);
             }
-            if (gui->catapultTexture) {
-                SDL_RenderCopy(gui->renderer, gui->catapultTexture, nullptr, &gui->catapultRect);
+
+            if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
+                if (gui->catapultTexture) {
+                    SDL_RenderCopy(gui->renderer, gui->catapultTexture, nullptr, &gui->catapultRect);
+                }
+                // Catapult Button
+                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
+                SDL_RenderFillRect(gui->renderer, &gui->catapultButton);
+
+                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
+                SDL_RenderDrawRect(gui->renderer, &gui->catapultButton);
             }
-
-            // Mage Button
-            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-            SDL_RenderFillRect(gui->renderer, &gui->mageButton);
-
-            SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-            SDL_RenderDrawRect(gui->renderer, &gui->mageButton);
-
-            // Catapult Button
-            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-            SDL_RenderFillRect(gui->renderer, &gui->catapultButton);
-
-            SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-            SDL_RenderDrawRect(gui->renderer, &gui->catapultButton);
         }
-
 
         SDL_Rect button = gui->exitButton;
         SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
