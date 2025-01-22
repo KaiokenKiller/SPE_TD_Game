@@ -13,31 +13,44 @@ namespace JanSordid::SDL_Example
 
 		if( !_font )
 		{
-			_font = TTF_OpenFont( BasePath "asset/font/RobotoSlab-Bold.ttf", 8.0f * _game.scalingFactor() );
+			_font = TTF_OpenFont( BasePath "asset/font/RobotoSlab-Bold.ttf", 4.0f * _game.scalingFactor() );
 			TTF_SetFontHinting( _font, TTF_HINTING_LIGHT );
 			if( !_font )
 				print( stderr, "TTF_OpenFont failed: {}\n", TTF_GetError() );
 		}
 
+		if( !_fontButtons )
+		{
+			_fontButtons = TTF_OpenFont( BasePath "asset/font/KellyAnnGothic.ttf", 8.0f * _game.scalingFactor() );
+			TTF_SetFontHinting( _fontButtons, TTF_HINTING_LIGHT );
+			if( !_fontButtons )
+				print( stderr, "TTF_OpenFont failed: {}\n", TTF_GetError() );
+		}
+
+		if( !_UISprite ) {
+			_UISprite = IMG_LoadTexture( renderer(), BasePath "asset/graphic/ui-elements.png" );
+			if( !_UISprite )
+				print( stderr, "IMG_LoadTexture UI Elements failed: {}\n", SDL_GetError() );
+		}
+
 		if( !_image )
 		{
-			_image = IMG_LoadTexture( renderer(), BasePath "asset/graphic/background.png" );
+			_image = IMG_LoadTexture( renderer(), BasePath "asset/graphic/Main-Menu/background.png" );
 			if( !_image )
-				print( stderr, "IMG_LoadTexture failed: {}\n", IMG_GetError() );
+				print( stderr, "IMG_LoadTexture Background failed: {}\n", IMG_GetError() );
+		}
+
+		if( !_logo ) {
+			_logo = IMG_LoadTexture( renderer(), BasePath "asset/graphic/Main-Menu/logo.png" );
+			if( !_logo )
+				print( stderr, "IMG_LoadTexture Logo failed: {}\n", IMG_GetError() );
 		}
 
 		if( !_music )
 		{
-			_music = Mix_LoadMUS( BasePath "asset/music/severance.ogg" );
+			_music = Mix_LoadMUS( BasePath "asset/music/The True Story of Beelzebub.ogg" );
 			if( !_music )
 				print( stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError() );
-		}
-
-		if( !_sound )
-		{
-			_sound = Mix_LoadWAV( BasePath "asset/sound/pew.wav" );
-			if( !_sound )
-				print( stderr, "Mix_LoadWAV failed: {}\n", Mix_GetError() );
 		}
 
         _game.data.unlocks.insert(Tower::TowerType::Archer1);
@@ -151,29 +164,10 @@ namespace JanSordid::SDL_Example
 		//for (uint x = 0; x < 100; ++x)
 		{
 			constexpr const char * text =
-				"                                          --== Introscreen of my Super Mega Gamey Game 3000 ==--\n\n"
-				"Dies ist ein Typoblindtext. An ihm kann man sehen, ob alle Buchstaben da sind und wie sie aussehen. "
-				"Manchmal benutzt man Worte wie Hamburgefonts, Rafgenduks oder Handgloves, um Schriften zu testen. "
-				"Manchmal Sätze, die alle Buchstaben des Alphabets enthalten - man nennt diese Sätze »Pangrams«. "
-				"Sehr bekannt ist dieser: The quick brown fox jumps over the lazy old dog. "
-				"Oft werden in Typoblindtexte auch fremdsprachige Satzteile eingebaut (AVAIL® and Wefox™ are testing aussi la Kerning), um die Wirkung in anderen Sprachen zu testen. "
-				"In Lateinisch sieht zum Beispiel fast jede Schrift gut aus. Quod erat demonstrandum. "
-				"Seit 1975 fehlen in den meisten Testtexten die Zahlen, weswegen nach TypoGb. §.204 ab dem Jahr 2034 Zahlen in 86 der Texte zur Pflicht werden. "
-				"Nichteinhaltung wird mit bis zu 245 € oder 368 $ bestraft. Genauso wichtig in sind mittlerweile auch Âçcèñtë, die in neueren Schriften aber fast immer enthalten sind. "
-				"Ein wichtiges aber schwierig zu integrierendes Feld sind OpenType-Funktionalitäten. "
-				"Je nach Software und Voreinstellungen können eingebaute Kapitälchen, Kerning oder Ligaturen (sehr pfiffig) nicht richtig dargestellt werden."
-				"\n\nRoyality free music by Karl Casey @ White Bat Audio"
+				"Music by Patrick de Arteaga"
 				"\n  - Press [F1] to (un)pause music."
 				"\n  - Press [F2] to (un)mute music."
-				"\nSource: https://www.youtube.com/watch?v=aFITtvK64B4"
-				"\n\nPress any key to continue!"
-				"\n\n!\"#$%&'()*+,-./0123456789:;<=>? c*8 uzu"
-				"\n@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-				"\n`abcdefghijklmnopqrstuvwxyz{|}~"
-				"\n\u00A0!¡c¢E£¤Y¥¦S§¨©ª«¬\u00AD®¯°C±n²³´uµ¶·¸¹º»¼½¾?¿"
-				"\nAÀÁÂÃÄ¨ÅÆCÇEÈÉÊËÌÍÎÏIDÐÑNOÒÓÔÕÖ×OØUÙÚÛÜYÝÞß"
-				"\naàáâãäåæcçeèéêëiìíîïdðnñoòóôõö÷oøuùúûüyýþyÿ"
-				"\ninjektion! enjoy major Heij project Stobject farbe kd aes real tw";
+				"\nSource: https://patrickdearteaga.com";
 
 			const Color outlineColor = _isDarkOutline
 				? Color {   0,   0,   0, SDL_ALPHA_OPAQUE }
@@ -184,50 +178,125 @@ namespace JanSordid::SDL_Example
 			// _textmode == 1 is Bitmap Font (currently uncached)
 			if( _textmode == 0 )
 			{
-				// Comment out to disable the cache. Uses 5ms without / 20 ms with harfbuzz
 				if( _blendedText == nullptr )
 				{
-					if( _blendedText != nullptr )
-						SDL_DestroyTexture( _blendedText );
-
 					Surface * surf = TTF_RenderUTF8_Blended_Wrapped( _font, text, white, windowSize.x - _p.x );
 					_blendedText = SDL_CreateTextureFromSurface( renderer(), surf );
 					SDL_FreeSurface( surf );
 
 					u32 fmt;
 					int access;
-					SDL_QueryTexture( _blendedText, &fmt, &access, &_blendedTextSize.x, &_blendedTextSize.y );
+					SDL_QueryTexture( _blendedText, &fmt, &access, &_blendedTextSize.x, &_blendedTextSize.y);
 				}
 
 				SDL_SetTextureColorMod( _blendedText, outlineColor.r, outlineColor.g, outlineColor.b );
 
 				for( const Point & offset : HSNR64::ShadowOffset::Rhombus )
 				{
-					const Rect dst_rect = Rect {_p.x, _p.y, _blendedTextSize.x, _blendedTextSize.y } + offset;
+					const Rect dst_rect = Rect {
+						windowSize.x - _blendedTextSize.x,
+						windowSize.y - _blendedTextSize.y,
+						_blendedTextSize.x,
+						_blendedTextSize.y
+					} + offset;
+
 					SDL_RenderCopy( renderer(), _blendedText, EntireRect, &dst_rect );
 				}
 
 				const Color & color = HSNR64::Palette( _colorIndex );
 				SDL_SetTextureColorMod( _blendedText, color.r, color.g, color.b );
-				const Rect dst_rect = { _p.x, _p.y, _blendedTextSize.x, _blendedTextSize.y };
+
+				const Rect dst_rect = {
+					windowSize.x - _blendedTextSize.x,
+					windowSize.y - _blendedTextSize.y,
+					_blendedTextSize.x,
+					_blendedTextSize.y
+				};
+
 				SDL_RenderCopy( renderer(), _blendedText, EntireRect, &dst_rect );
 			}
-			else
-			{
-				/*
-				TileFont::TF_Init( renderer() );
+		}
 
-				Rect dimension { _p.x, _p.y, winSize.x - (32 + _p.x), 9999 };
-				TileFont::TF_Render( renderer(), text, dimension, HSNR64::Palette( _colorIndex ), outlineColor );
-				*/
+		if (_logo)
+		{
+			SDL_Rect logoRect;
+			SDL_QueryTexture(_logo, nullptr, nullptr, &logoRect.w, &logoRect.h);
+			logoRect.x = (windowSize.x - logoRect.w) / 2;
+			logoRect.y = (windowSize.y - logoRect.h) / 8;
+			SDL_RenderCopy(renderer(), _logo, EntireRect, &logoRect);
+		}
+
+		int buttonWidth = windowSize.x / 4;
+		int buttonHeight = windowSize.y / 12;
+
+		Rect startButtonRect = {
+			(windowSize.x - buttonWidth) / 2,
+			windowSize.y / 2 + buttonHeight,
+			buttonWidth,
+			buttonHeight
+		};
+
+		Rect exitButtonRect = {
+			(windowSize.x - buttonWidth) / 2,
+			startButtonRect.y + buttonHeight * 2,
+			buttonWidth,
+			buttonHeight
+		};
+
+		Rect srcRect = {33, 0, 32, 32};
+
+		// Buttons rendern
+		SDL_RenderDrawRect(renderer(), &startButtonRect);
+		SDL_RenderCopy(renderer(), _UISprite, &srcRect, &startButtonRect);
+		SDL_RenderDrawRect(renderer(), &exitButtonRect);
+		SDL_RenderCopy(renderer(), _UISprite, &srcRect, &exitButtonRect);
+
+		// Buttons Text rendern
+		// Poor persons benchmark
+		//for (uint x = 0; x < 100; ++x)
+		{
+			constexpr const char * startText = "Start";
+			constexpr const char * exitText = "Exit";
+
+			const Color outlineColor = _isDarkOutline
+				? Color {   0,   0,   0, SDL_ALPHA_OPAQUE }
+				: Color { 255, 255, 255, SDL_ALPHA_OPAQUE };
+
+			if( _textmode == 0 ) {
+				if( _blendedStartText == nullptr )
+				{
+					Surface * surf = TTF_RenderUTF8_Blended_Wrapped( _fontButtons, startText, white, windowSize.x - _p.x );
+					_blendedStartText = SDL_CreateTextureFromSurface( renderer(), surf );
+					SDL_FreeSurface( surf );
+
+					u32 fmt;
+					int access;
+					SDL_QueryTexture( _blendedStartText, &fmt, &access, &_blendedStartTextSize.x, &_blendedStartTextSize.y);
+				}
+
+				SDL_SetTextureColorMod( _blendedStartText, outlineColor.r, outlineColor.g, outlineColor.b );
+
+				for( const Point & offset : HSNR64::ShadowOffset::Rhombus )
+				{
+					const Rect dst_rect = Rect {
+						startButtonRect.x - _blendedStartTextSize.x,
+						startButtonRect.y - _blendedStartTextSize.y,
+						_blendedStartTextSize.x,
+						_blendedStartTextSize.y
+					} + offset;
+
+					SDL_RenderCopy( renderer(), _blendedStartText, EntireRect, &dst_rect );
+				}
 			}
 		}
 	}
 
-#ifdef IMGUI
 
+
+#ifdef IMGUI
 	void IntroState::RenderUI( const u64 frame, const u64 totalMSec, const f32 deltaTNeeded )
 	{
+		/*
 		// ImGui Demo
 		static bool show_demo_window = true;
 		ImGui::SetNextWindowCollapsed( true, ImGuiCond_Once );
@@ -267,7 +336,7 @@ namespace JanSordid::SDL_Example
 		ImGui::SliderScalarN( "cavity left", ImGuiDataType_U8, m.left, 8, &min, &max );
 		ImGui::SliderScalarN( "cavity right", ImGuiDataType_U8, m.right, 8, &min, &max );
 		*/
-
+		/*
 		ImGui::Checkbox( "Draw Color Number", &drawColorNumber );
 
 		ImGui::PushID( "fg color" );
@@ -349,6 +418,7 @@ namespace JanSordid::SDL_Example
 		}
 
 		ImGui::End();
+		*/
 	}
 
 #endif
