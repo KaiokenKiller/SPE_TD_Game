@@ -87,6 +87,7 @@ namespace JanSordid::SDL_Example {
         int _damage;
         bool _isVisible;
 		FPoint _direction;
+		FPoint _startPosition;
 		FPoint _endPosition;
         Enemy *_target;
 

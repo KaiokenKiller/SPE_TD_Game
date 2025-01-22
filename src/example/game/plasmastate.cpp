@@ -19,7 +19,7 @@ namespace JanSordid::SDL_Example {
     }
 
 	Projectile * TowerArcher1::shoot(Enemy *target, f32 deltaT) {
-		Rect * startPosition = new Rect( _position->x, _position->y, _position->w/2, _position->h/2 );
+		Rect * startPosition = new Rect( _position->x, _position->y, 3, 14);
 		return new Projectile(startPosition, _projectileTexture, _attackDamage, target, deltaT);
 	}
 
@@ -31,7 +31,7 @@ namespace JanSordid::SDL_Example {
     }
 
 	Projectile * Mage1::shoot(Enemy *target, f32 deltaT) {
-		Rect * startPosition = new Rect( _position->x, _position->y, _position->w/2, _position->h/2 );
+		Rect * startPosition = new Rect( _position->x, _position->y, 32, 32 );
 		return new Projectile(startPosition, _projectileTexture, _attackDamage, target,deltaT);
     }
 
@@ -43,7 +43,7 @@ namespace JanSordid::SDL_Example {
     }
 
 	Projectile * Catapult1::shoot(Enemy *target, f32 deltaT) {
-		Rect * startPosition = new Rect( _position->x, _position->y, _position->w/2, _position->h/2 );
+		Rect * startPosition = new Rect( _position->x, _position->y, 32, 32 );
 		return new Projectile(startPosition, _projectileTexture, _attackDamage, target, deltaT);
     }
 
@@ -152,20 +152,21 @@ namespace JanSordid::SDL_Example {
 	Projectile::Projectile(Rect *position, Texture *texture, int damage, Enemy *target, f32 deltaT) {
 		_isVisible = true;
 		_position = position;
+		_startPosition = FPoint (_position->x,_position->y);
 		_texture = texture;
 		_damage = damage;
 		_target = target;
 
-
-
-		_endPosition = target->predictMove(deltaT * 5);
+		_endPosition = target->predictMove(deltaT * 10);
 		_direction = FPoint (_endPosition.x - position->x,_endPosition.y - position->y);
 	}
 
 	void Projectile::move(const f32 deltaT) {
 		if (_isVisible){
-			_position->x += deltaT * 10 * _direction.x;
-			_position->y += deltaT * 10 * _direction.y;
+			_position->x += deltaT * 2 * _direction.x;
+			_position->y += deltaT * 2 * _direction.y;
+			if (_position->x < _endPosition.x +10 && _position->x > _endPosition.x -10 && _position->y < _endPosition.y +10 && _position->y > _endPosition.y -10)
+				_isVisible = false;
 		}
 	}
 
@@ -216,7 +217,7 @@ namespace JanSordid::SDL_Example {
 
         // Spawning temporary Dummies
 		if (_game.data._towers.empty()) {
-			projectileSrcRectMap[archerTowerArrowTexture] = new Rect(0, 0, 3, 14);
+			projectileSrcRectMap[archerTowerArrowTexture] = new Rect(1, 1, 2, 12);
 			projectileSrcRectMap[mageTowerOrbTexture] = new Rect(0, 0, 32, 32);
 			projectileSrcRectMap[catapultTowerTexture] = new Rect(0, 0, 32, 32);
 
@@ -257,7 +258,7 @@ namespace JanSordid::SDL_Example {
 
 			tempRect = new Rect(
 					0,
-					gridHeight / 2 * tileSize * scalingFactor(),
+					gridHeight / 4 * 3*  tileSize * scalingFactor(),
 					46,
 					46
 			);
@@ -332,7 +333,7 @@ namespace JanSordid::SDL_Example {
 			for (auto tower: _game.data._towers) {
 				_projectiles.push_back(tower->shoot(_enemies[0], deltaT));
 			}
-			cd = totalMSec + 200;
+			cd = totalMSec + 500;
 		}
     }
 
@@ -364,7 +365,8 @@ namespace JanSordid::SDL_Example {
         }
 
 		for (auto &element: _projectiles) {
-			SDL_RenderCopy(renderer(), element->_texture, projectileSrcRectMap[element->_texture], element->_position);
+			if (element->_isVisible)
+				SDL_RenderCopy(renderer(), element->_texture, projectileSrcRectMap[element->_texture], element->_position);
 		}
 
         if (overworldButtonTexture) {
