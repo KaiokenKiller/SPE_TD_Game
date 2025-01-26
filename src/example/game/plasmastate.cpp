@@ -354,6 +354,17 @@ namespace JanSordid::SDL_Example {
 		for (auto projectile:_projectiles) {
 			projectile->move(deltaT);
 		}
+		if (_projectiles.size() > 500) {
+			Vector<Projectile*> newProjectiles;
+			for (auto projectile: _projectiles) {
+				if (projectile->_isVisible)
+					newProjectiles.push_back(projectile);
+				else{
+					delete projectile;
+				}
+			}
+			_projectiles = newProjectiles;
+		}
 
 		for (auto enemy:_enemies) {
 			enemy->move(deltaT);
