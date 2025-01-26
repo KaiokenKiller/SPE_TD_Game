@@ -87,16 +87,18 @@ namespace JanSordid::SDL_Example {
         int _damage;
         bool _isVisible;
 		FPoint _direction;
-		FPoint _startPosition;
-		FPoint _endPosition;
         Enemy *_target;
+		int _homingCounter = 100;
+		int _speed = 200;
 
-        Projectile(Rect *position, Texture *texture, int damage, Enemy *target, f32 deltaT);
+        Projectile(Rect *position, Texture *texture, int damage, Enemy *target);
 
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 
         void move(f32 deltaT);
+	protected:
+		void updateDirection();
     };
 
 
@@ -120,7 +122,10 @@ namespace JanSordid::SDL_Example {
 
         virtual ~Tower() = default;
 
-        virtual Projectile * shoot(Enemy *target, f32 deltaT) = 0;
+        virtual Projectile * shoot(Enemy *target, u64 totalMSec) = 0;
+
+	protected:
+		bool checkCooldown(u64 totalMSec);
     };
 
     class TowerArcher1 : public Tower {
@@ -128,7 +133,7 @@ namespace JanSordid::SDL_Example {
 
         TowerArcher1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
-		Projectile * shoot(Enemy *target, f32 deltaT) override;
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
     };
 
     class Mage1 : public Tower {
@@ -136,7 +141,7 @@ namespace JanSordid::SDL_Example {
 
         Mage1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
-		Projectile * shoot(Enemy *target, f32 deltaT) override;
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
     };
 
     class Catapult1 : public Tower {
@@ -144,7 +149,7 @@ namespace JanSordid::SDL_Example {
 
         Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
-		Projectile * shoot(Enemy *target, f32 deltaT) override;
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
     };
 
     struct GameData {
