@@ -87,16 +87,18 @@ namespace JanSordid::SDL_Example {
         int _damage;
         bool _isVisible;
 		FPoint _direction;
-		FPoint _startPosition;
-		FPoint _endPosition;
         Enemy *_target;
+		int _homingCounter = 100;
+		int _speed = 200;
 
-        Projectile(Rect *position, Texture *texture, int damage, Enemy *target, f32 deltaT);
+        Projectile(Rect *position, Texture *texture, int damage, Enemy *target);
 
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 
         void move(f32 deltaT);
+	protected:
+		void updateDirection();
     };
 
 
