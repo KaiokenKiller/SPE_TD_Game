@@ -11,15 +11,21 @@
 - ~~Brainstorming~~
 - ~~Towers ausdenken~~
 - ~~grobes UML erstellen~~
-  Tower State implementieren
+- Tower State implementieren
     - Basic Tower
-        - Schießen
+      - ~~Schießen~~
+      - ~~Cooldown~~
+      - Range
     - Dummy Gegner
-        - move function
+      - ~~move function~~
     - Placement
     - Projectiles
-    - Path
-    - ~~Map~~
+      - ~~Basic functions~~
+      - AoE
+    - ~~Path~~
+    - Map
+      - ~~Test Map~~
+      - First Level
 - Overworld State implementieren
     - Gebäude + GUI
         - Burg macht nichts
