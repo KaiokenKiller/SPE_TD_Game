@@ -11,40 +11,57 @@ namespace JanSordid::SDL_Example {
 		_projectileTexture = projectileTexture;
     }
 
+	bool Tower::checkCooldown(u64 totalMSec) {
+		if (_cooldown < totalMSec){
+			_cooldown = totalMSec + _attackSpeed;
+			return true;
+		}
+		return false;
+	}
+
     TowerArcher1::TowerArcher1(Rect *placement, Texture *texture, Texture * projectileTexture) : Tower(placement, texture, projectileTexture) {
         _type = TowerType::Archer1;
         _attackDamage = 5;
         _attackRange = 2;
-        _attackSpeed = 5;
+        _attackSpeed = 750;
     }
 
-	Projectile * TowerArcher1::shoot(Enemy *target, f32 deltaT) {
+	Projectile * TowerArcher1::shoot(Enemy *target,u64 totalMSec) {
+		if (checkCooldown(totalMSec)){
 		Rect * startPosition = new Rect( _position->x + (_position->w/2), _position->y + (_position->h/2), 3, 14);
 		return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+	}
+		return nullptr;
 	}
 
     Mage1::Mage1(Rect *placement, Texture *texture, Texture * projectileTexture) : Tower(placement, texture, projectileTexture) {
         _type = TowerType::Mage1;
         _attackDamage = 7;
         _attackRange = 2;
-        _attackSpeed = 3;
+        _attackSpeed = 1000;
     }
 
-	Projectile * Mage1::shoot(Enemy *target, f32 deltaT) {
+	Projectile * Mage1::shoot(Enemy *target, u64 totalMSec) {
+		if (checkCooldown(totalMSec)){
 		Rect * startPosition = new Rect( _position->x + (_position->w/2), _position->y + (_position->h/2), 32, 32 );
 		return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
-    }
+    	}
+		return nullptr;
+	}
 
     Catapult1::Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture) : Tower(placement, texture, projectileTexture) {
         _type = TowerType::Catapult1;
         _attackDamage = 10;
         _attackRange = 4;
-        _attackSpeed = 2;
+        _attackSpeed = 1500;
     }
 
-	Projectile * Catapult1::shoot(Enemy *target, f32 deltaT) {
-		Rect * startPosition = new Rect( _position->x + (_position->w/2), _position->y + (_position->h/2), 32, 32 );
-		return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+	Projectile * Catapult1::shoot(Enemy *target, u64 totalMSec) {
+		if (checkCooldown(totalMSec)) {
+			Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32, 32);
+			return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+		}
+		return nullptr;
     }
 
 	Enemy::Enemy(Rect *position, Texture *texture, Vector<FPoint> path,int hp, int speed) {
@@ -353,12 +370,10 @@ namespace JanSordid::SDL_Example {
 			}
 		}
 
-		static u64 cd = 0;
-		if (totalMSec > cd) {
-			for (auto tower: _game.data._towers) {
-				_projectiles.push_back(tower->shoot(_enemies[0], deltaT));
-			}
-			cd = totalMSec + 500;
+		for (auto tower: _game.data._towers) {
+			Projectile* temp = tower->shoot(_enemies[0], totalMSec);
+			if (temp != nullptr)
+				_projectiles.push_back(temp);
 		}
     }
 
