@@ -101,7 +101,6 @@ namespace JanSordid::SDL_Example {
 		void updateDirection();
     };
 
-
     class Tower {
     public:
         enum class TowerType {
@@ -151,6 +150,21 @@ namespace JanSordid::SDL_Example {
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
     };
+
+	class TowerSlot {
+	public:
+		Rect* _position;
+		Texture* _texture;
+		Rect* _textureSrcRect;
+		Rect * _towerIconPosition[3];
+		Rect* _towerIconSrc [3];
+		Texture* _towerIconTextures[3];
+		bool _clicked = false;
+		bool _used = false;
+
+		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3]);
+		Tower* placeTower(int selectedTower, std::unordered_set<Tower::TowerType> unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures);
+	};
 
     struct GameData {
         int gold = 100;
@@ -253,7 +267,7 @@ namespace JanSordid::SDL_Example {
         Texture *overworldButtonTexture = nullptr;
         Texture *enemyPathTile = nullptr;
         Texture *grassTile = nullptr;
-        Texture *towerSlot = nullptr;
+        Texture *towerSlotTexture = nullptr;
         Texture *archerTowerTexture = nullptr;
 		Texture *archerTowerArrowTexture = nullptr;
 		Texture *mageTowerTexture = nullptr;
@@ -261,6 +275,8 @@ namespace JanSordid::SDL_Example {
         Texture *catapultTowerTexture = nullptr;
 		Texture *catapultTowerStoneTexture = nullptr;
         Texture *enemyTexture = nullptr;
+
+		Music * _music = nullptr;
 
         static constexpr int gridWidth = 40;
         static constexpr int gridHeight = 22;
@@ -271,7 +287,9 @@ namespace JanSordid::SDL_Example {
         Rect *tileMap[gridHeight][gridWidth] = {nullptr};
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;
+		std::unordered_map<Tower::TowerType,Texture *> projectileTextureMap;
 
+		std::vector<TowerSlot*> _towerSlots;
         std::vector<Projectile *> _projectiles;
         std::vector<Enemy *> _enemies;
 

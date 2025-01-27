@@ -5,6 +5,7 @@
 
 namespace JanSordid::SDL_Example {
 
+
     Tower::Tower(Rect *placement, Texture *texture, Texture * projectileTexture) {
         _position = placement;
         _texture = texture;
@@ -63,6 +64,61 @@ namespace JanSordid::SDL_Example {
 		}
 		return nullptr;
     }
+
+	TowerSlot::TowerSlot(JanSordid::SDL::Rect *position, JanSordid::SDL::Texture *texture, JanSordid::SDL::Rect **towerIconSrc, JanSordid::SDL::Texture **towerIconTextures) {
+		_position = position;
+		_texture = texture;
+		_textureSrcRect = new Rect(0,0,62,61);
+		for (int i = 0; i < 3; ++i) {
+			_towerIconSrc[i] = towerIconSrc[i];
+			_towerIconTextures[i] = towerIconTextures[i];
+		}
+		_towerIconPosition[0] = new Rect(_position->x - 32,_position->y - 64 - 16,32,64);
+		_towerIconPosition[1] = new Rect(_position->x + ((_position->w/2)-16),_position->y - 64 - 16,32,64);
+		_towerIconPosition[2] = new Rect(_position->x + _position->w,_position->y - 64 - 16,32,64);
+	}
+
+	Tower* TowerSlot::placeTower(int selectedTower,std::unordered_set<Tower::TowerType> unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures) {
+		if (!_used) {
+			Tower::TowerType towerType;
+			switch (selectedTower) {
+				case 0: {
+					towerType = Tower::TowerType::Mage1;
+					break;
+				}
+				case 1: {
+					towerType = Tower::TowerType::Archer1;
+					break;
+				}
+				case 2: {
+					towerType = Tower::TowerType::Catapult1;
+					break;
+				}
+				default: {
+					return nullptr;
+				}
+			}
+			if (unlocks.contains(towerType)) {
+				// ToDo priceCheck implementieren
+				_used = true;
+
+				Rect * towerPosition = new Rect(_position->x-4,_position->y-66,70,130);
+				switch (towerType) {
+					case Tower::TowerType::Archer1:{
+						return new TowerArcher1{towerPosition,_towerIconTextures[1],projectileTextures[towerType]};
+					}
+					case Tower::TowerType::Mage1:{
+						return new Mage1{towerPosition,_towerIconTextures[0],projectileTextures[towerType]};
+					}
+					case Tower::TowerType::Catapult1:{
+						return new Catapult1{towerPosition,_towerIconTextures[2],projectileTextures[towerType]};
+					}
+
+				}
+			}
+		}
+		return nullptr;
+	}
 
 	Enemy::Enemy(Rect *position, Texture *texture, Vector<FPoint> path,int hp, int speed) {
 		_isAlive = true;
@@ -221,6 +277,9 @@ namespace JanSordid::SDL_Example {
         if (!grassTile) {
             grassTile = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/grass_tile.png");
         }
+		if (!towerSlotTexture){
+			towerSlotTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/PlaceForTower.png");
+		}
         if (!archerTowerTexture) {
             archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png");
         }
@@ -243,6 +302,13 @@ namespace JanSordid::SDL_Example {
             enemyTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Enemies/slime_walk.png");
         }
 
+		if (!_music) {
+			_music = Mix_LoadMUS(BasePath "asset/music/TD_Music.wav");
+			if (!_music)
+				print(stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError());
+		}
+		Mix_PlayMusic(_music, -1);
+
         if (tileMap[0][0] == nullptr) {
             for (int i = 0; i < gridHeight; i++) {
                 for (int j = 0; j < gridWidth; j++) {
@@ -257,12 +323,17 @@ namespace JanSordid::SDL_Example {
             }
         }
 
+
+
         // Spawning temporary Dummies
 		if (_game.data._towers.empty()) {
 			projectileSrcRectMap[archerTowerArrowTexture] = new Rect(1, 1, 2, 12);
 			projectileSrcRectMap[mageTowerOrbTexture] = new Rect(0, 0, 32, 32);
 			projectileSrcRectMap[catapultTowerTexture] = new Rect(0, 0, 32, 32);
 
+			projectileTextureMap[Tower::TowerType::Archer1] = archerTowerArrowTexture;
+			projectileTextureMap[Tower::TowerType::Mage1] = mageTowerOrbTexture;
+			projectileTextureMap[Tower::TowerType::Catapult1] = catapultTowerStoneTexture;
 
 			Rect *tempRect = new Rect(0, 0, towerWidth, towerHeight);
 			towerSrcRectMap[Tower::TowerType::Archer1] = tempRect;
@@ -297,6 +368,20 @@ namespace JanSordid::SDL_Example {
 
 			Catapult1 *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture, catapultTowerStoneTexture);
 			_game.data._towers.push_back(tempCatapultTower);
+
+			tempRect = new Rect(
+					10 * tileSize * scalingFactor(),
+					13 * tileSize * scalingFactor(),
+					62 / 1.5 * scalingFactor(),
+					62 / 1.5 * scalingFactor()
+			);
+
+			Rect* towerIconSrc [3] = {towerSrcRectMap[Tower::TowerType::Mage1],towerSrcRectMap[Tower::TowerType::Archer1],towerSrcRectMap[Tower::TowerType::Catapult1]};
+			Texture* towerIconTexture[3] = {mageTowerTexture,archerTowerTexture,catapultTowerTexture};
+
+
+			TowerSlot* tempTowerSlot = new TowerSlot(tempRect,towerSlotTexture,towerIconSrc,towerIconTexture);
+			_towerSlots.push_back(tempTowerSlot);
 
 			tempRect = new Rect(
 					0,
@@ -342,8 +427,31 @@ namespace JanSordid::SDL_Example {
                     _game.PushState(MyGS::Overworld);
                     return true;
                 }
+				for (auto &towerSlot:_towerSlots) {
+					if (!towerSlot->_used) {
+						if (towerSlot->_clicked) {
+							for (int i = 0; i < 3; ++i) {
+								if (SDL_PointInRect(&mouse, towerSlot->_towerIconPosition[i])) {
+									Tower *newTower = towerSlot->placeTower(i, _game.data.unlocks, projectileTextureMap);
+									if (newTower != nullptr) {
+										_game.data._towers.push_back(newTower);
+										return true;
+									}
+								}
+							}
+						}
+						if (SDL_PointInRect(&mouse, towerSlot->_position)) {
+							towerSlot->_clicked = !towerSlot->_clicked;
+						}
+					}
+				}
+
+				for (auto &tower:_game.data._towers) {
+					//ToDo Upgrades implementieren
+				}
             }
         }
+		return false;
     }
 
     bool TdState::Input() {
@@ -407,6 +515,12 @@ namespace JanSordid::SDL_Example {
             }
         }
 
+		for (auto &element: _towerSlots) {
+			if (!element->_used){
+			SDL_RenderCopy(renderer(), element->_texture, element->_textureSrcRect, element->_position);
+			}
+		}
+
         for (const auto &element: _game.data._towers) {
             SDL_RenderCopy(renderer(), element->_texture, towerSrcRectMap[element->_type], element->_position);
         }
@@ -418,6 +532,16 @@ namespace JanSordid::SDL_Example {
 		for (auto &element: _projectiles) {
 			if (element->_isVisible)
 				SDL_RenderCopy(renderer(), element->_texture, projectileSrcRectMap[element->_texture], element->_position);
+		}
+
+		for (auto &element: _towerSlots){
+			if (!element->_used) {
+				if (element->_clicked) {
+					for (int i = 0; i < 3; ++i) {
+						SDL_RenderCopy(renderer(), element->_towerIconTextures[i], element->_towerIconSrc[i], element->_towerIconPosition[i]);
+					}
+				}
+			}
 		}
 
         if (overworldButtonTexture) {
@@ -432,8 +556,6 @@ namespace JanSordid::SDL_Example {
             SDL_RenderCopy(renderer(), overworldButtonTexture, nullptr, &destRect);
         }
 
-
         SDL_RenderPresent(renderer());
-
     }
 } // namespace
