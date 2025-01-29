@@ -75,7 +75,7 @@ namespace JanSordid::SDL_Example {
 
         Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
 
-        void move(f32 deltaT);
+        void move(f32 deltaT, f32 scalingFactor);
 		//FPoint predictMove(f32 deltaT) const;
 
 		bool takeDamage(int damage);
@@ -96,7 +96,7 @@ namespace JanSordid::SDL_Example {
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 
-        void move(f32 deltaT);
+        void move(f32 deltaT, f32 scalingFactor);
 	protected:
 		void updateDirection();
     };
@@ -183,8 +183,8 @@ namespace JanSordid::SDL_Example {
 		bool _clicked = false;
 		bool _used = false;
 
-		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3]);
-		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures);
+		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3], f32 scalingFactor);
+		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures, f32 scalingFactor);
 	};
 
     struct GameData {

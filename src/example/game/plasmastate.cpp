@@ -96,7 +96,7 @@ namespace JanSordid::SDL_Example {
 	}
 
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
-                         Rect **towerIconSrc, Texture **towerIconTextures) {
+                         Rect **towerIconSrc, Texture **towerIconTextures, f32 scalingFactor) {
         _position = position;
         _texture = texture;
         _textureSrcRect = new Rect(0, 0, 62, 61);
@@ -105,15 +105,18 @@ namespace JanSordid::SDL_Example {
             _towerIconSrc[i] = towerIconSrc[i];
             _towerIconTextures[i] = towerIconTextures[i];
         }
-        _towerIconPosition[0] = new Rect(_position->x - 32, _position->y - 64 - 16, 32, 64);
-        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - 16), _position->y - 64 - 16, 32, 64);
-        _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - 64 - 16, 32, 64);
+		int iconWidth = 32*scalingFactor;
+		int iconHeight = 64*scalingFactor;
+
+        _towerIconPosition[0] = new Rect(_position->x - iconWidth, _position->y - iconHeight, iconWidth, iconHeight);
+        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y - (iconHeight + (8*scalingFactor)), iconWidth, iconHeight);
+        _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - iconHeight, iconWidth, iconHeight);
     }
 
-    Tower *TowerSlot::placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType, Texture *> projectileTextures) {
+    Tower *TowerSlot::placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType, Texture *> projectileTextures, f32 scalingFactor) {
         if (!_used) {
                 _used = true;
-                Rect *towerPosition = new Rect(_position->x - 4, _position->y - 66, 70, 130);
+                Rect *towerPosition = new Rect(_position->x - ((4/2)*scalingFactor), _position->y - ((66/2)*scalingFactor), ((70/2)*scalingFactor), ((130/2)*scalingFactor));
                 switch (towerType) {
                     case Tower::TowerType::Archer1: {
                         return new Archer1{towerPosition, _towerIconTextures[1], projectileTextures[towerType]};
@@ -146,9 +149,9 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
-    void Enemy::move(const f32 deltaT) {
+    void Enemy::move(const f32 deltaT, f32 scalingFactor) {
         if (_isAlive) {
-            int movement = deltaT * 100 * _speed;
+            int movement = deltaT * 100 * _speed * scalingFactor;
 
             while (movement > 0) {
                 if (_path[_currentPath].x != 0) {
@@ -263,10 +266,10 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    void Projectile::move(const f32 deltaT) {
+    void Projectile::move(const f32 deltaT, f32 scalingFactor) {
         if (_isVisible) {
-            _position->x += _direction.x * deltaT * _speed;
-            _position->y += _direction.y * deltaT * _speed;
+            _position->x += _direction.x * deltaT * _speed * scalingFactor;
+            _position->y += _direction.y * deltaT * _speed * scalingFactor;
 
             if (SDL_HasIntersection(_position, _target->_position)) {
                 _target->takeDamage(_damage);
@@ -395,14 +398,14 @@ namespace JanSordid::SDL_Example {
             Texture *towerIconTexture[3] = {mageTowerTexture, archerTowerTexture, catapultTowerTexture};
 
 
-            auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture);
+            auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture,scalingFactor());
             _towerSlots.push_back(tempTowerSlot);
 
             tempRect = new Rect(
                 0,
                 gridHeight / 4 * 3 * tileSize * scalingFactor(),
-                46,
-                46
+                46/2*scalingFactor(),
+                46/2*scalingFactor()
             );
 
             Vector<FPoint> path;
@@ -410,7 +413,7 @@ namespace JanSordid::SDL_Example {
             path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
 
-            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 2);
+            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 1);
             _enemies.push_back(tempEnemy);
 
             if (!overworldButtonTexture) {
@@ -481,7 +484,7 @@ namespace JanSordid::SDL_Example {
 											default:;
 										}
 										if (priceCheck) {
-											Tower *newTower = towerSlot->placeTower(towerType, projectileTextureMap);
+											Tower *newTower = towerSlot->placeTower(towerType, projectileTextureMap,scalingFactor());
 											if (newTower != nullptr) {
 												_game.data._towers.push_back(newTower);
 												return true;
@@ -511,7 +514,7 @@ namespace JanSordid::SDL_Example {
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
         for (auto projectile: _projectiles) {
-            projectile->move(deltaT);
+            projectile->move(deltaT,scalingFactor());
         }
         if (_projectiles.size() > 500) {
 			_projectiles.erase(
@@ -528,7 +531,7 @@ namespace JanSordid::SDL_Example {
 		}
 
         for (auto enemy: _enemies) {
-            enemy->move(deltaT);
+            enemy->move(deltaT,scalingFactor());
             // temporary for testing
             if (!enemy->_isAlive) {
                 Vector<FPoint> path;
