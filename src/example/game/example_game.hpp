@@ -195,7 +195,7 @@ namespace JanSordid::SDL_Example {
 		int _delay = 100;
 
 
-		EnemySpawner(std::vector<Enemy*> &enemies);
+		EnemySpawner(const std::vector<Enemy*> &enemies);
 		Enemy* spawn(u64 totalMSec);
 	};
 

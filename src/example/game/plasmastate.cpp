@@ -152,47 +152,47 @@ namespace JanSordid::SDL_Example {
 
     void Enemy::move(const f32 deltaT, f32 scalingFactor) {
         if (_isAlive) {
-            int movement = deltaT * 100 * _speed * scalingFactor;
+            int remainingMovement = deltaT * 100 * _speed * scalingFactor;
 
-            while (movement > 0) {
+            while (remainingMovement > 0 && _currentPath < _path.size()) {
                 if (_path[_currentPath].x != 0) {
-                    if (abs(_path[_currentPath].x) - movement < 0) {
+                    if (abs(_path[_currentPath].x) - remainingMovement <= 0) {
                         _position->x += _path[_currentPath].x;
-                        movement -= abs(_path[_currentPath].x);
+                        remainingMovement -= abs(_path[_currentPath].x);
                         _path[_currentPath].x = 0;
                         _currentPath++;
                     } else {
                         if (_path[_currentPath].x > 0) {
-                            _position->x += movement;
-                            _path[_currentPath].x -= movement;
-                            movement = 0;
+                            _position->x += remainingMovement;
+                            _path[_currentPath].x -= remainingMovement;
+                            remainingMovement = 0;
                         } else {
-                            _position->x -= movement;
-                            _path[_currentPath].x += movement;
-                            movement = 0;
+                            _position->x -= remainingMovement;
+                            _path[_currentPath].x += remainingMovement;
+                            remainingMovement = 0;
                         }
                     }
                 } else if (_path[_currentPath].y != 0) {
-                    if (abs(_path[_currentPath].y) - movement < 0) {
+                    if (abs(_path[_currentPath].y) - remainingMovement <= 0) {
                         _position->y += _path[_currentPath].y;
-                        movement -= abs(_path[_currentPath].y);
+                        remainingMovement -= abs(_path[_currentPath].y);
                         _path[_currentPath].y = 0;
                         _currentPath++;
                     } else {
                         if (_path[_currentPath].y > 0) {
-                            _position->y += movement;
-                            _path[_currentPath].y -= movement;
-                            movement = 0;
+                            _position->y += remainingMovement;
+                            _path[_currentPath].y -= remainingMovement;
+                            remainingMovement = 0;
                         } else {
-                            _position->y -= movement;
-                            _path[_currentPath].y += movement;
-                            movement = 0;
+                            _position->y -= remainingMovement;
+                            _path[_currentPath].y += remainingMovement;
+                            remainingMovement = 0;
                         }
                     }
                 }
-                if (_currentPath == _path.size())
-                    _isAlive = false; //Ziel erreicht
             }
+            if (_currentPath >= _path.size())
+                _isAlive = false; //Ziel erreicht
         }
     }
 
@@ -283,7 +283,7 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-	EnemySpawner::EnemySpawner(Vector<Enemy*> &enemies) :_enemies(enemies) {}
+	EnemySpawner::EnemySpawner(const Vector<Enemy*> &enemies) :_enemies(enemies) {}
 
 	Enemy *EnemySpawner::spawn(JanSordid::Core::u64 totalMSec) {
 		if (_delay <= totalMSec){
@@ -416,12 +416,7 @@ namespace JanSordid::SDL_Example {
             auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture,scalingFactor());
             _towerSlots.push_back(tempTowerSlot);
 
-            tempRect = new Rect(
-                0,
-                gridHeight / 4 * 3 * tileSize * scalingFactor(),
-                46/2*scalingFactor(),
-                46/2*scalingFactor()
-            );
+
 
             Vector<FPoint> path;
 
@@ -429,7 +424,14 @@ namespace JanSordid::SDL_Example {
 
 			Vector<Enemy*> enemiesToSpawn;
 
-			for (int i = 0; i < 100; ++i) {
+			for (int i = 0; i < 15; ++i) {
+			    tempRect = new Rect(
+                0,
+                gridHeight / 4 * 3 * tileSize * scalingFactor(),
+                46/2*scalingFactor(),
+                46/2*scalingFactor()
+            );
+
 				auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 1,1000);
 				enemiesToSpawn.push_back(tempEnemy);
 			}
@@ -482,7 +484,8 @@ namespace JanSordid::SDL_Example {
 											towerType = Tower::TowerType::Catapult1;
 											break;
 										}
-									}
+                                        default: ;
+                                    }
 									if (_game.data.unlocks.contains(towerType)) {
 										bool priceCheck = false;
 										switch (towerType) {
@@ -553,6 +556,7 @@ namespace JanSordid::SDL_Example {
         for (auto enemy: _enemies) {
             enemy->move(deltaT,scalingFactor());
             // temporary for testing
+            /*
             if (!enemy->_isAlive) {
                 Vector<FPoint> path;
                 path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
@@ -563,6 +567,7 @@ namespace JanSordid::SDL_Example {
                 enemy->_isAlive = true;
                 enemy->_hp = 50;
             }
+            */
         }
 
 		Enemy* spawnedEnemy = enemySpawner->spawn(totalMSec);
