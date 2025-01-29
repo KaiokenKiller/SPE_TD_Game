@@ -65,7 +65,8 @@ namespace JanSordid::SDL_Example {
 
         int _hp;
         int _speed;
-        bool _isAlive;
+        bool _isAlive = true;
+		int _spawnDelay;
 
         Rect *_position = nullptr;
         Rect *_textureSrcRect = nullptr;
@@ -73,7 +74,7 @@ namespace JanSordid::SDL_Example {
 		std::vector<FPoint> _path;
 		int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, int spawnDelay);
 
         void move(f32 deltaT, f32 scalingFactor);
 		//FPoint predictMove(f32 deltaT) const;
@@ -185,6 +186,17 @@ namespace JanSordid::SDL_Example {
 
 		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3], f32 scalingFactor);
 		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures, f32 scalingFactor);
+	};
+
+	class EnemySpawner{
+	public:
+		std::vector<Enemy*> _enemies;
+		int currentEnemy = 0;
+		int _delay = 100;
+
+
+		EnemySpawner(std::vector<Enemy*> &enemies);
+		Enemy* spawn(u64 totalMSec);
 	};
 
     struct GameData {
@@ -306,6 +318,7 @@ namespace JanSordid::SDL_Example {
         static constexpr int towerHeight = 130;
 
         Rect *tileMap[gridHeight][gridWidth] = {nullptr};
+		EnemySpawner* enemySpawner;
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;
 		std::unordered_map<Tower::TowerType,Texture *> projectileTextureMap;

@@ -132,12 +132,13 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed) {
-        _isAlive = true;
+    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed, int spawnDelay) {
         _position = position;
         _texture = texture;
         _hp = hp;
         _speed = speed;
+		_spawnDelay = spawnDelay;
+
         _textureSrcRect = new Rect(46 * 5, 0, 46, 46);
         _path = path;
     }
@@ -282,6 +283,20 @@ namespace JanSordid::SDL_Example {
         }
     }
 
+	EnemySpawner::EnemySpawner(Vector<Enemy*> &enemies) :_enemies(enemies) {}
+
+	Enemy *EnemySpawner::spawn(JanSordid::Core::u64 totalMSec) {
+		if (_delay <= totalMSec){
+			if (currentEnemy < _enemies.size()){
+				Enemy* enemy = _enemies[currentEnemy];
+				_delay = totalMSec + enemy->_spawnDelay;
+				currentEnemy++;
+				return enemy;
+			}
+		}
+		return nullptr;
+	}
+
     void TdState::Init() {
         Base::Init();
 
@@ -412,9 +427,14 @@ namespace JanSordid::SDL_Example {
 
             path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
+			Vector<Enemy*> enemiesToSpawn;
 
-            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 1);
-            _enemies.push_back(tempEnemy);
+			for (int i = 0; i < 100; ++i) {
+				auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 1,1000);
+				enemiesToSpawn.push_back(tempEnemy);
+			}
+
+			enemySpawner = new EnemySpawner(enemiesToSpawn);
 
             if (!overworldButtonTexture) {
                 if (TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
@@ -545,7 +565,13 @@ namespace JanSordid::SDL_Example {
             }
         }
 
+		Enemy* spawnedEnemy = enemySpawner->spawn(totalMSec);
+		if (spawnedEnemy != nullptr){
+			_enemies.push_back(spawnedEnemy);
+		}
+
         for (auto tower: _game.data._towers) {
+			// ToDo ordentliches Range handeling und Enemy selecting
             Projectile *temp = tower->shoot(_enemies[0], totalMSec);
             if (temp != nullptr)
                 _projectiles.push_back(temp);
