@@ -112,10 +112,11 @@ namespace JanSordid::SDL_Example {
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 		Texture * _projectileTexture = nullptr;
-        int _attackDamage = 0;
-        int _attackSpeed = 0;
-        int _attackRange = 0;
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
         int _cooldown = 0;
+        static int _price;
 
         Tower(Rect *placement, Texture *texture, Texture * projectileTexture);
 
@@ -123,20 +124,29 @@ namespace JanSordid::SDL_Example {
 
         virtual Projectile * shoot(Enemy *target, u64 totalMSec) = 0;
 
+        static bool checkPrice(int gold);
 	protected:
 		bool checkCooldown(u64 totalMSec);
     };
 
-    class TowerArcher1 : public Tower {
+    class Archer1 : public Tower {
     public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
 
-        TowerArcher1(Rect *placement, Texture *texture, Texture * projectileTexture);
+        Archer1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
     };
 
     class Mage1 : public Tower {
     public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
 
         Mage1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
@@ -145,6 +155,10 @@ namespace JanSordid::SDL_Example {
 
     class Catapult1 : public Tower {
     public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
 
         Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
@@ -156,9 +170,9 @@ namespace JanSordid::SDL_Example {
 		Rect* _position;
 		Texture* _texture;
 		Rect* _textureSrcRect;
-		Rect * _towerIconPosition[3];
-		Rect* _towerIconSrc [3];
-		Texture* _towerIconTextures[3];
+		Rect * _towerIconPosition[3]{};
+		Rect* _towerIconSrc [3]{};
+		Texture* _towerIconTextures[3]{};
 		bool _clicked = false;
 		bool _used = false;
 
