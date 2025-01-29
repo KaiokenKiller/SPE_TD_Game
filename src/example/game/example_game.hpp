@@ -125,6 +125,7 @@ namespace JanSordid::SDL_Example {
         virtual Projectile * shoot(Enemy *target, u64 totalMSec) = 0;
 
         static bool checkPrice(int gold);
+		virtual int getAttackSpeed() = 0;
 	protected:
 		bool checkCooldown(u64 totalMSec);
     };
@@ -139,6 +140,8 @@ namespace JanSordid::SDL_Example {
         Archer1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
     };
 
     class Mage1 : public Tower {
@@ -151,6 +154,8 @@ namespace JanSordid::SDL_Example {
         Mage1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
     };
 
     class Catapult1 : public Tower {
@@ -163,6 +168,8 @@ namespace JanSordid::SDL_Example {
         Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
     };
 
 	class TowerSlot {

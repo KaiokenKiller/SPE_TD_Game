@@ -20,7 +20,7 @@ namespace JanSordid::SDL_Example {
 
     bool Tower::checkCooldown(u64 totalMSec) {
         if (_cooldown < totalMSec) {
-            _cooldown = totalMSec + this->_attackSpeed;
+            _cooldown = totalMSec + getAttackSpeed();
             return true;
         }
         return false;
@@ -45,14 +45,18 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
+	int Archer1::getAttackSpeed() {
+		return _attackSpeed;
+	}
+
     Mage1::Mage1(Rect *placement, Texture *texture, Texture *projectileTexture) : Tower(
         placement, texture, projectileTexture) {
         _type = TowerType::Mage1;
-        _attackDamage = 7;
-        _attackRange = 2;
-        _attackSpeed = 1000;
-        _price = 150;
     }
+
+	int Mage1::getAttackSpeed() {
+		return _attackSpeed;
+	}
 
     int Mage1::_attackDamage = 7;
     int Mage1::_attackRange = 2;
@@ -71,10 +75,6 @@ namespace JanSordid::SDL_Example {
     Catapult1::Catapult1(Rect *placement, Texture *texture, Texture *projectileTexture) : Tower(
         placement, texture, projectileTexture) {
         _type = TowerType::Catapult1;
-        _attackDamage = 10;
-        _attackRange = 4;
-        _attackSpeed = 1500;
-        _price = 200;
     }
 
     int Catapult1::_attackDamage = 10;
@@ -90,6 +90,10 @@ namespace JanSordid::SDL_Example {
         }
         return nullptr;
     }
+
+	int Catapult1::getAttackSpeed() {
+		return _attackSpeed;
+	}
 
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
                          Rect **towerIconSrc, Texture **towerIconTextures) {
@@ -512,16 +516,18 @@ namespace JanSordid::SDL_Example {
             projectile->move(deltaT);
         }
         if (_projectiles.size() > 500) {
-            Vector<Projectile *> newProjectiles;
-            for (auto projectile: _projectiles) {
-                if (projectile->_isVisible)
-                    newProjectiles.push_back(projectile);
-                else {
-                    delete projectile;
-                }
-            }
-            _projectiles = newProjectiles;
-        }
+			_projectiles.erase(
+					std::remove_if(_projectiles.begin(), _projectiles.end(),
+								   [](Projectile* projectile) {
+									   if (!projectile->_isVisible) {
+										   delete projectile;  // Speicher freigeben
+										   return true;  // Entfernen aus dem Vektor
+									   }
+									   return false;  // Behalten im Vektor
+								   }),
+					_projectiles.end());
+
+		}
 
         for (auto enemy: _enemies) {
             enemy->move(deltaT);
