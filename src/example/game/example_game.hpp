@@ -73,10 +73,10 @@ namespace JanSordid::SDL_Example {
 		std::vector<FPoint> _path;
 		int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, std::vector<FPoint> path, int hp, int speed);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
 
         void move(f32 deltaT);
-		FPoint predictMove(f32 deltaT);
+		FPoint predictMove(f32 deltaT) const;
 
 		bool takeDamage(int damage);
     };
@@ -86,7 +86,7 @@ namespace JanSordid::SDL_Example {
     public:
         int _damage;
         bool _isVisible;
-		FPoint _direction;
+		FPoint _direction{};
         Enemy *_target;
 		int _homingCounter = 100;
 		int _speed = 200;
@@ -108,7 +108,7 @@ namespace JanSordid::SDL_Example {
             Mage1, Mage2_P1, Mage2_P2, Mage3_P1, Mage3_P2,
             Catapult1, Catapult2_P1, Catapult2_P2, Catapult3_P1, Catapult3_P2
         };
-        TowerType _type;
+        TowerType _type = TowerType::Archer1;
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 		Texture * _projectileTexture = nullptr;
@@ -163,7 +163,7 @@ namespace JanSordid::SDL_Example {
 		bool _used = false;
 
 		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3]);
-		Tower* placeTower(int selectedTower, std::unordered_set<Tower::TowerType> unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures);
+		Tower* placeTower(int selectedTower, const std::unordered_set<Tower::TowerType>& unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures);
 	};
 
     struct GameData {

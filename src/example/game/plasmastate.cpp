@@ -69,6 +69,7 @@ namespace JanSordid::SDL_Example {
 		_position = position;
 		_texture = texture;
 		_textureSrcRect = new Rect(0,0,62,61);
+
 		for (int i = 0; i < 3; ++i) {
 			_towerIconSrc[i] = towerIconSrc[i];
 			_towerIconTextures[i] = towerIconTextures[i];
@@ -78,7 +79,7 @@ namespace JanSordid::SDL_Example {
 		_towerIconPosition[2] = new Rect(_position->x + _position->w,_position->y - 64 - 16,32,64);
 	}
 
-	Tower* TowerSlot::placeTower(int selectedTower,std::unordered_set<Tower::TowerType> unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures) {
+	Tower* TowerSlot::placeTower(int selectedTower,const std::unordered_set<Tower::TowerType>& unlocks, std::unordered_map<Tower::TowerType,Texture*> projectileTextures) {
 		if (!_used) {
 			Tower::TowerType towerType;
 			switch (selectedTower) {
@@ -120,7 +121,7 @@ namespace JanSordid::SDL_Example {
 		return nullptr;
 	}
 
-	Enemy::Enemy(Rect *position, Texture *texture, Vector<FPoint> path,int hp, int speed) {
+	Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path,int hp, int speed) {
 		_isAlive = true;
 		_position = position;
 		_texture = texture;
@@ -183,8 +184,8 @@ namespace JanSordid::SDL_Example {
 		}
 	}
 
-	FPoint Enemy::predictMove(f32 deltaT) {
-		FPoint predictedMovement = FPoint (_position->x,_position->y);
+	FPoint Enemy::predictMove(f32 deltaT) const {
+		auto predictedMovement = FPoint (_position->x,_position->y);
 		int movement = deltaT * 100 * _speed;
 		int tempCurrentPath = _currentPath;
 
@@ -230,8 +231,7 @@ namespace JanSordid::SDL_Example {
 		_target = target;
 
 		_direction = FPoint ((_target->_position->x - _position->x),_target->_position->y - _position->y);
-		float directionLength = sqrt((_direction.x * _direction.x) + (_direction.y * _direction.y));
-		if (directionLength != 0){
+		if (float directionLength = sqrt((_direction.x * _direction.x) + (_direction.y * _direction.y)); directionLength != 0){
 			_direction.x /= directionLength;
 			_direction.x *= 2;
 			_direction.y /= directionLength;
@@ -346,7 +346,7 @@ namespace JanSordid::SDL_Example {
 					towerHeight / 2 * scalingFactor()
 			);
 
-			TowerArcher1 *tempTower = new TowerArcher1(tempRect, archerTowerTexture, archerTowerArrowTexture);
+			auto *tempTower = new TowerArcher1(tempRect, archerTowerTexture, archerTowerArrowTexture);
 			_game.data._towers.push_back(tempTower);
 
 			tempRect = new Rect(
@@ -356,7 +356,7 @@ namespace JanSordid::SDL_Example {
 					towerHeight / 1.5 * scalingFactor()
 			);
 
-			Mage1 *tempMageTower = new Mage1(tempRect, mageTowerTexture, mageTowerOrbTexture);
+			auto *tempMageTower = new Mage1(tempRect, mageTowerTexture, mageTowerOrbTexture);
 			_game.data._towers.push_back(tempMageTower);
 
 			tempRect = new Rect(
@@ -366,7 +366,7 @@ namespace JanSordid::SDL_Example {
 					towerHeight / 1.5 * scalingFactor()
 			);
 
-			Catapult1 *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture, catapultTowerStoneTexture);
+			auto *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture, catapultTowerStoneTexture);
 			_game.data._towers.push_back(tempCatapultTower);
 
 			tempRect = new Rect(
@@ -380,7 +380,7 @@ namespace JanSordid::SDL_Example {
 			Texture* towerIconTexture[3] = {mageTowerTexture,archerTowerTexture,catapultTowerTexture};
 
 
-			TowerSlot* tempTowerSlot = new TowerSlot(tempRect,towerSlotTexture,towerIconSrc,towerIconTexture);
+			auto* tempTowerSlot = new TowerSlot(tempRect,towerSlotTexture,towerIconSrc,towerIconTexture);
 			_towerSlots.push_back(tempTowerSlot);
 
 			tempRect = new Rect(
@@ -395,15 +395,13 @@ namespace JanSordid::SDL_Example {
 			path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
 
-			Enemy *tempEnemy = new Enemy(tempRect, enemyTexture, path, 10, 2);
+			auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 10, 2);
 			_enemies.push_back(tempEnemy);
 
 			if (!overworldButtonTexture) {
-				TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
-				if (buttonFont) {
+				if (TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
 					SDL_Color white = {255, 255, 255, 255};
-					SDL_Surface *btnSurf = TTF_RenderText_Blended(buttonFont, "Enter Overworld", white);
-					if (btnSurf) {
+					if (SDL_Surface *btnSurf = TTF_RenderText_Blended(buttonFont, "Enter Overworld", white)) {
 						overworldButtonTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
 						SDL_FreeSurface(btnSurf);
 					}
