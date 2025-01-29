@@ -12,19 +12,25 @@
 - ~~Towers ausdenken~~
 - ~~grobes UML erstellen~~
 - Tower State implementieren
-    - Basic Tower
+    - Tower
       - ~~Schießen~~
       - ~~Cooldown~~
       - Range
-    - Dummy Gegner
+      - Gegner finden
+    - Gegner
       - ~~move function~~
+      - Spawner
     - Placement
+      - ~~Basic Placement~~
+        - UI verschönern
+      - Upgrades
     - Projectiles
       - ~~Basic functions~~
       - AoE
-    - ~~Path~~
     - Map
+      - ~~Path~~ 
       - ~~Test Map~~
+      - Gym Level
       - First Level
 - Overworld State implementieren
     - Gebäude + GUI
