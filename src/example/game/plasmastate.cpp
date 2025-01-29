@@ -110,28 +110,8 @@ namespace JanSordid::SDL_Example {
         _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - 64 - 16, 32, 64);
     }
 
-    Tower *TowerSlot::placeTower(int selectedTower, const std::unordered_set<Tower::TowerType> &unlocks,
-                                 std::unordered_map<Tower::TowerType, Texture *> projectileTextures) {
+    Tower *TowerSlot::placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType, Texture *> projectileTextures) {
         if (!_used) {
-            Tower::TowerType towerType;
-            switch (selectedTower) {
-                case 0: {
-                    towerType = Tower::TowerType::Mage1;
-                    break;
-                }
-                case 1: {
-                    towerType = Tower::TowerType::Archer1;
-                    break;
-                }
-                case 2: {
-                    towerType = Tower::TowerType::Catapult1;
-                    break;
-                }
-                default: {
-                    return nullptr;
-                }
-            }
-            if (unlocks.contains(towerType)) {
                 _used = true;
                 Rect *towerPosition = new Rect(_position->x - 4, _position->y - 66, 70, 130);
                 switch (towerType) {
@@ -146,7 +126,6 @@ namespace JanSordid::SDL_Example {
                     }
                 }
             }
-        }
         return nullptr;
     }
 
@@ -213,6 +192,7 @@ namespace JanSordid::SDL_Example {
         }
     }
 
+	/*
     FPoint Enemy::predictMove(f32 deltaT) const {
         auto predictedMovement = FPoint(_position->x, _position->y);
         int movement = deltaT * 100 * _speed;
@@ -251,6 +231,7 @@ namespace JanSordid::SDL_Example {
         }
         return predictedMovement;
     }
+    */
 
     Projectile::Projectile(Rect *position, Texture *texture, int damage, Enemy *target) {
         _isVisible = true;
@@ -429,7 +410,7 @@ namespace JanSordid::SDL_Example {
             path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
 
-            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 10, 2);
+            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 2);
             _enemies.push_back(tempEnemy);
 
             if (!overworldButtonTexture) {
@@ -463,35 +444,52 @@ namespace JanSordid::SDL_Example {
                     if (!towerSlot->_used) {
                         if (towerSlot->_clicked) {
                             for (int i = 0; i < 3; ++i) {
-                                if (SDL_PointInRect(&mouse, towerSlot->_towerIconPosition[i])) {
-                                    bool priceCheck = false;
-                                    switch (i) {
-                                        case 0: {
-                                            if ((priceCheck = Mage1::checkPrice(_game.data.gold)))
-                                                _game.data.gold -= Mage1::_price;
-                                            break;
-                                        }
-                                        case 1: {
-                                            if ((priceCheck = Archer1::checkPrice(_game.data.gold)))
-                                                _game.data.gold -= Archer1::_price;
-                                            break;
-                                        }
-                                        case 2: {
-                                            if ((priceCheck = Catapult1::checkPrice(_game.data.gold)))
-                                                _game.data.gold -= Catapult1::_price;
-                                            break;
-                                        }
-                                        default: ;
-                                    }
-                                    if (priceCheck) {
-                                        Tower *newTower = towerSlot->placeTower(i, _game.data.unlocks, projectileTextureMap);
-                                        if (newTower != nullptr) {
-                                            _game.data._towers.push_back(newTower);
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
+								if (SDL_PointInRect(&mouse, towerSlot->_towerIconPosition[i])) {
+									Tower::TowerType towerType;
+									switch (i) {
+										case 0: {
+											towerType = Tower::TowerType::Mage1;
+											break;
+										}
+										case 1: {
+											towerType = Tower::TowerType::Archer1;
+											break;
+										}
+										case 2: {
+											towerType = Tower::TowerType::Catapult1;
+											break;
+										}
+									}
+									if (_game.data.unlocks.contains(towerType)) {
+										bool priceCheck = false;
+										switch (towerType) {
+											case Tower::TowerType::Mage1: {
+												if ((priceCheck = Mage1::checkPrice(_game.data.gold)))
+													_game.data.gold -= Mage1::_price;
+												break;
+											}
+											case Tower::TowerType::Archer1: {
+												if ((priceCheck = Archer1::checkPrice(_game.data.gold)))
+													_game.data.gold -= Archer1::_price;
+												break;
+											}
+											case Tower::TowerType::Catapult1: {
+												if ((priceCheck = Catapult1::checkPrice(_game.data.gold)))
+													_game.data.gold -= Catapult1::_price;
+												break;
+											}
+											default:;
+										}
+										if (priceCheck) {
+											Tower *newTower = towerSlot->placeTower(towerType, projectileTextureMap);
+											if (newTower != nullptr) {
+												_game.data._towers.push_back(newTower);
+												return true;
+											}
+										}
+									}
+								}
+							}
                         }
                         if (SDL_PointInRect(&mouse, towerSlot->_position)) {
                             towerSlot->_clicked = !towerSlot->_clicked;
@@ -540,7 +538,7 @@ namespace JanSordid::SDL_Example {
                 enemy->_path = path;
                 enemy->_currentPath = 0;
                 enemy->_isAlive = true;
-                enemy->_hp = 10;
+                enemy->_hp = 50;
             }
         }
 
