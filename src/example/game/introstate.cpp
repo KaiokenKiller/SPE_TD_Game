@@ -77,17 +77,11 @@ namespace JanSordid::SDL_Example {
 
     void IntroState::Enter(bool stacking) {
         Base::Enter(stacking);
-
-        if (Mix_GetMusicPosition(_music) <= 0.001)
-            Mix_PlayMusic(_music, -1);
-        else if (Mix_PausedMusic())
-            Mix_ResumeMusic();
+        Mix_PlayMusic(_music, -1);
     }
 
     void IntroState::Exit(bool stacking) {
-        if (!Mix_PausedMusic())
-            Mix_PauseMusic();
-
+        Mix_HaltMusic();
         Base::Exit(stacking);
     }
 
@@ -108,22 +102,7 @@ namespace JanSordid::SDL_Example {
         switch (event.type) {
             case SDL_KEYDOWN: {
                 const Keysym &what_key = event.key.keysym;
-
-                if (what_key.scancode == SDL_SCANCODE_F1 && event.key.repeat == 0) {
-                    if (Mix_PausedMusic())
-                        Mix_ResumeMusic();
-                    else
-                        Mix_PauseMusic();
-                } else if (what_key.scancode == SDL_SCANCODE_F2 && event.key.repeat == 0) {
-                    if (Mix_VolumeMusic(-1) == MIX_MAX_VOLUME)
-                        Mix_VolumeMusic(0);
-                    else
-                        Mix_VolumeMusic(MIX_MAX_VOLUME);
-                } else if (what_key.scancode == SDL_SCANCODE_F3 && event.key.repeat == 0) {
-                    Mix_PlayChannel(-1, _sound, 0);
-                } else if (what_key.scancode == SDL_SCANCODE_F4 && event.key.repeat == 0) {
-                    _textmode = (_textmode + 1) % 2;
-                } else if (what_key.scancode == SDL_SCANCODE_F9) {
+                if (what_key.scancode == SDL_SCANCODE_F9) {
                     // crash/shutdown, since State #6 does not exist
                     _game.ReplaceState(MyGS::Invalid);
                 } else if (what_key.scancode == SDL_SCANCODE_ESCAPE) {
@@ -133,8 +112,6 @@ namespace JanSordid::SDL_Example {
                 }
 
                 return true; // Confusing control flow: Handled by all but the else case
-
-                break;
             }
 
             case SDL_MOUSEBUTTONDOWN:
@@ -173,8 +150,6 @@ namespace JanSordid::SDL_Example {
 
         constexpr const char *text =
                 "Music by Patrick de Arteaga"
-                "\n  - Press [F1] to (un)pause music."
-                "\n  - Press [F2] to (un)mute music."
                 "\nSource: https://patrickdearteaga.com";
 
         const Color outlineColor = _isDarkOutline

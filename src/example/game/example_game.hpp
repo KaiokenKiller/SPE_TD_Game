@@ -319,15 +319,13 @@ namespace JanSordid::SDL_Example {
         using Base::Base;
 
         void Init() override;
-
+        void Enter( bool isStacking )   override;
+        void Exit( bool isStackedUpon ) override;
         void Destroy() override;
-
         bool Input() override;
 
         bool HandleEvent(const Event &event) override;
-
         void Update(u64 frame, u64 totalMSec, f32 deltaT) override;
-
         void Render(u64 frame, u64 totalMSec, f32 deltaT) override;
     };
 

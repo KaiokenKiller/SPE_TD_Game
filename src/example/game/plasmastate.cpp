@@ -320,7 +320,6 @@ namespace JanSordid::SDL_Example {
             if (!_music)
                 print(stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError());
         }
-        Mix_PlayMusic(_music, -1);
 
         if (tileMap[0][0] == nullptr) {
             for (int i = 0; i < gridHeight; i++) {
@@ -424,6 +423,16 @@ namespace JanSordid::SDL_Example {
                 }
             }
         }
+    }
+
+    void TdState::Enter(bool stacking) {
+        Base::Enter(stacking);
+        Mix_PlayMusic(_music, -1);
+    }
+
+    void TdState::Exit(bool stacking) {
+        Mix_HaltMusic();
+        Base::Exit(stacking);
     }
 
     void TdState::Destroy() {
