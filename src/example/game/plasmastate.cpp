@@ -292,14 +292,14 @@ namespace JanSordid::SDL_Example {
             towerSlotTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/PlaceForTower.png");
         }
         if (!archerTowerTexture) {
-            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png");
+            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
         }
         if (!archerTowerArrowTexture) {
             archerTowerArrowTexture = IMG_LoadTexture(
                 renderer(), BasePathGraphic "/Archer-Tower/archer_tower_arrow.png");
         }
         if (!mageTowerTexture) {
-            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage-tower.png");
+            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
         }
         if (!mageTowerOrbTexture) {
             mageTowerOrbTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower_orb.png");
