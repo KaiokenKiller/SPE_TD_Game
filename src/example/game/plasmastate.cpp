@@ -148,48 +148,35 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
- void Enemy::move(const f32 deltaT) {
-        if (_isAlive) {
-            int movement = deltaT * 100 * _speed;
+    void Enemy::move(const f32 deltaT) {
+        if (!_isAlive || _currentPath >= _path.size()) return;
 
-            while (movement > 0) {
-                if (_path[_currentPath].x != 0) {
-                    if (abs(_path[_currentPath].x) - movement < 0) {
-                        _position->x += _path[_currentPath].x;
-                        movement -= abs(_path[_currentPath].x);
-                        _path[_currentPath].x = 0;
-                        _currentPath++;
-                    } else {
-                        if (_path[_currentPath].x > 0) {
-                            _position->x += movement;
-                            _path[_currentPath].x -= movement;
-                            movement = 0;
-                        } else {
-                            _position->x -= movement;
-                            _path[_currentPath].x += movement;
-                            movement = 0;
-                        }
-                    }
-                } else if (_path[_currentPath].y != 0) {
-                    if (abs(_path[_currentPath].y) - movement < 0) {
-                        _position->y += _path[_currentPath].y;
-                        movement -= abs(_path[_currentPath].y);
-                        _path[_currentPath].y = 0;
-                        _currentPath++;
-                    } else {
-                        if (_path[_currentPath].y > 0) {
-                            _position->y += movement;
-                            _path[_currentPath].y -= movement;
-                            movement = 0;
-                        } else {
-                            _position->y -= movement;
-                            _path[_currentPath].y += movement;
-                            movement = 0;
-                        }
-                    }
+        int movement = static_cast<int>(deltaT * 100.0f * _speed);
+
+        // Sicherstellen, dass die Schleife nicht unendlich läuft
+        while (movement > 0 && _currentPath < _path.size()) {
+            FPoint &currentMove = _path[_currentPath];
+
+            if (currentMove.x != 0) {
+                int moveX = std::min(movement, static_cast<int>(std::abs(currentMove.x)));
+                _position->x += (currentMove.x > 0) ? moveX : -moveX;
+                currentMove.x += (currentMove.x > 0) ? -moveX : moveX;
+                movement -= moveX;
+            }
+            else if (currentMove.y != 0) {
+                int moveY = std::min(movement, static_cast<int>(std::abs(currentMove.y)));
+                _position->y += (currentMove.y > 0) ? moveY : -moveY;
+                currentMove.y += (currentMove.y > 0) ? -moveY : moveY;
+                movement -= moveY;
+            }
+
+            // Wichtige Abfrage: Wenn die Bewegung abgeschlossen ist, gehe zum nächsten Punkt
+            if (currentMove.x == 0 && currentMove.y == 0) {
+                _currentPath++;
+                if (_currentPath >= _path.size()) {
+                    _isAlive = false; // Gegner hat Ziel erreicht
+                    break;
                 }
-                if (_currentPath == _path.size())
-                    _isAlive = false; //Ziel erreicht
             }
         }
     }
