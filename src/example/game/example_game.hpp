@@ -304,6 +304,7 @@ namespace JanSordid::SDL_Example {
         static constexpr int tileSize = 16;
         static constexpr int towerWidth = 70;
         static constexpr int towerHeight = 130;
+        int respawnCD = 0;
 
         Rect *tileMap[gridHeight][gridWidth] = {nullptr};
         std::vector<std::vector<char>> levelData;

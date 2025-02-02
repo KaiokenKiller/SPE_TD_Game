@@ -588,6 +588,21 @@ namespace JanSordid::SDL_Example {
     }
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
+
+        // Most basic enemy spawner copied from Jan
+        if( respawnCD < totalMSec ) {
+            Rect *tempRect = new Rect(
+                _mapPathStart.second * tileSize * scalingFactor(),
+                _mapPathStart.first * tileSize * scalingFactor(),
+                46,
+                46
+            );
+            auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
+            _enemies.push_back(tempEnemy);
+
+            respawnCD = totalMSec + 2000;
+        }
+
         for (auto projectile: _projectiles) {
             projectile->move(deltaT);
         }
