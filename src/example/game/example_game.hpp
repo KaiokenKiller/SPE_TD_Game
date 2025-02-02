@@ -306,6 +306,11 @@ namespace JanSordid::SDL_Example {
         static constexpr int towerHeight = 130;
 
         Rect *tileMap[gridHeight][gridWidth] = {nullptr};
+        std::vector<std::vector<char>> levelData;
+        Vector<FPoint> _mapPath;
+        std::pair<int, int> _mapPathStart;
+        std::pair<int, int> _mapPathEnd;
+
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;
 		std::unordered_map<Tower::TowerType,Texture *> projectileTextureMap;
