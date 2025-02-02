@@ -326,7 +326,7 @@ namespace JanSordid::SDL_Example {
         }
 
         // Read map from file
-        std::ifstream file(BasePath "asset/map/map1");
+        std::ifstream file(BasePath "asset/map/map2");
         std::string line;
 
         if (file.is_open()) {
@@ -421,19 +421,17 @@ namespace JanSordid::SDL_Example {
             //_game.data._towers.push_back(tempCatapultTower);
 
 
-            Vector<FPoint> path;
-            std::pair<int, int> start;
-            std::pair<int, int> end;
+
             std::map<int, std::pair<int, int>> edges; // Automatisch sortiert nach Zahlen
 
-            // 1️⃣ `S`, `Z` und nummerierte `E`-Punkte suchen
+            // 'S`, `Z` und Nummern für Pfad suchen
             for (int i = 0; i < levelData.size(); i++) {
                 for (int j = 0; j < levelData[i].size(); j++) {
                     char tile = levelData[i][j];
                     if (tile == 'S') {
-                        start = {i, j};
+                        _mapPathStart = {i, j};
                     } else if (tile == 'Z') {
-                        end = {i, j};
+                        _mapPathEnd = {i, j};
                     } else if (isdigit(tile)) {
                         int edgeNum = tile - '0';
                         edges[edgeNum] = {i, j}; // Eckpunkte nach Nummer sortieren
@@ -446,19 +444,19 @@ namespace JanSordid::SDL_Example {
                 SDL_Quit();
             }
 
-            // 1️⃣ Start → Erster Punkt im Pfad
+            // Start → Erster Punkt im Pfad
             auto firstEdge = edges.begin()->second;  // Koordinaten des ersten Pfadpunkts
-            int start_dx = (firstEdge.second - start.second) * tileSize * scalingFactor();
-            int start_dy = (firstEdge.first - start.first) * tileSize * scalingFactor();
+            int start_dx = (firstEdge.second - _mapPathStart.second) * tileSize * scalingFactor();
+            int start_dy = (firstEdge.first - _mapPathStart.first) * tileSize * scalingFactor();
 
             if (start_dx != 0) {
-                path.push_back(FPoint(start_dx, 0));
+                _mapPath.push_back(FPoint(start_dx, 0));
             }
             if (start_dy != 0) {
-                path.push_back(FPoint(0, start_dy));
+                _mapPath.push_back(FPoint(0, start_dy));
             }
 
-            // 2️⃣ Bewegung entlang der Edges
+            // Bewegung entlang der Edges
             for (auto it = edges.begin(); next(it) != edges.end(); ++it) {
                 auto current = it->second;       // (i, j) aktueller Punkt
                 auto nextPos = next(it)->second; // (i, j) nächster Punkt
@@ -467,33 +465,33 @@ namespace JanSordid::SDL_Example {
                 int dy = (nextPos.first - current.first) * tileSize * scalingFactor();
 
                 if (dx != 0) {
-                    path.push_back(FPoint(dx, 0)); // Bewegung in X-Richtung
+                    _mapPath.push_back(FPoint(dx, 0)); // Bewegung in X-Richtung
                 }
                 if (dy != 0) {
-                    path.push_back(FPoint(0, dy)); // Bewegung in Y-Richtung
+                    _mapPath.push_back(FPoint(0, dy)); // Bewegung in Y-Richtung
                 }
             }
 
-            // 3️⃣ Letzter Punkt → Endpunkt (`end`)
+            // Letzter Punkt → Endpunkt (`end`)
             auto lastEdge = edges.rbegin()->second;  // Koordinaten des letzten Pfadpunkts
-            int end_dx = (end.second - lastEdge.second) * tileSize * scalingFactor();
-            int end_dy = (end.first - lastEdge.first) * tileSize * scalingFactor();
+            int end_dx = (_mapPathEnd.second - lastEdge.second) * tileSize * scalingFactor();
+            int end_dy = (_mapPathEnd.first - lastEdge.first) * tileSize * scalingFactor();
 
             if (end_dx != 0) {
-                path.push_back(FPoint(end_dx, 0));
+                _mapPath.push_back(FPoint(end_dx, 0));
             }
             if (end_dy != 0) {
-                path.push_back(FPoint(0, end_dy));
+                _mapPath.push_back(FPoint(0, end_dy));
             }
 
             tempRect = new Rect(
-                start.second * tileSize * scalingFactor(),
-                start.first * tileSize * scalingFactor(),
+                _mapPathStart.second * tileSize * scalingFactor(),
+                _mapPathStart.first * tileSize * scalingFactor(),
                 46,
                 46
             );
 
-            auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 2);
+            auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
             _enemies.push_back(tempEnemy);
 
             if (!overworldButtonTexture) {
@@ -624,11 +622,12 @@ namespace JanSordid::SDL_Example {
             enemy->move(deltaT);
             // temporary for testing
             if (!enemy->_isAlive) {
-                Vector<FPoint> path;
-                path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
+                //Vector<FPoint> path;
+                //path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
-                enemy->_position->x = 0;
-                enemy->_path = path;
+                enemy->_position->x = _mapPathStart.second;
+                enemy->_position->y = _mapPathStart.first;
+                enemy->_path = _mapPath;
                 enemy->_currentPath = 0;
                 enemy->_isAlive = true;
                 enemy->_hp = 50;
@@ -656,10 +655,16 @@ namespace JanSordid::SDL_Example {
                 switch (tile) {
                     case '.': SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                         break;
-                    case 'P': SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
+                    case 'S':
+                    case 'Z':
+                    case 'P':
+                        SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
                         break;
                     default: SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                         break;
+                }
+                if ( std::isdigit(tile) ) {
+                    SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
                 }
             }
         }
