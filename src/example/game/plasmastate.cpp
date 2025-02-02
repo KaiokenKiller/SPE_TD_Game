@@ -591,14 +591,34 @@ namespace JanSordid::SDL_Example {
 
         // Most basic enemy spawner copied from Jan
         if( respawnCD < totalMSec ) {
-            Rect *tempRect = new Rect(
-                _mapPathStart.second * tileSize * scalingFactor(),
-                _mapPathStart.first * tileSize * scalingFactor(),
-                46,
-                46
-            );
-            auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
-            _enemies.push_back(tempEnemy);
+            if (!_deadEnemies.empty()) {
+                // Gegner aus der "Toten"-Liste holen
+                Enemy* tempEnemy = _deadEnemies.back();
+                _deadEnemies.pop_back();
+
+                // Gegner zurücksetzen
+                tempEnemy->_position->x = _mapPathStart.second * tileSize * scalingFactor();
+                tempEnemy->_position->y = _mapPathStart.first * tileSize * scalingFactor();
+                tempEnemy->_path = _mapPath;
+                tempEnemy->_currentPath = 0;
+                tempEnemy->_isAlive = true;
+                tempEnemy->_hp = 50;
+
+                // Gegner der _enemies-Liste hinzufügen
+                _enemies.push_back(tempEnemy);
+                std::cout << "Reused old enemie" << std::endl;
+
+            } else {
+                // Neuen Gegner erstellen, falls kein "toter" Gegner verfügbar ist
+                Rect* tempRect = new Rect(
+                    _mapPathStart.second * tileSize * scalingFactor(),
+                    _mapPathStart.first * tileSize * scalingFactor(),
+                    46,
+                    46
+                );
+                auto* tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
+                _enemies.push_back(tempEnemy);
+            }
 
             respawnCD = totalMSec + 2000;
         }
@@ -620,21 +640,19 @@ namespace JanSordid::SDL_Example {
 
 		}
 
-        for (auto enemy: _enemies) {
+        for (auto enemy : _enemies) {
             enemy->move(deltaT);
-            // temporary for testing
             if (!enemy->_isAlive) {
-                //Vector<FPoint> path;
-                //path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
-
-                enemy->_position->x = _mapPathStart.second;
-                enemy->_position->y = _mapPathStart.first;
-                enemy->_path = _mapPath;
-                enemy->_currentPath = 0;
-                enemy->_isAlive = true;
-                enemy->_hp = 50;
+                _deadEnemies.push_back(enemy);
+                _toRemove.push_back(enemy); // Gegner zum Entfernen markieren
             }
         }
+
+        // Entferne die markierten Gegner aus _enemies
+        for (Enemy* enemy : _toRemove) {
+            _enemies.erase(std::remove(_enemies.begin(), _enemies.end(), enemy), _enemies.end());
+        }
+        _toRemove.clear(); // Hilfsvektor leeren
 
         for (auto tower: _game.data._towers) {
             Projectile *temp = tower->shoot(_enemies[0], totalMSec);
