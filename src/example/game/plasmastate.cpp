@@ -1,4 +1,6 @@
 #include <iostream>
+#include <map>
+
 #include "example_game.hpp"
 
 namespace JanSordid::SDL_Example {
@@ -150,6 +152,7 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
+
     void Enemy::move(const f32 deltaT, f32 scalingFactor) {
         if (_isAlive) {
             int remainingMovement = deltaT * 100 * _speed * scalingFactor;
@@ -195,6 +198,7 @@ namespace JanSordid::SDL_Example {
                 _isAlive = false; //Ziel erreicht
         }
     }
+
 
 	/*
     FPoint Enemy::predictMove(f32 deltaT) const {
@@ -300,6 +304,7 @@ namespace JanSordid::SDL_Example {
     void TdState::Init() {
         Base::Init();
 
+        // Init assets
         if (!enemyPathTile) {
             enemyPathTile = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/enemy_path_tile.png");
         }
@@ -310,14 +315,14 @@ namespace JanSordid::SDL_Example {
             towerSlotTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Floor/PlaceForTower.png");
         }
         if (!archerTowerTexture) {
-            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_idle.png");
+            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
         }
         if (!archerTowerArrowTexture) {
             archerTowerArrowTexture = IMG_LoadTexture(
                 renderer(), BasePathGraphic "/Archer-Tower/archer_tower_arrow.png");
         }
         if (!mageTowerTexture) {
-            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage-tower.png");
+            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
         }
         if (!mageTowerOrbTexture) {
             mageTowerOrbTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower_orb.png");
@@ -338,7 +343,20 @@ namespace JanSordid::SDL_Example {
             if (!_music)
                 print(stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError());
         }
-        Mix_PlayMusic(_music, -1);
+
+        // Read map from file
+        std::ifstream file(BasePath "asset/map/map2");
+        std::string line;
+
+        if (file.is_open()) {
+            while (std::getline(file, line)) {
+                levelData.emplace_back(line.begin(), line.end());
+            }
+            file.close();
+        } else {
+            SDL_Log("Fehler: Konnte die Level-Datei nicht öffnen!");
+            SDL_Quit();
+        }
 
         if (tileMap[0][0] == nullptr) {
             for (int i = 0; i < gridHeight; i++) {
@@ -354,6 +372,28 @@ namespace JanSordid::SDL_Example {
             }
         }
 
+        Rect *towerIconSrc[3] = {
+            towerSrcRectMap[Tower::TowerType::Mage1], towerSrcRectMap[Tower::TowerType::Archer1],
+            towerSrcRectMap[Tower::TowerType::Catapult1]
+        };
+        Texture *towerIconTexture[3] = {mageTowerTexture, archerTowerTexture, catapultTowerTexture};
+
+        for (int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                char tile = levelData[i][j];
+                    if( tile == 'T' ){
+                        Rect *tempRect = new Rect(
+                            j * tileSize * scalingFactor(),
+                            i * tileSize * scalingFactor(),
+                            62 / 1.5 * scalingFactor(),
+                            62 / 1.5 * scalingFactor()
+                        );
+
+                        auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture);
+                        _towerSlots.push_back(tempTowerSlot);
+                }
+            }
+        }
 
         // Spawning temporary Dummies
         if (_game.data._towers.empty()) {
@@ -376,8 +416,8 @@ namespace JanSordid::SDL_Example {
                 towerHeight / 2 * scalingFactor()
             );
 
-            auto *tempTower = new Archer1(tempRect, archerTowerTexture, archerTowerArrowTexture);
-            _game.data._towers.push_back(tempTower);
+            //auto *tempTower = new Archer1(tempRect, archerTowerTexture, archerTowerArrowTexture);
+            //_game.data._towers.push_back(tempTower);
 
             tempRect = new Rect(
                 25 * tileSize * scalingFactor(),
@@ -386,8 +426,8 @@ namespace JanSordid::SDL_Example {
                 towerHeight / 1.5 * scalingFactor()
             );
 
-            auto *tempMageTower = new Mage1(tempRect, mageTowerTexture, mageTowerOrbTexture);
-            _game.data._towers.push_back(tempMageTower);
+            //auto *tempMageTower = new Mage1(tempRect, mageTowerTexture, mageTowerOrbTexture);
+            //_game.data._towers.push_back(tempMageTower);
 
             tempRect = new Rect(
                 15 * tileSize * scalingFactor(),
@@ -396,47 +436,82 @@ namespace JanSordid::SDL_Example {
                 towerHeight / 1.5 * scalingFactor()
             );
 
-            auto *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture, catapultTowerStoneTexture);
-            _game.data._towers.push_back(tempCatapultTower);
+            //auto *tempCatapultTower = new Catapult1(tempRect, catapultTowerTexture, catapultTowerStoneTexture);
+            //_game.data._towers.push_back(tempCatapultTower);
+
+
+
+            std::map<int, std::pair<int, int>> edges; // Automatisch sortiert nach Zahlen
+
+            // 'S`, `Z` und Nummern für Pfad suchen
+            for (int i = 0; i < levelData.size(); i++) {
+                for (int j = 0; j < levelData[i].size(); j++) {
+                    char tile = levelData[i][j];
+                    if (tile == 'S') {
+                        _mapPathStart = {i, j};
+                    } else if (tile == 'Z') {
+                        _mapPathEnd = {i, j};
+                    } else if (isdigit(tile)) {
+                        int edgeNum = tile - '0';
+                        edges[edgeNum] = {i, j}; // Eckpunkte nach Nummer sortieren
+                    }
+                }
+            }
+
+            if (edges.empty()) {
+                std::cout << "Fehler: Keine nummerierten `E`-Punkte gefunden!" << std::endl;
+                SDL_Quit();
+            }
+
+            // Start → Erster Punkt im Pfad
+            auto firstEdge = edges.begin()->second;  // Koordinaten des ersten Pfadpunkts
+            int start_dx = (firstEdge.second - _mapPathStart.second) * tileSize * scalingFactor();
+            int start_dy = (firstEdge.first - _mapPathStart.first) * tileSize * scalingFactor();
+
+            if (start_dx != 0) {
+                _mapPath.push_back(FPoint(start_dx, 0));
+            }
+            if (start_dy != 0) {
+                _mapPath.push_back(FPoint(0, start_dy));
+            }
+
+            // Bewegung entlang der Edges
+            for (auto it = edges.begin(); next(it) != edges.end(); ++it) {
+                auto current = it->second;       // (i, j) aktueller Punkt
+                auto nextPos = next(it)->second; // (i, j) nächster Punkt
+
+                int dx = (nextPos.second - current.second) * tileSize * scalingFactor();
+                int dy = (nextPos.first - current.first) * tileSize * scalingFactor();
+
+                if (dx != 0) {
+                    _mapPath.push_back(FPoint(dx, 0)); // Bewegung in X-Richtung
+                }
+                if (dy != 0) {
+                    _mapPath.push_back(FPoint(0, dy)); // Bewegung in Y-Richtung
+                }
+            }
+
+            // Letzter Punkt → Endpunkt (`end`)
+            auto lastEdge = edges.rbegin()->second;  // Koordinaten des letzten Pfadpunkts
+            int end_dx = (_mapPathEnd.second - lastEdge.second) * tileSize * scalingFactor();
+            int end_dy = (_mapPathEnd.first - lastEdge.first) * tileSize * scalingFactor();
+
+            if (end_dx != 0) {
+                _mapPath.push_back(FPoint(end_dx, 0));
+            }
+            if (end_dy != 0) {
+                _mapPath.push_back(FPoint(0, end_dy));
+            }
 
             tempRect = new Rect(
-                10 * tileSize * scalingFactor(),
-                13 * tileSize * scalingFactor(),
-                62 / 1.5 * scalingFactor(),
-                62 / 1.5 * scalingFactor()
+                _mapPathStart.second * tileSize * scalingFactor(),
+                _mapPathStart.first * tileSize * scalingFactor(),
+                46,
+                46
             );
 
-            Rect *towerIconSrc[3] = {
-                towerSrcRectMap[Tower::TowerType::Mage1], towerSrcRectMap[Tower::TowerType::Archer1],
-                towerSrcRectMap[Tower::TowerType::Catapult1]
-            };
-            Texture *towerIconTexture[3] = {mageTowerTexture, archerTowerTexture, catapultTowerTexture};
-
-
-            auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture,scalingFactor());
-            _towerSlots.push_back(tempTowerSlot);
-
-
-
-            Vector<FPoint> path;
-
-            path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
-
-			Vector<Enemy*> enemiesToSpawn;
-
-			for (int i = 0; i < 15; ++i) {
-			    tempRect = new Rect(
-                0,
-                gridHeight / 4 * 3 * tileSize * scalingFactor(),
-                46/2*scalingFactor(),
-                46/2*scalingFactor()
-            );
-
-				auto *tempEnemy = new Enemy(tempRect, enemyTexture, path, 50, 1,1000);
-				enemiesToSpawn.push_back(tempEnemy);
-			}
-
-			enemySpawner = new EnemySpawner(enemiesToSpawn);
+            auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
+            _enemies.push_back(tempEnemy);
 
             if (!overworldButtonTexture) {
                 if (TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
@@ -449,6 +524,16 @@ namespace JanSordid::SDL_Example {
                 }
             }
         }
+    }
+
+    void TdState::Enter(bool stacking) {
+        Base::Enter(stacking);
+        Mix_PlayMusic(_music, -1);
+    }
+
+    void TdState::Exit(bool stacking) {
+        Mix_HaltMusic();
+        Base::Exit(stacking);
     }
 
     void TdState::Destroy() {
@@ -536,6 +621,41 @@ namespace JanSordid::SDL_Example {
     }
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
+
+        // Most basic enemy spawner copied from Jan
+        if( respawnCD < totalMSec ) {
+            if (!_deadEnemies.empty()) {
+                // Gegner aus der "Toten"-Liste holen
+                Enemy* tempEnemy = _deadEnemies.back();
+                _deadEnemies.pop_back();
+
+                // Gegner zurücksetzen
+                tempEnemy->_position->x = _mapPathStart.second * tileSize * scalingFactor();
+                tempEnemy->_position->y = _mapPathStart.first * tileSize * scalingFactor();
+                tempEnemy->_path = _mapPath;
+                tempEnemy->_currentPath = 0;
+                tempEnemy->_isAlive = true;
+                tempEnemy->_hp = 50;
+
+                // Gegner der _enemies-Liste hinzufügen
+                _enemies.push_back(tempEnemy);
+                std::cout << "Reused old enemie" << std::endl;
+
+            } else {
+                // Neuen Gegner erstellen, falls kein "toter" Gegner verfügbar ist
+                Rect* tempRect = new Rect(
+                    _mapPathStart.second * tileSize * scalingFactor(),
+                    _mapPathStart.first * tileSize * scalingFactor(),
+                    46,
+                    46
+                );
+                auto* tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 2);
+                _enemies.push_back(tempEnemy);
+            }
+
+            respawnCD = totalMSec + 2000;
+        }
+
         for (auto projectile: _projectiles) {
             projectile->move(deltaT,scalingFactor());
         }
@@ -553,27 +673,22 @@ namespace JanSordid::SDL_Example {
 
 		}
 
-        for (auto enemy: _enemies) {
-            enemy->move(deltaT,scalingFactor());
-            // temporary for testing
-            /*
-            if (!enemy->_isAlive) {
-                Vector<FPoint> path;
-                path.push_back(FPoint(40 * tileSize * scalingFactor(), 0));
 
-                enemy->_position->x = 0;
-                enemy->_path = path;
-                enemy->_currentPath = 0;
-                enemy->_isAlive = true;
-                enemy->_hp = 50;
+        for (auto enemy : _enemies) {
+            enemy->move(deltaT);
+            if (!enemy->_isAlive) {
+                _deadEnemies.push_back(enemy);
+                _toRemove.push_back(enemy); // Gegner zum Entfernen markieren
             }
             */
         }
 
-		Enemy* spawnedEnemy = enemySpawner->spawn(totalMSec);
-		if (spawnedEnemy != nullptr){
-			_enemies.push_back(spawnedEnemy);
-		}
+        // Entferne die markierten Gegner aus _enemies
+        for (Enemy* enemy : _toRemove) {
+            _enemies.erase(std::remove(_enemies.begin(), _enemies.end(), enemy), _enemies.end());
+        }
+        _toRemove.clear(); // Hilfsvektor leeren
+
 
         for (auto tower: _game.data._towers) {
 			// ToDo ordentliches Range handeling und Enemy selecting
@@ -589,14 +704,24 @@ namespace JanSordid::SDL_Example {
         //totalMSec += 2147470000u + 2147480000u;
         Point windowSize;
         SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
-
+        Uint32 rendererStart = SDL_GetTicks();
 
         for (int i = 0; i < gridHeight; i++) {
             for (int j = 0; j < gridWidth; j++) {
-                if (i == gridHeight / 2 || i == (gridHeight / 2) + 1) {
+                char tile = levelData[i][j];
+                switch (tile) {
+                    case '.': SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
+                        break;
+                    case 'S':
+                    case 'Z':
+                    case 'P':
+                        SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
+                        break;
+                    default: SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
+                        break;
+                }
+                if ( std::isdigit(tile) ) {
                     SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
-                } else {
-                    SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                 }
             }
         }
@@ -645,5 +770,13 @@ namespace JanSordid::SDL_Example {
         }
 
         SDL_RenderPresent(renderer());
+
+        Uint32 rendererTimeNeeded = SDL_GetTicks() - rendererStart;
+        int delay = 1000 / 60 - rendererTimeNeeded;
+
+        if( delay > 0) {
+            SDL_Delay(delay);
+        }
+
     }
 } // namespace

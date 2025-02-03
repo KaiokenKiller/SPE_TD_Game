@@ -316,9 +316,15 @@ namespace JanSordid::SDL_Example {
         static constexpr int tileSize = 16;
         static constexpr int towerWidth = 70;
         static constexpr int towerHeight = 130;
+        int respawnCD = 0;
 
         Rect *tileMap[gridHeight][gridWidth] = {nullptr};
-		EnemySpawner* enemySpawner;
+        std::vector<std::vector<char>> levelData;
+        Vector<FPoint> _mapPath;
+        std::pair<int, int> _mapPathStart;
+        std::pair<int, int> _mapPathEnd;
+
+
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;
 		std::unordered_map<Tower::TowerType,Texture *> projectileTextureMap;
@@ -326,21 +332,21 @@ namespace JanSordid::SDL_Example {
 		std::vector<TowerSlot*> _towerSlots;
         std::vector<Projectile *> _projectiles;
         std::vector<Enemy *> _enemies;
+        std::vector<Enemy*> _deadEnemies;
+        std::vector<Enemy*> _toRemove; // Hilfsvektor für zu entfernende Gegner
 
     public:
         // ctor
         using Base::Base;
 
         void Init() override;
-
+        void Enter( bool isStacking )   override;
+        void Exit( bool isStackedUpon ) override;
         void Destroy() override;
-
         bool Input() override;
 
         bool HandleEvent(const Event &event) override;
-
         void Update(u64 frame, u64 totalMSec, f32 deltaT) override;
-
         void Render(u64 frame, u64 totalMSec, f32 deltaT) override;
     };
 
