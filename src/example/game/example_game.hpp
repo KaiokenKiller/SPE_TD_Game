@@ -65,7 +65,8 @@ namespace JanSordid::SDL_Example {
 
         int _hp;
         int _speed;
-        bool _isAlive;
+        bool _isAlive = true;
+		int _spawnDelay;
 
         Rect *_position = nullptr;
         Rect *_textureSrcRect = nullptr;
@@ -73,9 +74,9 @@ namespace JanSordid::SDL_Example {
 		std::vector<FPoint> _path;
 		int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, int spawnDelay);
 
-        void move(f32 deltaT);
+        void move(f32 deltaT, f32 scalingFactor);
 		//FPoint predictMove(f32 deltaT) const;
 
 		bool takeDamage(int damage);
@@ -96,7 +97,7 @@ namespace JanSordid::SDL_Example {
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 
-        void move(f32 deltaT);
+        void move(f32 deltaT, f32 scalingFactor);
 	protected:
 		void updateDirection();
     };
@@ -183,8 +184,19 @@ namespace JanSordid::SDL_Example {
 		bool _clicked = false;
 		bool _used = false;
 
-		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3]);
-		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures);
+		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3], f32 scalingFactor);
+		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures, f32 scalingFactor);
+	};
+
+	class EnemySpawner{
+	public:
+		std::vector<Enemy*> _enemies;
+		int currentEnemy = 0;
+		int _delay = 100;
+
+
+		EnemySpawner(const std::vector<Enemy*> &enemies);
+		Enemy* spawn(u64 totalMSec);
 	};
 
     struct GameData {
@@ -311,6 +323,7 @@ namespace JanSordid::SDL_Example {
         Vector<FPoint> _mapPath;
         std::pair<int, int> _mapPathStart;
         std::pair<int, int> _mapPathEnd;
+
 
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;

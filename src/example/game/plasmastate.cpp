@@ -98,7 +98,7 @@ namespace JanSordid::SDL_Example {
 	}
 
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
-                         Rect **towerIconSrc, Texture **towerIconTextures) {
+                         Rect **towerIconSrc, Texture **towerIconTextures, f32 scalingFactor) {
         _position = position;
         _texture = texture;
         _textureSrcRect = new Rect(0, 0, 62, 61);
@@ -107,15 +107,18 @@ namespace JanSordid::SDL_Example {
             _towerIconSrc[i] = towerIconSrc[i];
             _towerIconTextures[i] = towerIconTextures[i];
         }
-        _towerIconPosition[0] = new Rect(_position->x - 32, _position->y - 64 - 16, 32, 64);
-        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - 16), _position->y - 64 - 16, 32, 64);
-        _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - 64 - 16, 32, 64);
+		int iconWidth = 32*scalingFactor;
+		int iconHeight = 64*scalingFactor;
+
+        _towerIconPosition[0] = new Rect(_position->x - iconWidth, _position->y - iconHeight, iconWidth, iconHeight);
+        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y - (iconHeight + (8*scalingFactor)), iconWidth, iconHeight);
+        _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - iconHeight, iconWidth, iconHeight);
     }
 
-    Tower *TowerSlot::placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType, Texture *> projectileTextures) {
+    Tower *TowerSlot::placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType, Texture *> projectileTextures, f32 scalingFactor) {
         if (!_used) {
                 _used = true;
-                Rect *towerPosition = new Rect(_position->x - 4, _position->y - 66, 70, 130);
+                Rect *towerPosition = new Rect(_position->x - ((4/2)*scalingFactor), _position->y - ((66/2)*scalingFactor), ((70/2)*scalingFactor), ((130/2)*scalingFactor));
                 switch (towerType) {
                     case Tower::TowerType::Archer1: {
                         return new Archer1{towerPosition, _towerIconTextures[1], projectileTextures[towerType]};
@@ -131,12 +134,13 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed) {
-        _isAlive = true;
+    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed, int spawnDelay) {
         _position = position;
         _texture = texture;
         _hp = hp;
         _speed = speed;
+		_spawnDelay = spawnDelay;
+
         _textureSrcRect = new Rect(46 * 5, 0, 46, 46);
         _path = path;
     }
@@ -148,36 +152,50 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
-    void Enemy::move(const f32 deltaT) {
-        if (!_isAlive || _currentPath >= _path.size()) return;
 
-        int movement = static_cast<int>(deltaT * 100.0f * _speed);
+    void Enemy::move(const f32 deltaT, f32 scalingFactor) {
+        if (_isAlive) {
+            int remainingMovement = deltaT * 100 * _speed * scalingFactor;
 
-        // Sicherstellen, dass die Schleife nicht unendlich läuft
-        while (movement > 0 && _currentPath < _path.size()) {
-            FPoint &currentMove = _path[_currentPath];
-
-            if (currentMove.x != 0) {
-                int moveX = std::min(movement, static_cast<int>(std::abs(currentMove.x)));
-                _position->x += (currentMove.x > 0) ? moveX : -moveX;
-                currentMove.x += (currentMove.x > 0) ? -moveX : moveX;
-                movement -= moveX;
-            }
-            else if (currentMove.y != 0) {
-                int moveY = std::min(movement, static_cast<int>(std::abs(currentMove.y)));
-                _position->y += (currentMove.y > 0) ? moveY : -moveY;
-                currentMove.y += (currentMove.y > 0) ? -moveY : moveY;
-                movement -= moveY;
-            }
-
-            // Wichtige Abfrage: Wenn die Bewegung abgeschlossen ist, gehe zum nächsten Punkt
-            if (currentMove.x == 0 && currentMove.y == 0) {
-                _currentPath++;
-                if (_currentPath >= _path.size()) {
-                    _isAlive = false; // Gegner hat Ziel erreicht
-                    break;
+            while (remainingMovement > 0 && _currentPath < _path.size()) {
+                if (_path[_currentPath].x != 0) {
+                    if (abs(_path[_currentPath].x) - remainingMovement <= 0) {
+                        _position->x += _path[_currentPath].x;
+                        remainingMovement -= abs(_path[_currentPath].x);
+                        _path[_currentPath].x = 0;
+                        _currentPath++;
+                    } else {
+                        if (_path[_currentPath].x > 0) {
+                            _position->x += remainingMovement;
+                            _path[_currentPath].x -= remainingMovement;
+                            remainingMovement = 0;
+                        } else {
+                            _position->x -= remainingMovement;
+                            _path[_currentPath].x += remainingMovement;
+                            remainingMovement = 0;
+                        }
+                    }
+                } else if (_path[_currentPath].y != 0) {
+                    if (abs(_path[_currentPath].y) - remainingMovement <= 0) {
+                        _position->y += _path[_currentPath].y;
+                        remainingMovement -= abs(_path[_currentPath].y);
+                        _path[_currentPath].y = 0;
+                        _currentPath++;
+                    } else {
+                        if (_path[_currentPath].y > 0) {
+                            _position->y += remainingMovement;
+                            _path[_currentPath].y -= remainingMovement;
+                            remainingMovement = 0;
+                        } else {
+                            _position->y -= remainingMovement;
+                            _path[_currentPath].y += remainingMovement;
+                            remainingMovement = 0;
+                        }
+                    }
                 }
             }
+            if (_currentPath >= _path.size())
+                _isAlive = false; //Ziel erreicht
         }
     }
 
@@ -253,10 +271,10 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    void Projectile::move(const f32 deltaT) {
+    void Projectile::move(const f32 deltaT, f32 scalingFactor) {
         if (_isVisible) {
-            _position->x += _direction.x * deltaT * _speed;
-            _position->y += _direction.y * deltaT * _speed;
+            _position->x += _direction.x * deltaT * _speed * scalingFactor;
+            _position->y += _direction.y * deltaT * _speed * scalingFactor;
 
             if (SDL_HasIntersection(_position, _target->_position)) {
                 _target->takeDamage(_damage);
@@ -268,6 +286,20 @@ namespace JanSordid::SDL_Example {
             }
         }
     }
+
+	EnemySpawner::EnemySpawner(const Vector<Enemy*> &enemies) :_enemies(enemies) {}
+
+	Enemy *EnemySpawner::spawn(JanSordid::Core::u64 totalMSec) {
+		if (_delay <= totalMSec){
+			if (currentEnemy < _enemies.size()){
+				Enemy* enemy = _enemies[currentEnemy];
+				_delay = totalMSec + enemy->_spawnDelay;
+				currentEnemy++;
+				return enemy;
+			}
+		}
+		return nullptr;
+	}
 
     void TdState::Init() {
         Base::Init();
@@ -537,7 +569,8 @@ namespace JanSordid::SDL_Example {
 											towerType = Tower::TowerType::Catapult1;
 											break;
 										}
-									}
+                                        default: ;
+                                    }
 									if (_game.data.unlocks.contains(towerType)) {
 										bool priceCheck = false;
 										switch (towerType) {
@@ -559,7 +592,7 @@ namespace JanSordid::SDL_Example {
 											default:;
 										}
 										if (priceCheck) {
-											Tower *newTower = towerSlot->placeTower(towerType, projectileTextureMap);
+											Tower *newTower = towerSlot->placeTower(towerType, projectileTextureMap,scalingFactor());
 											if (newTower != nullptr) {
 												_game.data._towers.push_back(newTower);
 												return true;
@@ -624,7 +657,7 @@ namespace JanSordid::SDL_Example {
         }
 
         for (auto projectile: _projectiles) {
-            projectile->move(deltaT);
+            projectile->move(deltaT,scalingFactor());
         }
         if (_projectiles.size() > 500) {
 			_projectiles.erase(
@@ -640,12 +673,14 @@ namespace JanSordid::SDL_Example {
 
 		}
 
+
         for (auto enemy : _enemies) {
             enemy->move(deltaT);
             if (!enemy->_isAlive) {
                 _deadEnemies.push_back(enemy);
                 _toRemove.push_back(enemy); // Gegner zum Entfernen markieren
             }
+            */
         }
 
         // Entferne die markierten Gegner aus _enemies
@@ -654,7 +689,9 @@ namespace JanSordid::SDL_Example {
         }
         _toRemove.clear(); // Hilfsvektor leeren
 
+
         for (auto tower: _game.data._towers) {
+			// ToDo ordentliches Range handeling und Enemy selecting
             Projectile *temp = tower->shoot(_enemies[0], totalMSec);
             if (temp != nullptr)
                 _projectiles.push_back(temp);
