@@ -65,8 +65,7 @@ namespace JanSordid::SDL_Example {
 
         int _hp;
         int _speed;
-        bool _isAlive = true;
-		int _spawnDelay;
+        bool _isAlive;
 
         Rect *_position = nullptr;
         Rect *_textureSrcRect = nullptr;
@@ -74,10 +73,9 @@ namespace JanSordid::SDL_Example {
 		std::vector<FPoint> _path;
 		int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, int spawnDelay);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
 
         void move(f32 deltaT, f32 scalingFactor);
-		//FPoint predictMove(f32 deltaT) const;
 
 		bool takeDamage(int damage);
     };
@@ -113,6 +111,10 @@ namespace JanSordid::SDL_Example {
         Rect *_position = nullptr;
         Texture *_texture = nullptr;
 		Texture * _projectileTexture = nullptr;
+        std::vector<Rect*> _towerIconPosition ={};
+        std::vector<Rect*> _towerIconSrc ={};
+        std::vector<Texture*> _towerIconTextures ={};
+        bool _clicked = false;
         static int _attackDamage;
         static int _attackSpeed;
         static int _attackRange;
@@ -125,8 +127,10 @@ namespace JanSordid::SDL_Example {
 
         virtual Projectile * shoot(Enemy *target, u64 totalMSec) = 0;
 
-        static bool checkPrice(int gold);
 		virtual int getAttackSpeed() = 0;
+        virtual int getPrice() = 0;
+
+        int sellTower();
 	protected:
 		bool checkCooldown(u64 totalMSec);
     };
@@ -138,11 +142,72 @@ namespace JanSordid::SDL_Example {
         static int _attackRange;
         static int _price;
 
-        Archer1(Rect *placement, Texture *texture, Texture * projectileTexture);
+        Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
 
 		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Archer2_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Archer2_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Archer2_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Archer2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Archer3_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Archer3_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Archer3_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Archer3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
     };
 
     class Mage1 : public Tower {
@@ -152,11 +217,72 @@ namespace JanSordid::SDL_Example {
         static int _attackRange;
         static int _price;
 
-        Mage1(Rect *placement, Texture *texture, Texture * projectileTexture);
+        Mage1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
 
 		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Mage2_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Mage2_P1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Mage2_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Mage2_P2(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Mage3_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Mage3_P1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Mage3_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Mage3_P2(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
     };
 
     class Catapult1 : public Tower {
@@ -166,11 +292,72 @@ namespace JanSordid::SDL_Example {
         static int _attackRange;
         static int _price;
 
-        Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture);
+        Catapult1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
 
 		Projectile * shoot(Enemy *target, u64 totalMSec) override;
 
 		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Catapult2_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Catapult2_P1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Catapult2_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Catapult2_P2(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Catapult3_P1 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Catapult3_P1(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
+    };
+
+    class Catapult3_P2 : public Tower {
+    public:
+        static int _attackDamage;
+        static int _attackSpeed;
+        static int _attackRange;
+        static int _price;
+
+        Catapult3_P2(Rect *placement, Texture *texture, Texture * projectileTexture, const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
+
+		Projectile * shoot(Enemy *target, u64 totalMSec) override;
+
+		int getAttackSpeed() override;
+        int getPrice() override;
     };
 
 	class TowerSlot {
@@ -185,18 +372,7 @@ namespace JanSordid::SDL_Example {
 		bool _used = false;
 
 		TowerSlot(Rect* position, Texture* texture, Rect* towerIconSrc [3], Texture* towerIconTextures[3], f32 scalingFactor);
-		Tower* placeTower(Tower::TowerType towerType, std::unordered_map<Tower::TowerType,Texture*> projectileTextures, f32 scalingFactor);
-	};
-
-	class EnemySpawner{
-	public:
-		std::vector<Enemy*> _enemies;
-		int currentEnemy = 0;
-		int _delay = 100;
-
-
-		EnemySpawner(const std::vector<Enemy*> &enemies);
-		Enemy* spawn(u64 totalMSec);
+		Rect* placeTower(f32 scalingFactor);
 	};
 
     struct GameData {
@@ -302,11 +478,24 @@ namespace JanSordid::SDL_Example {
         Texture *grassTile = nullptr;
         Texture *towerSlotTexture = nullptr;
         Texture *archerTowerTexture = nullptr;
+        Texture *archerTower_2P1_Texture = nullptr;
+        Texture *archerTower_2P2_Texture = nullptr;
+        Texture *archerTower_3P1_Texture = nullptr;
+        Texture *archerTower_3P2_Texture = nullptr;
 		Texture *archerTowerArrowTexture = nullptr;
 		Texture *mageTowerTexture = nullptr;
+        Texture *mageTower_2P1_Texture = nullptr;
+        Texture *mageTower_2P2_Texture = nullptr;
+        Texture *mageTower_3P1_Texture = nullptr;
+        Texture *mageTower_3P2_Texture = nullptr;
 		Texture *mageTowerOrbTexture = nullptr;
         Texture *catapultTowerTexture = nullptr;
+        Texture *catapultTower_2P1_Texture = nullptr;
+        Texture *catapultTower_2P2_Texture = nullptr;
+        Texture *catapultTower_3P1_Texture = nullptr;
+        Texture *catapultTower_3P2_Texture = nullptr;
 		Texture *catapultTowerStoneTexture = nullptr;
+        Texture *sellIconTexture = nullptr;
         Texture *enemyTexture = nullptr;
 
 		Music * _music = nullptr;
@@ -324,7 +513,6 @@ namespace JanSordid::SDL_Example {
         std::pair<int, int> _mapPathStart;
         std::pair<int, int> _mapPathEnd;
 
-
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
 		std::unordered_map<Texture *,Rect *> projectileSrcRectMap;
 		std::unordered_map<Tower::TowerType,Texture *> projectileTextureMap;
@@ -334,6 +522,8 @@ namespace JanSordid::SDL_Example {
         std::vector<Enemy *> _enemies;
         std::vector<Enemy*> _deadEnemies;
         std::vector<Enemy*> _toRemove; // Hilfsvektor für zu entfernende Gegner
+
+        void createTower(Tower::TowerType towerType, Rect* towerPosition);
 
     public:
         // ctor
