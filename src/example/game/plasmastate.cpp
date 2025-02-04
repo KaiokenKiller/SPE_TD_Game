@@ -1139,6 +1139,7 @@ namespace JanSordid::SDL_Example {
                                     for (auto &towerSlot: _towerSlots) {
                                         if (towerSlot->_position->x == tower->_position->x + ((4/2)*scalingFactor()) && towerSlot->_position->y == tower->_position->y + ((66/2)*scalingFactor())) {
                                             towerSlot->_used = false;
+                                            towerSlot->_clicked = false;
                                             break;
                                         }
                                     }
