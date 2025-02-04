@@ -1128,8 +1128,6 @@ namespace JanSordid::SDL_Example {
                 Tower* soldTower = nullptr;
                 int towerIndex = 0;
                 for (auto &tower: _game.data._towers) {
-                    //ToDo Upgrades implementieren
-
                     if (tower->_clicked) {
                         int i = 0;
                         Tower::TowerType towerType;
