@@ -15,34 +15,37 @@
     - Tower
       - ~~Schießen~~
       - ~~Cooldown~~
-      - Range
-      - Gegner finden
+      - ~~Range~~
+      - ~~Gegner finden~~
     - Gegner
       - ~~move function~~
-      - Spawner
+      - ~~Spawner~~
+      - Waves
     - Placement
       - ~~Basic Placement~~
         - UI verschönern
-      - Upgrades
+      - ~~Upgrades~~
     - Projectiles
       - ~~Basic functions~~
       - AoE
+      - Burning
+      - Slowing
     - Map
       - ~~Path~~ 
       - ~~Test Map~~
-      - Gym Level
-      - First Level
+      - ~~Gym Level~~
+      - ~~First Level~~
 - Overworld State implementieren
     - Gebäude + GUI
-        - Burg macht nichts
-        - Researchbuilding
-            - Liste alle locked Tower mit button zum "Kaufen"
+        - ~~Burg macht nichts~~
+        - ~~Researchbuilding~~
+            - Liste aller locked Tower mit button zum "Kaufen"
         - Mine
             - ~~Upgradebutton~~
                 - ~~+1 gold pro level pro update tic~~
     - ~~Ressourcen~~
         - ~~Gold~~
-- Menu State implementieren
+- ~~Menu State implementieren~~
 
 ## Meetings
 
