@@ -11,7 +11,6 @@ namespace JanSordid::SDL_Example {
     }
 
     int Tower::_attackDamage = 0;
-    int Tower::_attackRange = 0;
     int Tower::_attackSpeed = 0;
     int Tower::_price = 0;
 
@@ -24,27 +23,31 @@ namespace JanSordid::SDL_Example {
         return false;
     }
 
+
     int Tower::sellTower() {
-        return getPrice() /2;
+        return getPrice() / 2;
     }
 
-    Archer1::Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    Archer1::Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
+                     const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(new Rect(_position->x - iconWidth, _position->y, iconWidth, iconHeight));
         _towerIconPosition.push_back(new Rect(_position->x + _position->w, _position->y, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Archer1;
     }
 
     int Archer1::_attackDamage = 5;
-    int Archer1::_attackRange = 2;
+    int Archer1::_attackRange = 400;
     int Archer1::_attackSpeed = 750;
     int Archer1::_price = 100;
 
@@ -57,30 +60,48 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-	int Archer1::getAttackSpeed() {
-		return _attackSpeed;
-	}
+    int Archer1::getAttackSpeed() {
+        return _attackSpeed;
+    }
 
     int Archer1::getPrice() {
         return _price;
     }
 
-    Archer2_P1::Archer2_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Archer1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << distance << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Archer2_P1::Archer2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                           const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                           f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Archer2_P1;
     }
 
     int Archer2_P1::_attackDamage = 5;
-    int Archer2_P1::_attackRange = 2;
+    int Archer2_P1::_attackRange = 5;
     int Archer2_P1::_attackSpeed = 500;
     int Archer2_P1::_price = 150;
 
@@ -101,22 +122,40 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Archer2_P2::Archer2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Archer2_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Archer2_P2::Archer2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                           const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                           f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Archer2_P2;
     }
 
     int Archer2_P2::_attackDamage = 10;
-    int Archer2_P2::_attackRange = 2;
+    int Archer2_P2::_attackRange = 5;
     int Archer2_P2::_attackSpeed = 1000;
     int Archer2_P2::_price = 150;
 
@@ -137,21 +176,37 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Archer3_P1::Archer3_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Archer2_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Archer3_P1::Archer3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                           const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                           f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Archer3_P1;
     }
 
     int Archer3_P1::_attackDamage = 5;
-    int Archer3_P1::_attackRange = 2;
+    int Archer3_P1::_attackRange = 5;
     int Archer3_P1::_attackSpeed = 250;
     int Archer3_P1::_price = 200;
 
@@ -172,21 +227,37 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Archer3_P2::Archer3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Archer3_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Archer3_P2::Archer3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                           const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                           f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Archer3_P2;
     }
 
     int Archer3_P2::_attackDamage = 25;
-    int Archer3_P2::_attackRange = 2;
+    int Archer3_P2::_attackRange = 5;
     int Archer3_P2::_attackSpeed = 1500;
     int Archer3_P2::_price = 200;
 
@@ -207,31 +278,46 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Mage1::Mage1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Archer3_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Mage1::Mage1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
+                 const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(new Rect(_position->x - iconWidth, _position->y, iconWidth, iconHeight));
         _towerIconPosition.push_back(new Rect(_position->x + _position->w, _position->y, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Mage1;
     }
 
-	int Mage1::getAttackSpeed() {
-		return _attackSpeed;
-	}
+    int Mage1::getAttackSpeed() {
+        return _attackSpeed;
+    }
 
     int Mage1::getPrice() {
         return _price;
     }
 
     int Mage1::_attackDamage = 7;
-    int Mage1::_attackRange = 2;
+    int Mage1::_attackRange = 500;
     int Mage1::_attackSpeed = 1000;
     int Mage1::_price = 150;
 
@@ -244,16 +330,34 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Mage2_P1::Mage2_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Mage1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Mage2_P1::Mage2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                       const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                       f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Mage2_P1;
     }
@@ -267,7 +371,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Mage2_P1::_attackDamage = 7;
-    int Mage2_P1::_attackRange = 2;
+    int Mage2_P1::_attackRange = 5;
     int Mage2_P1::_attackSpeed = 1000;
     int Mage2_P1::_price = 200;
 
@@ -280,16 +384,34 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Mage2_P2::Mage2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Mage2_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Mage2_P2::Mage2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                       const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                       f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Mage2_P2;
     }
@@ -303,7 +425,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Mage2_P2::_attackDamage = 7;
-    int Mage2_P2::_attackRange = 2;
+    int Mage2_P2::_attackRange = 5;
     int Mage2_P2::_attackSpeed = 1000;
     int Mage2_P2::_price = 200;
 
@@ -316,15 +438,31 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Mage3_P1::Mage3_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Mage2_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Mage3_P1::Mage3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                       const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                       f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Mage3_P1;
     }
@@ -338,7 +476,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Mage3_P1::_attackDamage = 7;
-    int Mage3_P1::_attackRange = 2;
+    int Mage3_P1::_attackRange = 5;
     int Mage3_P1::_attackSpeed = 1000;
     int Mage3_P1::_price = 250;
 
@@ -351,15 +489,31 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Mage3_P2::Mage3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Mage3_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Mage3_P2::Mage3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                       const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                       f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Mage3_P2;
     }
@@ -373,7 +527,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Mage3_P2::_attackDamage = 7;
-    int Mage3_P2::_attackRange = 2;
+    int Mage3_P2::_attackRange = 5;
     int Mage3_P2::_attackSpeed = 1000;
     int Mage3_P2::_price = 250;
 
@@ -386,23 +540,39 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-    Catapult1::Catapult1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Mage3_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Catapult1::Catapult1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                         const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                         f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(new Rect(_position->x - iconWidth, _position->y, iconWidth, iconHeight));
         _towerIconPosition.push_back(new Rect(_position->x + _position->w, _position->y, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Catapult1;
     }
 
     int Catapult1::_attackDamage = 10;
-    int Catapult1::_attackRange = 4;
+    int Catapult1::_attackRange = 5;
     int Catapult1::_attackSpeed = 1500;
     int Catapult1::_price = 200;
 
@@ -415,30 +585,48 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
-	int Catapult1::getAttackSpeed() {
-		return _attackSpeed;
-	}
+    int Catapult1::getAttackSpeed() {
+        return _attackSpeed;
+    }
 
     int Catapult1::getPrice() {
         return _price;
     }
 
-    Catapult2_P1::Catapult2_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Catapult1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Catapult2_P1::Catapult2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                               const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                               f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Catapult2_P1;
     }
 
     int Catapult2_P1::_attackDamage = 10;
-    int Catapult2_P1::_attackRange = 4;
+    int Catapult2_P1::_attackRange = 5;
     int Catapult2_P1::_attackSpeed = 1500;
     int Catapult2_P1::_price = 250;
 
@@ -459,22 +647,40 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Catapult2_P2::Catapult2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Catapult2_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Catapult2_P2::Catapult2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                               const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                               f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + iconHeight, iconWidth, iconHeight));
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                         iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Catapult2_P2;
     }
 
     int Catapult2_P2::_attackDamage = 10;
-    int Catapult2_P2::_attackRange = 4;
+    int Catapult2_P2::_attackRange = 5;
     int Catapult2_P2::_attackSpeed = 1500;
     int Catapult2_P2::_price = 250;
 
@@ -495,21 +701,37 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Catapult3_P1::Catapult3_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Catapult2_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Catapult3_P1::Catapult3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
+                               const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                               f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Catapult3_P1;
     }
 
     int Catapult3_P1::_attackDamage = 10;
-    int Catapult3_P1::_attackRange = 4;
+    int Catapult3_P1::_attackRange = 5;
     int Catapult3_P1::_attackSpeed = 1500;
     int Catapult3_P1::_price = 300;
 
@@ -530,21 +752,37 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    Catapult3_P2::Catapult3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect*>& towerIconSrc, const Vector<Texture*>& towerIconTextures, f32 scalingFactor) : Tower(
-        placement, texture, projectileTexture) {
+    bool Catapult3_P1::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
+    Catapult3_P2::Catapult3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
+                               const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
+                               f32 scalingFactor) : Tower(
+            placement, texture, projectileTexture) {
         _towerIconSrc = towerIconSrc;
         _towerIconTextures = towerIconTextures;
 
-        int iconWidth = 16*scalingFactor;
-        int iconHeight = 32*scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
 
-        _towerIconPosition.push_back(new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y + (_position->h), iconWidth, iconHeight));
+        _towerIconPosition.push_back(
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
+                         iconWidth, iconHeight));
 
         _type = TowerType::Catapult3_P2;
     }
 
     int Catapult3_P2::_attackDamage = 10;
-    int Catapult3_P2::_attackRange = 4;
+    int Catapult3_P2::_attackRange = 5;
     int Catapult3_P2::_attackSpeed = 1500;
     int Catapult3_P2::_price = 300;
 
@@ -565,6 +803,18 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
+    bool Catapult3_P2::checkRange(const Enemy &enemy) {
+        int xdist = _position->x - enemy._position->x;
+        int ydist = _position->y - enemy._position->y;
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        std::cout << _attackRange << std::endl;
+        if (distance <= _attackRange) {
+            return true;
+        }
+        return false;
+    }
+
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
                          Rect **towerIconSrc, Texture **towerIconTextures, f32 scalingFactor) {
         _position = position;
@@ -575,18 +825,20 @@ namespace JanSordid::SDL_Example {
             _towerIconSrc[i] = towerIconSrc[i];
             _towerIconTextures[i] = towerIconTextures[i];
         }
-        int iconWidth = 32*scalingFactor;
-        int iconHeight = 64*scalingFactor;
+        int iconWidth = 32 * scalingFactor;
+        int iconHeight = 64 * scalingFactor;
         _towerIconPosition[0] = new Rect(_position->x - iconWidth, _position->y - iconHeight, iconWidth, iconHeight);
-        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - (iconWidth/2)), _position->y - (iconHeight + (8*scalingFactor)), iconWidth, iconHeight);
+        _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)),
+                                         _position->y - (iconHeight + (8 * scalingFactor)), iconWidth, iconHeight);
         _towerIconPosition[2] = new Rect(_position->x + _position->w, _position->y - iconHeight, iconWidth, iconHeight);
     }
 
     Rect *TowerSlot::placeTower(f32 scalingFactor) {
         if (!_used) {
-                _used = true;
-            return new Rect(_position->x - ((4/2)*scalingFactor), _position->y - ((66/2)*scalingFactor), ((70/2)*scalingFactor), ((130/2)*scalingFactor));
-            }
+            _used = true;
+            return new Rect(_position->x - ((4 / 2) * scalingFactor), _position->y - ((66 / 2) * scalingFactor),
+                            ((70 / 2) * scalingFactor), ((130 / 2) * scalingFactor));
+        }
         return nullptr;
     }
 
@@ -607,7 +859,7 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
-    void Enemy::move(const f32 deltaT,f32 scalingFactor) {
+    void Enemy::move(const f32 deltaT, f32 scalingFactor) {
         if (!_isAlive || _currentPath >= _path.size()) return;
 
         int movement = static_cast<int>(deltaT * 100.0f * _speed * scalingFactor);
@@ -621,8 +873,7 @@ namespace JanSordid::SDL_Example {
                 _position->x += (currentMove.x > 0) ? moveX : -moveX;
                 currentMove.x += (currentMove.x > 0) ? -moveX : moveX;
                 movement -= moveX;
-            }
-            else if (currentMove.y != 0) {
+            } else if (currentMove.y != 0) {
                 int moveY = std::min(movement, static_cast<int>(std::abs(currentMove.y)));
                 _position->y += (currentMove.y > 0) ? moveY : -moveY;
                 currentMove.y += (currentMove.y > 0) ? -moveY : moveY;
@@ -649,7 +900,7 @@ namespace JanSordid::SDL_Example {
 
         _direction = FPoint((_target->_position->x - _position->x), _target->_position->y - _position->y);
         if (float directionLength = sqrt((_direction.x * _direction.x) + (_direction.y * _direction.y));
-            directionLength != 0) {
+                directionLength != 0) {
             _direction.x /= directionLength;
             _direction.x *= 2;
             _direction.y /= directionLength;
@@ -689,111 +940,139 @@ namespace JanSordid::SDL_Example {
     void TdState::createTower(Tower::TowerType towerType, Rect *towerPosition) {
         switch (towerType) {
             case Tower::TowerType::Archer1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer2_P1],towerSrcRectMap[Tower::TowerType::Archer2_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {archerTower_2P1_Texture,archerTower_2P2_Texture,sellIconTexture};
-                auto * newTower = new Archer1(towerPosition,archerTowerTexture,archerTowerArrowTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer2_P1],
+                                            towerSrcRectMap[Tower::TowerType::Archer2_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{archerTower_2P1_Texture, archerTower_2P2_Texture, sellIconTexture};
+                auto *newTower = new Archer1(towerPosition, archerTowerTexture, archerTowerArrowTexture, towerIconSrc,
+                                             towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Archer2_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer3_P1],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {archerTower_3P1_Texture,sellIconTexture};
-                auto * newTower = new Archer2_P1(towerPosition,archerTower_2P1_Texture,archerTowerArrowTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer3_P1],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{archerTower_3P1_Texture, sellIconTexture};
+                auto *newTower = new Archer2_P1(towerPosition, archerTower_2P1_Texture, archerTowerArrowTexture,
+                                                towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Archer2_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer3_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {archerTower_3P2_Texture,sellIconTexture};
-                auto * newTower = new Archer2_P2(towerPosition,archerTower_2P2_Texture,archerTowerArrowTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer3_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{archerTower_3P2_Texture, sellIconTexture};
+                auto *newTower = new Archer2_P2(towerPosition, archerTower_2P2_Texture, archerTowerArrowTexture,
+                                                towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Archer3_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Archer3_P1(towerPosition,archerTower_3P1_Texture,archerTowerArrowTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Archer3_P1(towerPosition, archerTower_3P1_Texture, archerTowerArrowTexture,
+                                                towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Archer3_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Archer3_P2(towerPosition,archerTower_3P2_Texture,archerTowerArrowTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Archer3_P2(towerPosition, archerTower_3P2_Texture, archerTowerArrowTexture,
+                                                towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Mage1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Mage2_P1],towerSrcRectMap[Tower::TowerType::Mage2_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {mageTower_2P1_Texture,mageTower_2P2_Texture,sellIconTexture};
-                auto * newTower = new Mage1(towerPosition,mageTowerTexture,mageTowerOrbTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Mage2_P1],
+                                            towerSrcRectMap[Tower::TowerType::Mage2_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{mageTower_2P1_Texture, mageTower_2P2_Texture, sellIconTexture};
+                auto *newTower = new Mage1(towerPosition, mageTowerTexture, mageTowerOrbTexture, towerIconSrc,
+                                           towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Mage2_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Mage3_P1],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {mageTower_3P1_Texture,sellIconTexture};
-                auto * newTower = new Mage2_P1(towerPosition,mageTower_2P1_Texture,mageTowerOrbTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Mage3_P1],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{mageTower_3P1_Texture, sellIconTexture};
+                auto *newTower = new Mage2_P1(towerPosition, mageTower_2P1_Texture, mageTowerOrbTexture, towerIconSrc,
+                                              towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Mage2_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Mage3_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {mageTower_3P2_Texture,sellIconTexture};
-                auto * newTower = new Mage2_P2(towerPosition,mageTower_2P2_Texture,mageTowerOrbTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Mage3_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{mageTower_3P2_Texture, sellIconTexture};
+                auto *newTower = new Mage2_P2(towerPosition, mageTower_2P2_Texture, mageTowerOrbTexture, towerIconSrc,
+                                              towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Mage3_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Mage3_P1(towerPosition,mageTower_3P1_Texture,mageTowerOrbTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Mage3_P1(towerPosition, mageTower_3P1_Texture, mageTowerOrbTexture, towerIconSrc,
+                                              towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Mage3_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Mage3_P2(towerPosition,mageTower_3P2_Texture,mageTowerOrbTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Mage3_P2(towerPosition, mageTower_3P2_Texture, mageTowerOrbTexture, towerIconSrc,
+                                              towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Catapult1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Catapult2_P1],towerSrcRectMap[Tower::TowerType::Catapult2_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {catapultTower_2P1_Texture,catapultTower_2P2_Texture,sellIconTexture};
-                auto * newTower = new Catapult1(towerPosition,catapultTowerTexture,catapultTowerStoneTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Catapult2_P1],
+                                            towerSrcRectMap[Tower::TowerType::Catapult2_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{catapultTower_2P1_Texture, catapultTower_2P2_Texture,
+                                                    sellIconTexture};
+                auto *newTower = new Catapult1(towerPosition, catapultTowerTexture, catapultTowerStoneTexture,
+                                               towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Catapult2_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Catapult3_P1],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {catapultTower_3P1_Texture,sellIconTexture};
-                auto * newTower = new Catapult2_P1(towerPosition,catapultTower_2P1_Texture,catapultTowerStoneTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Catapult3_P1],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{catapultTower_3P1_Texture, sellIconTexture};
+                auto *newTower = new Catapult2_P1(towerPosition, catapultTower_2P1_Texture, catapultTowerStoneTexture,
+                                                  towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Catapult2_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Catapult3_P2],towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {catapultTower_3P2_Texture,sellIconTexture};
-                auto * newTower = new Catapult2_P2(towerPosition,catapultTower_2P2_Texture,catapultTowerStoneTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Catapult3_P2],
+                                            towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{catapultTower_3P2_Texture, sellIconTexture};
+                auto *newTower = new Catapult2_P2(towerPosition, catapultTower_2P2_Texture, catapultTowerStoneTexture,
+                                                  towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Catapult3_P1: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Catapult3_P1(towerPosition,catapultTower_3P1_Texture,catapultTowerStoneTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Catapult3_P1(towerPosition, catapultTower_3P1_Texture, catapultTowerStoneTexture,
+                                                  towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
             case Tower::TowerType::Catapult3_P2: {
-                Vector<Rect*> towerIconSrc {towerSrcRectMap[Tower::TowerType::Archer1]};
-                Vector<Texture*> towerIconTextures {sellIconTexture};
-                auto * newTower = new Catapult3_P2(towerPosition,catapultTower_3P2_Texture,catapultTowerStoneTexture,towerIconSrc,towerIconTextures,scalingFactor());
+                Vector<Rect *> towerIconSrc{towerSrcRectMap[Tower::TowerType::Archer1]};
+                Vector<Texture *> towerIconTextures{sellIconTexture};
+                auto *newTower = new Catapult3_P2(towerPosition, catapultTower_3P2_Texture, catapultTowerStoneTexture,
+                                                  towerIconSrc, towerIconTextures, scalingFactor());
                 _game.data._towers.push_back(newTower);
                 break;
             }
-            default: ;
+            default:;
         }
     }
 
@@ -813,74 +1092,81 @@ namespace JanSordid::SDL_Example {
         }
         if (!archerTowerTexture) {
             archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
-            towerSrcRectMap[Tower::TowerType::Archer1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Archer1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_2P1_Texture) {
-            archerTower_2P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
-            towerSrcRectMap[Tower::TowerType::Archer2_P1] = new Rect(0,0,towerWidth,towerHeight);
+            archerTower_2P1_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
+            towerSrcRectMap[Tower::TowerType::Archer2_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_2P2_Texture) {
-            archerTower_2P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_crossbow.png");
-            towerSrcRectMap[Tower::TowerType::Archer2_P2] = new Rect(0,0,towerWidth,towerHeight);
+            archerTower_2P2_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_crossbow.png");
+            towerSrcRectMap[Tower::TowerType::Archer2_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_3P1_Texture) {
             archerTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
-            towerSrcRectMap[Tower::TowerType::Archer3_P1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Archer3_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_3P2_Texture) {
-            archerTower_3P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_ballista.png");
-            towerSrcRectMap[Tower::TowerType::Archer3_P2] = new Rect(0,0,towerWidth,towerHeight);
+            archerTower_3P2_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_ballista.png");
+            towerSrcRectMap[Tower::TowerType::Archer3_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTowerArrowTexture) {
             archerTowerArrowTexture = IMG_LoadTexture(
-                renderer(), BasePathGraphic "/Archer-Tower/archer_tower_arrow.png");
+                    renderer(), BasePathGraphic "/Archer-Tower/archer_tower_arrow.png");
         }
         if (!mageTowerTexture) {
             mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Mage1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!mageTower_2P1_Texture) {
             mageTower_2P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage2_P1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Mage2_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!mageTower_2P2_Texture) {
             mageTower_2P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage2_P2] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Mage2_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!mageTower_3P1_Texture) {
             mageTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage3_P1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Mage3_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!mageTower_3P2_Texture) {
             mageTower_3P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage3_P2] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Mage3_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!mageTowerOrbTexture) {
             mageTowerOrbTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower_orb.png");
         }
         if (!catapultTowerTexture) {
             catapultTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult1] = new Rect(0,0,towerWidth,towerHeight);
+            towerSrcRectMap[Tower::TowerType::Catapult1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!catapultTower_2P1_Texture) {
-            catapultTower_2P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult2_P1] = new Rect(0,0,towerWidth,towerHeight);
+            catapultTower_2P1_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult2_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!catapultTower_2P2_Texture) {
-            catapultTower_2P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult2_P2] = new Rect(0,0,towerWidth,towerHeight);
+            catapultTower_2P2_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult2_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!catapultTower_3P1_Texture) {
-            catapultTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult3_P1] = new Rect(0,0,towerWidth,towerHeight);
+            catapultTower_3P1_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult3_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!catapultTower_3P2_Texture) {
-            catapultTower_3P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult3_P2] = new Rect(0,0,towerWidth,towerHeight);
+            catapultTower_3P2_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult3_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!catapultTowerStoneTexture) {
             catapultTowerStoneTexture = IMG_LoadTexture(
-                renderer(), BasePathGraphic "Catapult-Tower/catapult_tower_stone.png");
+                    renderer(), BasePathGraphic "Catapult-Tower/catapult_tower_stone.png");
         }
 
         if (!sellIconTexture) {
@@ -914,10 +1200,10 @@ namespace JanSordid::SDL_Example {
             for (int i = 0; i < gridHeight; i++) {
                 for (int j = 0; j < gridWidth; j++) {
                     Rect *temp = new Rect(
-                        j * tileSize * scalingFactor(),
-                        i * tileSize * scalingFactor(),
-                        tileSize * scalingFactor(),
-                        tileSize * scalingFactor()
+                            j * tileSize * scalingFactor(),
+                            i * tileSize * scalingFactor(),
+                            tileSize * scalingFactor(),
+                            tileSize * scalingFactor()
                     );
                     tileMap[i][j] = temp;
                 }
@@ -925,23 +1211,24 @@ namespace JanSordid::SDL_Example {
         }
         if (_towerSlots.empty()) {
             Rect *towerIconSrc[3] = {
-                towerSrcRectMap[Tower::TowerType::Mage1], towerSrcRectMap[Tower::TowerType::Archer1],
-                towerSrcRectMap[Tower::TowerType::Catapult1]
+                    towerSrcRectMap[Tower::TowerType::Mage1], towerSrcRectMap[Tower::TowerType::Archer1],
+                    towerSrcRectMap[Tower::TowerType::Catapult1]
             };
             Texture *towerIconTexture[3] = {mageTowerTexture, archerTowerTexture, catapultTowerTexture};
 
             for (int i = 0; i < gridHeight; i++) {
                 for (int j = 0; j < gridWidth; j++) {
                     char tile = levelData[i][j];
-                    if( tile == 'T' ){
+                    if (tile == 'T') {
                         Rect *tempRect = new Rect(
-                            j * tileSize * scalingFactor(),
-                            i * tileSize * scalingFactor(),
-                            62 / 2 * scalingFactor(),
-                            62 / 2 * scalingFactor()
+                                j * tileSize * scalingFactor(),
+                                i * tileSize * scalingFactor(),
+                                62 / 2 * scalingFactor(),
+                                62 / 2 * scalingFactor()
                         );
 
-                        auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture, scalingFactor());
+                        auto *tempTowerSlot = new TowerSlot(tempRect, towerSlotTexture, towerIconSrc, towerIconTexture,
+                                                            scalingFactor());
                         _towerSlots.push_back(tempTowerSlot);
                     }
                 }
@@ -1076,7 +1363,7 @@ namespace JanSordid::SDL_Example {
                                             towerType = Tower::TowerType::Catapult1;
                                             break;
                                         }
-                                        default: ;
+                                        default:;
                                     }
                                     if (_game.data.unlocks.contains(towerType)) {
                                         switch (towerType) {
@@ -1125,7 +1412,7 @@ namespace JanSordid::SDL_Example {
                         }
                     }
                 }
-                Tower* soldTower = nullptr;
+                Tower *soldTower = nullptr;
                 int towerIndex = 0;
                 for (auto &tower: _game.data._towers) {
                     if (tower->_clicked) {
@@ -1137,7 +1424,10 @@ namespace JanSordid::SDL_Example {
                                     _game.data.gold += tower->sellTower();
                                     soldTower = tower;
                                     for (auto &towerSlot: _towerSlots) {
-                                        if (towerSlot->_position->x == tower->_position->x + ((4/2)*scalingFactor()) && towerSlot->_position->y == tower->_position->y + ((66/2)*scalingFactor())) {
+                                        if (towerSlot->_position->x ==
+                                            tower->_position->x + ((4 / 2) * scalingFactor()) &&
+                                            towerSlot->_position->y ==
+                                            tower->_position->y + ((66 / 2) * scalingFactor())) {
                                             towerSlot->_used = false;
                                             towerSlot->_clicked = false;
                                             break;
@@ -1252,8 +1542,7 @@ namespace JanSordid::SDL_Example {
                                         default:
                                             return false;
                                     }
-                                }
-                                else {
+                                } else {
                                     return false;
                                 }
                             }
@@ -1269,7 +1558,7 @@ namespace JanSordid::SDL_Example {
                         break;
                 }
                 if (soldTower != nullptr) {
-                    auto towerIndexIterator = (_game.data._towers.begin() +towerIndex);
+                    auto towerIndexIterator = (_game.data._towers.begin() + towerIndex);
                     _game.data._towers.erase(towerIndexIterator);
                     delete soldTower;
                 }
@@ -1285,10 +1574,10 @@ namespace JanSordid::SDL_Example {
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
 
         // Most basic enemy spawner copied from Jan
-        if( respawnCD < totalMSec ) {
+        if (respawnCD < totalMSec) {
             if (!_deadEnemies.empty()) {
                 // Gegner aus der "Toten"-Liste holen
-                Enemy* tempEnemy = _deadEnemies.back();
+                Enemy *tempEnemy = _deadEnemies.back();
                 _deadEnemies.pop_back();
 
                 // Gegner zurücksetzen
@@ -1305,13 +1594,13 @@ namespace JanSordid::SDL_Example {
 
             } else {
                 // Neuen Gegner erstellen, falls kein "toter" Gegner verfügbar ist
-                Rect* tempRect = new Rect(
-                    _mapPathStart.second * tileSize * scalingFactor(),
-                    _mapPathStart.first * tileSize * scalingFactor(),
-                    46,
-                    46
+                Rect *tempRect = new Rect(
+                        _mapPathStart.second * tileSize * scalingFactor(),
+                        _mapPathStart.first * tileSize * scalingFactor(),
+                        46,
+                        46
                 );
-                auto* tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 1);
+                auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 1);
                 _enemies.push_back(tempEnemy);
             }
 
@@ -1319,24 +1608,24 @@ namespace JanSordid::SDL_Example {
         }
 
         for (auto projectile: _projectiles) {
-            projectile->move(deltaT,scalingFactor());
+            projectile->move(deltaT, scalingFactor());
         }
         if (_projectiles.size() > 500) {
-			_projectiles.erase(
-					std::remove_if(_projectiles.begin(), _projectiles.end(),
-								   [](Projectile* projectile) {
-									   if (!projectile->_isVisible) {
-										   delete projectile;  // Speicher freigeben
-										   return true;  // Entfernen aus dem Vektor
-									   }
-									   return false;  // Behalten im Vektor
-								   }),
-					_projectiles.end());
+            _projectiles.erase(
+                    std::remove_if(_projectiles.begin(), _projectiles.end(),
+                                   [](Projectile *projectile) {
+                                       if (!projectile->_isVisible) {
+                                           delete projectile;  // Speicher freigeben
+                                           return true;  // Entfernen aus dem Vektor
+                                       }
+                                       return false;  // Behalten im Vektor
+                                   }),
+                    _projectiles.end());
 
-		}
+        }
 
-        for (auto enemy : _enemies) {
-            enemy->move(deltaT,scalingFactor());
+        for (auto enemy: _enemies) {
+            enemy->move(deltaT, scalingFactor());
             if (!enemy->_isAlive) {
                 _deadEnemies.push_back(enemy);
                 _toRemove.push_back(enemy); // Gegner zum Entfernen markieren
@@ -1344,15 +1633,20 @@ namespace JanSordid::SDL_Example {
         }
 
         // Entferne die markierten Gegner aus _enemies
-        for (Enemy* enemy : _toRemove) {
+        for (Enemy *enemy: _toRemove) {
             _enemies.erase(std::remove(_enemies.begin(), _enemies.end(), enemy), _enemies.end());
         }
         _toRemove.clear(); // Hilfsvektor leeren
 
         for (auto tower: _game.data._towers) {
-            Projectile *temp = tower->shoot(_enemies[0], totalMSec);
-            if (temp != nullptr)
-                _projectiles.push_back(temp);
+            for (auto enemy: _enemies) {
+
+                if (tower->checkRange(*enemy)) {
+                    Projectile *temp = tower->shoot(enemy, totalMSec);
+                    if (temp != nullptr)
+                        _projectiles.push_back(temp);
+                }
+            }
         }
     }
 
@@ -1368,17 +1662,19 @@ namespace JanSordid::SDL_Example {
             for (int j = 0; j < gridWidth; j++) {
                 char tile = levelData[i][j];
                 switch (tile) {
-                    case '.': SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
+                    case '.':
+                        SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                         break;
                     case 'S':
                     case 'Z':
                     case 'P':
                         SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
                         break;
-                    default: SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
+                    default:
+                        SDL_RenderCopy(renderer(), grassTile, EntireRect, tileMap[i][j]);
                         break;
                 }
-                if ( std::isdigit(tile) ) {
+                if (std::isdigit(tile)) {
                     SDL_RenderCopy(renderer(), enemyPathTile, EntireRect, tileMap[i][j]);
                 }
             }
@@ -1395,7 +1691,8 @@ namespace JanSordid::SDL_Example {
             if (element->_clicked) {
                 int i = 0;
                 for (auto &icon_position: element->_towerIconPosition) {
-                    SDL_RenderCopy(renderer(), element->_towerIconTextures[i], element->_towerIconSrc[i], icon_position);
+                    SDL_RenderCopy(renderer(), element->_towerIconTextures[i], element->_towerIconSrc[i],
+                                   icon_position);
                     i++;
                 }
             }
@@ -1439,7 +1736,7 @@ namespace JanSordid::SDL_Example {
         Uint32 rendererTimeNeeded = SDL_GetTicks() - rendererStart;
         int delay = 1000 / 60 - rendererTimeNeeded;
 
-        if( delay > 0) {
+        if (delay > 0) {
             SDL_Delay(delay);
         }
 

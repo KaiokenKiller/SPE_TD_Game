@@ -196,7 +196,7 @@ namespace JanSordid::SDL_Example {
 
             SDL_RenderCopy(renderer(), _blendedText, EntireRect, &dst_rect);
         }
-        
+
 
         if (_logo) {
             SDL_Rect logoRect;
