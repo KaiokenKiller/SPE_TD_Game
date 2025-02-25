@@ -27,14 +27,15 @@
       - ~~Upgrades~~
     - Projectiles
       - ~~Basic functions~~
-      - AoE
-      - Burning
-      - Slowing
+      - ~~AoE~~
+      - ~~Burning~~
+      - ~~Slowing~~
     - Map
       - ~~Path~~ 
       - ~~Test Map~~
       - ~~Gym Level~~
       - ~~First Level~~
+      - Wave System
 - Overworld State implementieren
     - Gebäude + GUI
         - ~~Burg macht nichts~~
