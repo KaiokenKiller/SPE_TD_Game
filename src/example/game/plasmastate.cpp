@@ -4,6 +4,8 @@
 #include "example_game.hpp"
 
 namespace JanSordid::SDL_Example {
+    #pragma region Classes
+    #pragma region Towers
     Tower::Tower(Rect *placement, Texture *texture, Texture *projectileTexture) {
         _position = placement;
         _texture = texture;
@@ -28,6 +30,8 @@ namespace JanSordid::SDL_Example {
         return getPrice() / 2;
     }
 
+    #pragma region Archers
+
     Archer1::Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                      const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
             placement, texture, projectileTexture) {
@@ -47,7 +51,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Archer1::_attackDamage = 5;
-    int Archer1::_attackRange = 400;
+    int Archer1::_attackRange = 75;
     int Archer1::_attackSpeed = 750;
     int Archer1::_price = 100;
 
@@ -64,20 +68,13 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Archer1::getPrice() {
-        return _price;
+    int Archer1::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Archer1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
 
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << distance << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Archer1::getPrice() {
+        return _price;
     }
 
     Archer2_P1::Archer2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -91,7 +88,7 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -101,7 +98,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Archer2_P1::_attackDamage = 5;
-    int Archer2_P1::_attackRange = 5;
+    int Archer2_P1::_attackRange = 75;
     int Archer2_P1::_attackSpeed = 500;
     int Archer2_P1::_price = 150;
 
@@ -118,21 +115,14 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Archer2_P1::getAttackRange() {
+        return _attackRange;
+    }
+
     int Archer2_P1::getPrice() {
         return _price;
     }
 
-    bool Archer2_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
-    }
 
     Archer2_P2::Archer2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
                            const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
@@ -145,7 +135,7 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -155,7 +145,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Archer2_P2::_attackDamage = 10;
-    int Archer2_P2::_attackRange = 5;
+    int Archer2_P2::_attackRange = 75;
     int Archer2_P2::_attackSpeed = 1000;
     int Archer2_P2::_price = 150;
 
@@ -172,20 +162,12 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Archer2_P2::getPrice() {
-        return _price;
+    int Archer2_P2::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Archer2_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Archer2_P2::getPrice() {
+        return _price;
     }
 
     Archer3_P1::Archer3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -206,8 +188,8 @@ namespace JanSordid::SDL_Example {
     }
 
     int Archer3_P1::_attackDamage = 5;
-    int Archer3_P1::_attackRange = 5;
-    int Archer3_P1::_attackSpeed = 250;
+    int Archer3_P1::_attackRange = 75;
+    int Archer3_P1::_attackSpeed = 200;
     int Archer3_P1::_price = 200;
 
 
@@ -223,20 +205,12 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Archer3_P1::getPrice() {
-        return _price;
+    int Archer3_P1::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Archer3_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Archer3_P1::getPrice() {
+        return _price;
     }
 
     Archer3_P2::Archer3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -257,7 +231,7 @@ namespace JanSordid::SDL_Example {
     }
 
     int Archer3_P2::_attackDamage = 25;
-    int Archer3_P2::_attackRange = 5;
+    int Archer3_P2::_attackRange = 150;
     int Archer3_P2::_attackSpeed = 1500;
     int Archer3_P2::_price = 200;
 
@@ -274,22 +248,16 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Archer3_P2::getAttackRange() {
+        return _attackRange;
+    }
+
     int Archer3_P2::getPrice() {
         return _price;
     }
+#pragma endregion
 
-    bool Archer3_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
-    }
-
+    #pragma region Mages
     Mage1::Mage1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                  const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
             placement, texture, projectileTexture) {
@@ -312,12 +280,16 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Mage1::getAttackRange() {
+        return _attackRange;
+    }
+
     int Mage1::getPrice() {
         return _price;
     }
 
-    int Mage1::_attackDamage = 7;
-    int Mage1::_attackRange = 500;
+    int Mage1::_attackDamage = 10;
+    int Mage1::_attackRange = 75;
     int Mage1::_attackSpeed = 1000;
     int Mage1::_price = 150;
 
@@ -328,18 +300,6 @@ namespace JanSordid::SDL_Example {
             return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
         }
         return nullptr;
-    }
-
-    bool Mage1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
     }
 
     Mage2_P1::Mage2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -353,7 +313,7 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -366,34 +326,28 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Mage2_P1::getAttackRange() {
+        return _attackRange;
+    }
+
     int Mage2_P1::getPrice() {
         return _price;
     }
 
-    int Mage2_P1::_attackDamage = 7;
-    int Mage2_P1::_attackRange = 5;
+    int Mage2_P1::_attackDamage = 10;
+    int Mage2_P1::_attackRange = 75;
     int Mage2_P1::_attackSpeed = 1000;
     int Mage2_P1::_price = 200;
+    int Mage2_P1::_burnDamage = 1;
+    int Mage2_P1::_burnDuration = 2500;
 
     Projectile *Mage2_P1::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new BurningProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration, target);
         }
         return nullptr;
-    }
-
-    bool Mage2_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
     }
 
     Mage2_P2::Mage2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -407,7 +361,7 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -420,14 +374,21 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Mage2_P2::getAttackRange() {
+        return _attackRange;
+    }
+
     int Mage2_P2::getPrice() {
         return _price;
     }
 
-    int Mage2_P2::_attackDamage = 7;
-    int Mage2_P2::_attackRange = 5;
-    int Mage2_P2::_attackSpeed = 1000;
+    int Mage2_P2::_attackDamage = 5;
+    int Mage2_P2::_attackRange = 75;
+    int Mage2_P2::_attackSpeed = 750;
     int Mage2_P2::_price = 200;
+    float Mage2_P2::_slowFactor = 0.75;
+    int Mage2_P2::_slowDuration = 2500;
+
 
     Projectile *Mage2_P2::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
@@ -436,18 +397,6 @@ namespace JanSordid::SDL_Example {
             return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
         }
         return nullptr;
-    }
-
-    bool Mage2_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
     }
 
     Mage3_P1::Mage3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -471,34 +420,30 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Mage3_P1::getAttackRange() {
+        return _attackRange;
+    }
+
     int Mage3_P1::getPrice() {
         return _price;
     }
 
-    int Mage3_P1::_attackDamage = 7;
-    int Mage3_P1::_attackRange = 5;
+    int Mage3_P1::_attackDamage = 10;
+    int Mage3_P1::_attackRange = 150;
     int Mage3_P1::_attackSpeed = 1000;
     int Mage3_P1::_price = 250;
+    int Mage3_P1::_burnDamage = 2;
+    int Mage3_P1::_burnDuration = 5000;
+    int Mage3_P1::_splashDamage = 5;
+    int Mage3_P1::_splashRadius = 25;
 
     Projectile *Mage3_P1::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration,_splashDamage,_splashRadius, target);
         }
         return nullptr;
-    }
-
-    bool Mage3_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
     }
 
     Mage3_P2::Mage3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -522,36 +467,33 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
+    int Mage3_P2::getAttackRange() {
+        return _attackRange;
+    }
+
     int Mage3_P2::getPrice() {
         return _price;
     }
 
-    int Mage3_P2::_attackDamage = 7;
-    int Mage3_P2::_attackRange = 5;
-    int Mage3_P2::_attackSpeed = 1000;
+    int Mage3_P2::_attackDamage = 3;
+    int Mage3_P2::_attackRange = 75;
+    int Mage3_P2::_attackSpeed = 250;
     int Mage3_P2::_price = 250;
+    float Mage3_P2::_slowFactor = 0.5;
+    int Mage3_P2::_slowDuration = 2500;
 
     Projectile *Mage3_P2::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new SlowingProjectile(startPosition, _projectileTexture, _attackDamage,_slowFactor,_slowDuration, target);
         }
         return nullptr;
     }
 
-    bool Mage3_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
+    #pragma endregion
 
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
-    }
-
+    #pragma region Catapults
     Catapult1::Catapult1(Rect *placement, Texture *texture, Texture *projectileTexture,
                          const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
                          f32 scalingFactor) : Tower(
@@ -571,16 +513,18 @@ namespace JanSordid::SDL_Example {
         _type = TowerType::Catapult1;
     }
 
-    int Catapult1::_attackDamage = 10;
-    int Catapult1::_attackRange = 5;
+    int Catapult1::_attackDamage = 7;
+    int Catapult1::_attackRange = 100;
     int Catapult1::_attackSpeed = 1500;
     int Catapult1::_price = 200;
+    int Catapult1::_splashDamage = 5;
+    int Catapult1::_splashRadius = 25;
 
     Projectile *Catapult1::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
         }
         return nullptr;
     }
@@ -589,20 +533,16 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Catapult1::getPrice() {
-        return _price;
+    int Catapult1::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Catapult1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
+    int Catapult2_P1::getAttackRange() {
+        return _attackRange;
+    }
 
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Catapult1::getPrice() {
+        return _price;
     }
 
     Catapult2_P1::Catapult2_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -616,7 +556,7 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -626,15 +566,17 @@ namespace JanSordid::SDL_Example {
     }
 
     int Catapult2_P1::_attackDamage = 10;
-    int Catapult2_P1::_attackRange = 5;
+    int Catapult2_P1::_attackRange = 150;
     int Catapult2_P1::_attackSpeed = 1500;
     int Catapult2_P1::_price = 250;
+    int Catapult2_P1::_splashDamage = 5;
+    int Catapult2_P1::_splashRadius = 35;
 
     Projectile *Catapult2_P1::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
         }
         return nullptr;
     }
@@ -643,20 +585,12 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Catapult2_P1::getPrice() {
-        return _price;
+    int Catapult2_P2::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Catapult2_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Catapult2_P1::getPrice() {
+        return _price;
     }
 
     Catapult2_P2::Catapult2_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -670,25 +604,27 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + iconHeight, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
                          iconWidth, iconHeight));
 
         _type = TowerType::Catapult2_P2;
+        std::vector<FPoint> temp;
+        _dummyEnemy = new Enemy(placement,nullptr,temp,0,0);
     }
 
-    int Catapult2_P2::_attackDamage = 10;
-    int Catapult2_P2::_attackRange = 5;
-    int Catapult2_P2::_attackSpeed = 1500;
+    int Catapult2_P2::_attackDamage = 2;
+    int Catapult2_P2::_attackRange = 25;
+    int Catapult2_P2::_attackSpeed = 100;
     int Catapult2_P2::_price = 250;
 
     Projectile *Catapult2_P2::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_attackDamage,_attackRange, _dummyEnemy);
         }
         return nullptr;
     }
@@ -697,20 +633,12 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Catapult2_P2::getPrice() {
-        return _price;
+    int Catapult3_P1::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Catapult2_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Catapult2_P2::getPrice() {
+        return _price;
     }
 
     Catapult3_P1::Catapult3_P1(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -730,16 +658,18 @@ namespace JanSordid::SDL_Example {
         _type = TowerType::Catapult3_P1;
     }
 
-    int Catapult3_P1::_attackDamage = 10;
-    int Catapult3_P1::_attackRange = 5;
+    int Catapult3_P1::_attackDamage = 15;
+    int Catapult3_P1::_attackRange = 150;
     int Catapult3_P1::_attackSpeed = 1500;
     int Catapult3_P1::_price = 300;
+    int Catapult3_P1::_splashDamage = 7;
+    int Catapult3_P1::_splashRadius = 35;
 
     Projectile *Catapult3_P1::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
         }
         return nullptr;
     }
@@ -748,20 +678,12 @@ namespace JanSordid::SDL_Example {
         return _attackSpeed;
     }
 
-    int Catapult3_P1::getPrice() {
-        return _price;
+    int Catapult3_P2::getAttackRange() {
+        return _attackRange;
     }
 
-    bool Catapult3_P1::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
+    int Catapult3_P1::getPrice() {
+        return _price;
     }
 
     Catapult3_P2::Catapult3_P2(Rect *placement, Texture *texture, Texture *projectileTexture,
@@ -779,18 +701,22 @@ namespace JanSordid::SDL_Example {
                          iconWidth, iconHeight));
 
         _type = TowerType::Catapult3_P2;
+        std::vector<FPoint> temp;
+        _dummyEnemy = new Enemy(placement,nullptr,temp,0,0);
     }
 
-    int Catapult3_P2::_attackDamage = 10;
-    int Catapult3_P2::_attackRange = 5;
-    int Catapult3_P2::_attackSpeed = 1500;
+    int Catapult3_P2::_attackDamage = 2;
+    int Catapult3_P2::_attackRange = 50;
+    int Catapult3_P2::_attackSpeed = 100;
     int Catapult3_P2::_price = 300;
+    int Catapult3_P2::_burnDamage = 2;
+    int Catapult3_P2::_burnDuration = 2500;
 
     Projectile *Catapult3_P2::shoot(Enemy *target, u64 totalMSec) {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new Projectile(startPosition, _projectileTexture, _attackDamage, target);
+            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration,_attackDamage,_attackRange, _dummyEnemy);
         }
         return nullptr;
     }
@@ -803,17 +729,7 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    bool Catapult3_P2::checkRange(const Enemy &enemy) {
-        int xdist = _position->x - enemy._position->x;
-        int ydist = _position->y - enemy._position->y;
-
-        int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        std::cout << _attackRange << std::endl;
-        if (distance <= _attackRange) {
-            return true;
-        }
-        return false;
-    }
+    #pragma endregion
 
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
                          Rect **towerIconSrc, Texture **towerIconTextures, f32 scalingFactor) {
@@ -842,11 +758,15 @@ namespace JanSordid::SDL_Example {
         return nullptr;
     }
 
+#pragma endregion
+
+    #pragma region Enemys
     Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed) {
         _isAlive = true;
         _position = position;
         _texture = texture;
         _hp = hp;
+        _maxSpeed = speed;
         _speed = speed;
         _textureSrcRect = new Rect(46 * 5, 0, 46, 46);
         _path = path;
@@ -891,6 +811,63 @@ namespace JanSordid::SDL_Example {
         }
     }
 
+    #pragma endregion
+
+    #pragma region Status
+
+    Status::Status(int duration, Enemy* target, u64 totalMSec) {
+        _duration = duration;
+        _target = target;
+        _startTime = totalMSec;
+    }
+
+    BurningStatus::BurningStatus(int burnDamage, int duration, Enemy* target, u64 totalMSec):Status(duration,target, totalMSec) {
+        _damage = burnDamage;
+        _cooldown = totalMSec;
+    }
+
+    void BurningStatus::tick(u64 totalMSec) {
+        if (_isActive){
+            if (totalMSec > _startTime+_duration) {
+                _isActive = false;
+                return;
+            }
+
+            int tickTime = 500;
+            if (totalMSec > _cooldown + tickTime) {
+                while (totalMSec > _cooldown + tickTime) {
+                    _target->takeDamage(_damage);
+                    _cooldown += tickTime;
+                }
+                _cooldown = totalMSec;
+            }
+        }
+    }
+
+    SlowingStatus::SlowingStatus(float slownessFactor, int duration, Enemy* target, u64 totalMSec):Status(duration,target, totalMSec) {
+        _slownessFactor = slownessFactor;
+    }
+
+    void SlowingStatus::tick(u64 totalMSec) {
+        if (_isActive) {
+            if (totalMSec > _startTime+_duration) {
+                _isActive = false;
+                _target->_speed = _target->_maxSpeed;
+                return;
+            }
+            if (!_isSlowed) {
+                if (_target->_speed > _target->_maxSpeed*_slownessFactor) {
+                    _target->_speed = _target->_maxSpeed*_slownessFactor;
+                }
+                _isSlowed = true;
+            }
+        }
+    }
+
+
+    #pragma endregion
+
+    #pragma region Projectiles
     Projectile::Projectile(Rect *position, Texture *texture, int damage, Enemy *target) {
         _isVisible = true;
         _position = position;
@@ -921,7 +898,7 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    void Projectile::move(const f32 deltaT, f32 scalingFactor) {
+    bool Projectile::move(const f32 deltaT, f32 scalingFactor) {
         if (_isVisible) {
             _position->x += _direction.x * deltaT * _speed * scalingFactor;
             _position->y += _direction.y * deltaT * _speed * scalingFactor;
@@ -929,14 +906,64 @@ namespace JanSordid::SDL_Example {
             if (SDL_HasIntersection(_position, _target->_position)) {
                 _target->takeDamage(_damage);
                 _isVisible = false;
+                return true;
             }
             _homingCounter -= deltaT * 1000;
             if (_homingCounter <= 0) {
                 updateDirection();
             }
         }
+        return false;
     }
 
+    BurningProjectile::BurningProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, Enemy *target):Projectile(position,texture,damage,target) {
+        _burnDamage = burnDamage;
+        _burnDuration = burnDuration;
+        _type.insert(ProjectileType::Burn);
+    }
+
+    Status *BurningProjectile::applyEffect(u64 totalMSec) {
+        return new BurningStatus(_burnDamage,_burnDuration,_target,totalMSec);
+    }
+
+    SlowingProjectile::SlowingProjectile(Rect *position, Texture *texture, int damage, float slowFactor, int slowDuration, Enemy *target):Projectile(position,texture,damage,target) {
+        _slowFactor = slowFactor;
+        _slowDuration = slowDuration;
+        _type.insert(ProjectileType::Slow);
+    }
+
+    Status *SlowingProjectile::applyEffect(u64 totalMSec) {
+        return new SlowingStatus(_slowFactor,_slowDuration,_target,totalMSec);
+    }
+
+    SplashProjectile::SplashProjectile(Rect *position, Texture *texture, int damage, int splashDamage, int splashRadius, Enemy *target):Projectile(position,texture,damage,target) {
+        _splashDamage = splashDamage;
+        _splashRadius = splashRadius;
+        _type.insert(ProjectileType::Splash);
+    }
+
+    BurningSplashProjectile::BurningSplashProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, int splashDamage, int splashRadius, Enemy *target):SplashProjectile(position,texture,damage,splashDamage,splashRadius,target) {
+        _burnDamage = burnDamage;
+        _burnDuration = burnDuration;
+        _type.insert(ProjectileType::Burn);
+    }
+
+    Status *BurningSplashProjectile::applyEffect(Enemy *target, u64 totalMSec) {
+        return new BurningStatus(_burnDamage,_burnDuration,_target,totalMSec);
+    }
+
+    SlowingSplashProjectile::SlowingSplashProjectile(Rect *position, Texture *texture, int damage, float slowFacotr, int slowDuration, int splashDamage, int splashRadius, Enemy *target):SplashProjectile(position,texture,damage,splashDamage,splashRadius,target) {
+        _slowFactor = slowFacotr;
+        _slowDuration = slowDuration;
+        _type.insert(ProjectileType::Slow);
+    }
+
+    Status *SlowingSplashProjectile::applyEffect(Enemy *target, u64 totalMSec) {
+        return new SlowingStatus(_slowFactor,_slowDuration,_target,totalMSec);
+    }
+
+    #pragma endregion
+    #pragma endregion
     void TdState::createTower(Tower::TowerType towerType, Rect *towerPosition) {
         switch (towerType) {
             case Tower::TowerType::Archer1: {
@@ -1076,6 +1103,16 @@ namespace JanSordid::SDL_Example {
         }
     }
 
+    bool checkRange(const Rect* src, const Rect* dst, int range, f32 scalingFactor) {
+        int xdist = (src->x+(src->w/2)) - (dst->x+(dst->w/2));
+        int ydist = (src->y+(src->h/2)) - (dst->y+(dst->h/2));
+
+        int distance = std::sqrt(xdist * xdist + ydist * ydist);
+        if (distance <= range*scalingFactor) {
+            return true;
+        }
+        return false;
+    }
 
     void TdState::Init() {
         Base::Init();
@@ -1233,6 +1270,25 @@ namespace JanSordid::SDL_Example {
                     }
                 }
             }
+
+            // Temporary unlock everything
+            _game.data.unlocks.insert(Tower::TowerType::Archer2_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Archer2_P2);
+            _game.data.unlocks.insert(Tower::TowerType::Archer3_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Archer3_P2);
+            _game.data.unlocks.insert(Tower::TowerType::Catapult1);
+            _game.data.unlocks.insert(Tower::TowerType::Catapult2_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Catapult2_P2);
+            _game.data.unlocks.insert(Tower::TowerType::Catapult3_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Catapult3_P2);
+            _game.data.unlocks.insert(Tower::TowerType::Mage1);
+            _game.data.unlocks.insert(Tower::TowerType::Mage2_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Mage2_P2);
+            _game.data.unlocks.insert(Tower::TowerType::Mage3_P1);
+            _game.data.unlocks.insert(Tower::TowerType::Mage3_P2);
+
+
+
         }
 
         // Spawning temporary Dummies
@@ -1414,10 +1470,11 @@ namespace JanSordid::SDL_Example {
                 }
                 Tower *soldTower = nullptr;
                 int towerIndex = 0;
+                Tower::TowerType towerType;
+                Rect* newTowerPosition = nullptr;
                 for (auto &tower: _game.data._towers) {
                     if (tower->_clicked) {
                         int i = 0;
-                        Tower::TowerType towerType;
                         for (auto icon: tower->_towerIconPosition) {
                             if (SDL_PointInRect(&mouse, icon)) {
                                 if (icon == tower->_towerIconPosition.back()) {
@@ -1446,96 +1503,96 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Archer2_P1: {
                                             if (Archer2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer2_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Archer2_P2: {
                                             if (Archer2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer2_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Archer3_P1: {
                                             if (Archer3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer3_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Archer3_P2: {
                                             if (Archer3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer3_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Mage2_P1: {
                                             if (Mage2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage2_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Mage2_P2: {
                                             if (Mage2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage2_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Mage3_P1: {
                                             if (Mage3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage3_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Mage3_P2: {
                                             if (Mage3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage3_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Catapult2_P1: {
                                             if (Catapult2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult2_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Catapult2_P2: {
                                             if (Catapult2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult2_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Catapult3_P1: {
                                             if (Catapult3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult3_P1::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
                                         case Tower::TowerType::Catapult3_P2: {
                                             if (Catapult3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult3_P2::_price;
-                                                createTower(towerType, tower->_position);
-                                                return true;
+                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                soldTower = tower;
                                             }
                                             break;
                                         }
@@ -1552,6 +1609,7 @@ namespace JanSordid::SDL_Example {
                     if (SDL_PointInRect(&mouse, tower->_position)) {
                         tower->_clicked = !tower->_clicked;
                     }
+
                     if (!soldTower)
                         towerIndex++;
                     else
@@ -1561,6 +1619,9 @@ namespace JanSordid::SDL_Example {
                     auto towerIndexIterator = (_game.data._towers.begin() + towerIndex);
                     _game.data._towers.erase(towerIndexIterator);
                     delete soldTower;
+                }
+                if (newTowerPosition != nullptr) {
+                    createTower(towerType, newTowerPosition);
                 }
             }
         }
@@ -1608,9 +1669,51 @@ namespace JanSordid::SDL_Example {
         }
 
         for (auto projectile: _projectiles) {
-            projectile->move(deltaT, scalingFactor());
+            if (projectile->move(deltaT, scalingFactor())){
+                if (projectile->_type.contains(Projectile::ProjectileType::Splash)) {
+                    if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
+                        for (auto enemy: _enemies) {
+                            if (enemy != projectile->_target) {
+                                auto* splashProjectile = static_cast<BurningSplashProjectile*>(projectile);
+                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                    enemy->takeDamage(splashProjectile->_splashDamage);
+                                    _statuses.push_back(splashProjectile->applyEffect(enemy,totalMSec));
+                                }
+                            }
+                        }
+                    }
+                    else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
+                        for (auto enemy: _enemies) {
+                            if (enemy != projectile->_target) {
+                                auto* splashProjectile = static_cast<SlowingSplashProjectile*>(projectile);
+                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                    enemy->takeDamage(splashProjectile->_splashDamage);
+                                    _statuses.push_back(splashProjectile->applyEffect(enemy,totalMSec));
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (auto enemy: _enemies) {
+                            if (enemy != projectile->_target) {
+                                auto* splashProjectile = static_cast<SplashProjectile*>(projectile);
+                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                    enemy->takeDamage(splashProjectile->_splashDamage);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
+                    _statuses.push_back(static_cast<BurningProjectile*>(projectile)->applyEffect(totalMSec));
+                }
+                else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
+                    _statuses.push_back(static_cast<SlowingProjectile*>(projectile)->applyEffect(totalMSec));
+                }
+            }
         }
         if (_projectiles.size() > 500) {
+            print("Projectile");
             _projectiles.erase(
                     std::remove_if(_projectiles.begin(), _projectiles.end(),
                                    [](Projectile *projectile) {
@@ -1621,7 +1724,23 @@ namespace JanSordid::SDL_Example {
                                        return false;  // Behalten im Vektor
                                    }),
                     _projectiles.end());
+        }
 
+        for (auto status: _statuses) {
+            status->tick(totalMSec);
+        }
+        if (_statuses.size() > 500) {
+            print("Status");
+            _statuses.erase(
+                    std::remove_if(_statuses.begin(), _statuses.end(),
+                                   [](Status *status) {
+                                       if (!status->_isActive) {
+                                           delete status;  // Speicher freigeben
+                                           return true;  // Entfernen aus dem Vektor
+                                       }
+                                       return false;  // Behalten im Vektor
+                                   }),
+                    _statuses.end());
         }
 
         for (auto enemy: _enemies) {
@@ -1641,7 +1760,7 @@ namespace JanSordid::SDL_Example {
         for (auto tower: _game.data._towers) {
             for (auto enemy: _enemies) {
 
-                if (tower->checkRange(*enemy)) {
+                if (checkRange(tower->_position,enemy->_position,tower->getAttackRange(),scalingFactor())) {
                     Projectile *temp = tower->shoot(enemy, totalMSec);
                     if (temp != nullptr)
                         _projectiles.push_back(temp);
