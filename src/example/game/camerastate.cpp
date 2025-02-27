@@ -47,6 +47,20 @@ namespace JanSordid::SDL_Example {
                 TTF_CloseFont(buttonFont);
             }
         }
+
+        if (!goldDisplayTexture) {
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string goldText = "Gold: " + std::to_string(_game.data.gold);
+                const char *goldChar = goldText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, goldChar, white)) {
+                    goldDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+        }
+
         _game.data.day += 1;
         _game.data.gold += _game.data.mineLevel * 10;
         std::cout << _game.data.gold << std::endl;
@@ -129,6 +143,34 @@ namespace JanSordid::SDL_Example {
             destRect.x = tdButton.x + (tdButton.w - texW) / 2;
             destRect.y = tdButton.y + (tdButton.h - texH) / 2;
             SDL_RenderCopy(renderer(), tdButtonTexture, nullptr, &destRect);
+        }
+
+        if (goldDisplayTexture) {
+            SDL_DestroyTexture(goldDisplayTexture);
+            goldDisplayTexture = nullptr;
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string goldText = "Gold: " + std::to_string(_game.data.gold);
+                const char *goldChar = goldText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, goldChar, white)) {
+                    goldDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+
+            int texW, texH;
+            SDL_QueryTexture(goldDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10;
+            destRect.y = 10;
+            SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
         }
 
         SDL_RenderPresent(renderer());

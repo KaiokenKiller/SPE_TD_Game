@@ -60,8 +60,9 @@ namespace JanSordid::SDL_Example {
         const char *title;
     };
 
-    #pragma region IngameObjects
-    #pragma region Enemies
+#pragma region IngameObjects
+#pragma region Enemies
+
     class Enemy {
     public:
 
@@ -82,28 +83,33 @@ namespace JanSordid::SDL_Example {
 
         bool takeDamage(int damage);
     };
-    #pragma endregion
 
-    #pragma region Status
+#pragma endregion
+
+#pragma region Status
+
     class Status {
-        public:
+    public:
 
         int _startTime;
         int _duration;
-        Enemy* _target;
+        Enemy *_target;
         bool _isActive = true;
 
-        Status(int duration, Enemy* target, u64 totalMSec);
+        Status(int duration, Enemy *target, u64 totalMSec);
+
         virtual ~Status() = default;
+
         virtual void tick(u64 totalMSec) = 0;
     };
 
     class BurningStatus : public Status {
-        public:
+    public:
         int _damage;
         int _cooldown;
 
-        BurningStatus(int damage, int duration, Enemy* target, u64 totalMSec);
+        BurningStatus(int damage, int duration, Enemy *target, u64 totalMSec);
+
         void tick(u64 totalMSec) override;
     };
 
@@ -112,16 +118,20 @@ namespace JanSordid::SDL_Example {
         float _slownessFactor;
         bool _isSlowed = false;
 
-        SlowingStatus(float slownessFactor, int duration, Enemy* target, u64 totalMSec);
+        SlowingStatus(float slownessFactor, int duration, Enemy *target, u64 totalMSec);
+
         void tick(u64 totalMSec) override;
     };
 
 #pragma endregion
 
-    #pragma region Projectiles
+#pragma region Projectiles
+
     class Projectile {
     public:
-        enum class ProjectileType {Burn,Slow,Splash};
+        enum class ProjectileType {
+            Burn, Slow, Splash
+        };
 
         int _damage;
         bool _isVisible;
@@ -144,40 +154,45 @@ namespace JanSordid::SDL_Example {
     };
 
     class BurningProjectile : public Projectile {
-        public:
+    public:
         int _burnDamage;
         int _burnDuration;
 
-        BurningProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, Enemy *target);
+        BurningProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration,
+                          Enemy *target);
 
-        Status* applyEffect(u64 totalMSec);
+        Status *applyEffect(u64 totalMSec);
     };
 
     class SlowingProjectile : public Projectile {
-        public:
+    public:
         float _slowFactor;
         int _slowDuration;
 
-        SlowingProjectile(Rect *position, Texture *texture, int damage, float slowFactor, int slowDuration, Enemy *target);
+        SlowingProjectile(Rect *position, Texture *texture, int damage, float slowFactor, int slowDuration,
+                          Enemy *target);
 
-        Status* applyEffect(u64 totalMSec);
+        Status *applyEffect(u64 totalMSec);
     };
 
     class SplashProjectile : public Projectile {
-        public:
+    public:
         int _splashRadius;
         int _splashDamage;
 
-        SplashProjectile(Rect *position, Texture *texture, int damage, int splashDamage, int splashRadius, Enemy *target);
+        SplashProjectile(Rect *position, Texture *texture, int damage, int splashDamage, int splashRadius,
+                         Enemy *target);
     };
 
     class BurningSplashProjectile : public SplashProjectile {
-        public:
+    public:
         int _burnDamage;
         int _burnDuration;
 
-        BurningSplashProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, int splashDamage, int splashRadius, Enemy *target);
-        Status* applyEffect(Enemy* target,u64 totalMSec);
+        BurningSplashProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration,
+                                int splashDamage, int splashRadius, Enemy *target);
+
+        Status *applyEffect(Enemy *target, u64 totalMSec);
     };
 
     class SlowingSplashProjectile : public SplashProjectile {
@@ -185,13 +200,16 @@ namespace JanSordid::SDL_Example {
         float _slowFactor;
         int _slowDuration;
 
-        SlowingSplashProjectile(Rect *position, Texture *texture, int damage, float slowFacotr, int slowDuration, int splashDamage, int splashRadius, Enemy *target);
-        Status* applyEffect(Enemy* target,u64 totalMSec);
+        SlowingSplashProjectile(Rect *position, Texture *texture, int damage, float slowFacotr, int slowDuration,
+                                int splashDamage, int splashRadius, Enemy *target);
+
+        Status *applyEffect(Enemy *target, u64 totalMSec);
     };
 
 #pragma endregion
 
-    #pragma region Towers
+#pragma region Towers
+
     class Tower {
     public:
         enum class TowerType {
@@ -220,7 +238,9 @@ namespace JanSordid::SDL_Example {
         virtual Projectile *shoot(Enemy *target, u64 totalMSec) = 0;
 
         virtual int getAttackSpeed() = 0;
+
         virtual int getAttackRange() = 0;
+
         virtual int getPrice() = 0;
 
 
@@ -244,7 +264,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -261,7 +283,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -278,7 +302,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -295,7 +321,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -312,7 +340,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -329,7 +359,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -348,7 +380,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -367,7 +401,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -388,7 +424,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -407,7 +445,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -426,7 +466,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -445,7 +487,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -455,7 +499,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
-        Enemy* _dummyEnemy;
+        Enemy *_dummyEnemy;
 
         Catapult2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                      const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -463,7 +507,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -482,7 +528,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -494,7 +542,7 @@ namespace JanSordid::SDL_Example {
         static int _price;
         static int _burnDamage;
         static int _burnDuration;
-        Enemy* _dummyEnemy;
+        Enemy *_dummyEnemy;
 
         Catapult3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                      const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -502,7 +550,9 @@ namespace JanSordid::SDL_Example {
         Projectile *shoot(Enemy *target, u64 totalMSec) override;
 
         int getAttackSpeed() override;
+
         int getAttackRange() override;
+
         int getPrice() override;
     };
 
@@ -625,6 +675,7 @@ namespace JanSordid::SDL_Example {
         //Eigener Stuff:
         SDL_Rect overworldButton = {50, 50, 120, 40};
         Texture *overworldButtonTexture = nullptr;
+        Texture *goldDisplayTexture = nullptr;
         Texture *enemyPathTile = nullptr;
         Texture *grassTile = nullptr;
         Texture *towerSlotTexture = nullptr;
@@ -702,6 +753,7 @@ namespace JanSordid::SDL_Example {
         using Base = MyGameState;
 
     protected:
+        Texture *goldDisplayTexture = nullptr;
         Texture *bg[4] = {nullptr};
         Texture *buildingSprites[4] = {nullptr};
         Point bgSize[4]; // Is initialized in Init()

@@ -4,8 +4,9 @@
 #include "example_game.hpp"
 
 namespace JanSordid::SDL_Example {
-    #pragma region Classes
-    #pragma region Towers
+#pragma region Classes
+#pragma region Towers
+
     Tower::Tower(Rect *placement, Texture *texture, Texture *projectileTexture) {
         _position = placement;
         _texture = texture;
@@ -30,7 +31,7 @@ namespace JanSordid::SDL_Example {
         return getPrice() / 2;
     }
 
-    #pragma region Archers
+#pragma region Archers
 
     Archer1::Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                      const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
@@ -88,7 +89,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -135,7 +137,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -255,9 +258,11 @@ namespace JanSordid::SDL_Example {
     int Archer3_P2::getPrice() {
         return _price;
     }
+
 #pragma endregion
 
-    #pragma region Mages
+#pragma region Mages
+
     Mage1::Mage1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                  const Vector<Texture *> &towerIconTextures, f32 scalingFactor) : Tower(
             placement, texture, projectileTexture) {
@@ -313,7 +318,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -345,7 +351,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new BurningProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration, target);
+            return new BurningProjectile(startPosition, _projectileTexture, _attackDamage, _burnDamage, _burnDuration,
+                                         target);
         }
         return nullptr;
     }
@@ -361,7 +368,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -441,7 +449,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration,_splashDamage,_splashRadius, target);
+            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage, _burnDamage,
+                                               _burnDuration, _splashDamage, _splashRadius, target);
         }
         return nullptr;
     }
@@ -486,14 +495,16 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SlowingProjectile(startPosition, _projectileTexture, _attackDamage,_slowFactor,_slowDuration, target);
+            return new SlowingProjectile(startPosition, _projectileTexture, _attackDamage, _slowFactor, _slowDuration,
+                                         target);
         }
         return nullptr;
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region Catapults
+#pragma region Catapults
+
     Catapult1::Catapult1(Rect *placement, Texture *texture, Texture *projectileTexture,
                          const Vector<Rect *> &towerIconSrc, const Vector<Texture *> &towerIconTextures,
                          f32 scalingFactor) : Tower(
@@ -524,7 +535,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage, _splashDamage, _splashRadius,
+                                        target);
         }
         return nullptr;
     }
@@ -556,7 +568,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -576,7 +589,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage, _splashDamage, _splashRadius,
+                                        target);
         }
         return nullptr;
     }
@@ -604,7 +618,8 @@ namespace JanSordid::SDL_Example {
         int iconHeight = 32 * scalingFactor;
 
         _towerIconPosition.push_back(
-                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight/2, iconWidth,
+                new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y - iconHeight / 2,
+                         iconWidth,
                          iconHeight));
         _towerIconPosition.push_back(
                 new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)), _position->y + (_position->h),
@@ -612,7 +627,7 @@ namespace JanSordid::SDL_Example {
 
         _type = TowerType::Catapult2_P2;
         std::vector<FPoint> temp;
-        _dummyEnemy = new Enemy(placement,nullptr,temp,0,0);
+        _dummyEnemy = new Enemy(placement, nullptr, temp, 0, 0);
     }
 
     int Catapult2_P2::_attackDamage = 2;
@@ -624,7 +639,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_attackDamage,_attackRange, _dummyEnemy);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage, _attackDamage, _attackRange,
+                                        _dummyEnemy);
         }
         return nullptr;
     }
@@ -669,7 +685,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage,_splashDamage,_splashRadius, target);
+            return new SplashProjectile(startPosition, _projectileTexture, _attackDamage, _splashDamage, _splashRadius,
+                                        target);
         }
         return nullptr;
     }
@@ -702,7 +719,7 @@ namespace JanSordid::SDL_Example {
 
         _type = TowerType::Catapult3_P2;
         std::vector<FPoint> temp;
-        _dummyEnemy = new Enemy(placement,nullptr,temp,0,0);
+        _dummyEnemy = new Enemy(placement, nullptr, temp, 0, 0);
     }
 
     int Catapult3_P2::_attackDamage = 2;
@@ -716,7 +733,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage,_burnDamage,_burnDuration,_attackDamage,_attackRange, _dummyEnemy);
+            return new BurningSplashProjectile(startPosition, _projectileTexture, _attackDamage, _burnDamage,
+                                               _burnDuration, _attackDamage, _attackRange, _dummyEnemy);
         }
         return nullptr;
     }
@@ -729,7 +747,7 @@ namespace JanSordid::SDL_Example {
         return _price;
     }
 
-    #pragma endregion
+#pragma endregion
 
     TowerSlot::TowerSlot(Rect *position, Texture *texture,
                          Rect **towerIconSrc, Texture **towerIconTextures, f32 scalingFactor) {
@@ -760,7 +778,8 @@ namespace JanSordid::SDL_Example {
 
 #pragma endregion
 
-    #pragma region Enemys
+#pragma region Enemys
+
     Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed) {
         _isAlive = true;
         _position = position;
@@ -811,24 +830,25 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region Status
+#pragma region Status
 
-    Status::Status(int duration, Enemy* target, u64 totalMSec) {
+    Status::Status(int duration, Enemy *target, u64 totalMSec) {
         _duration = duration;
         _target = target;
         _startTime = totalMSec;
     }
 
-    BurningStatus::BurningStatus(int burnDamage, int duration, Enemy* target, u64 totalMSec):Status(duration,target, totalMSec) {
+    BurningStatus::BurningStatus(int burnDamage, int duration, Enemy *target, u64 totalMSec) : Status(duration, target,
+                                                                                                      totalMSec) {
         _damage = burnDamage;
         _cooldown = totalMSec;
     }
 
     void BurningStatus::tick(u64 totalMSec) {
-        if (_isActive){
-            if (totalMSec > _startTime+_duration) {
+        if (_isActive) {
+            if (totalMSec > _startTime + _duration) {
                 _isActive = false;
                 return;
             }
@@ -844,20 +864,22 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    SlowingStatus::SlowingStatus(float slownessFactor, int duration, Enemy* target, u64 totalMSec):Status(duration,target, totalMSec) {
+    SlowingStatus::SlowingStatus(float slownessFactor, int duration, Enemy *target, u64 totalMSec) : Status(duration,
+                                                                                                            target,
+                                                                                                            totalMSec) {
         _slownessFactor = slownessFactor;
     }
 
     void SlowingStatus::tick(u64 totalMSec) {
         if (_isActive) {
-            if (totalMSec > _startTime+_duration) {
+            if (totalMSec > _startTime + _duration) {
                 _isActive = false;
                 _target->_speed = _target->_maxSpeed;
                 return;
             }
             if (!_isSlowed) {
-                if (_target->_speed > _target->_maxSpeed*_slownessFactor) {
-                    _target->_speed = _target->_maxSpeed*_slownessFactor;
+                if (_target->_speed > _target->_maxSpeed * _slownessFactor) {
+                    _target->_speed = _target->_maxSpeed * _slownessFactor;
                 }
                 _isSlowed = true;
             }
@@ -865,9 +887,10 @@ namespace JanSordid::SDL_Example {
     }
 
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region Projectiles
+#pragma region Projectiles
+
     Projectile::Projectile(Rect *position, Texture *texture, int damage, Enemy *target) {
         _isVisible = true;
         _position = position;
@@ -916,54 +939,67 @@ namespace JanSordid::SDL_Example {
         return false;
     }
 
-    BurningProjectile::BurningProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, Enemy *target):Projectile(position,texture,damage,target) {
+    BurningProjectile::BurningProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration,
+                                         Enemy *target) : Projectile(position, texture, damage, target) {
         _burnDamage = burnDamage;
         _burnDuration = burnDuration;
         _type.insert(ProjectileType::Burn);
     }
 
     Status *BurningProjectile::applyEffect(u64 totalMSec) {
-        return new BurningStatus(_burnDamage,_burnDuration,_target,totalMSec);
+        return new BurningStatus(_burnDamage, _burnDuration, _target, totalMSec);
     }
 
-    SlowingProjectile::SlowingProjectile(Rect *position, Texture *texture, int damage, float slowFactor, int slowDuration, Enemy *target):Projectile(position,texture,damage,target) {
+    SlowingProjectile::SlowingProjectile(Rect *position, Texture *texture, int damage, float slowFactor,
+                                         int slowDuration, Enemy *target) : Projectile(position, texture, damage,
+                                                                                       target) {
         _slowFactor = slowFactor;
         _slowDuration = slowDuration;
         _type.insert(ProjectileType::Slow);
     }
 
     Status *SlowingProjectile::applyEffect(u64 totalMSec) {
-        return new SlowingStatus(_slowFactor,_slowDuration,_target,totalMSec);
+        return new SlowingStatus(_slowFactor, _slowDuration, _target, totalMSec);
     }
 
-    SplashProjectile::SplashProjectile(Rect *position, Texture *texture, int damage, int splashDamage, int splashRadius, Enemy *target):Projectile(position,texture,damage,target) {
+    SplashProjectile::SplashProjectile(Rect *position, Texture *texture, int damage, int splashDamage, int splashRadius,
+                                       Enemy *target) : Projectile(position, texture, damage, target) {
         _splashDamage = splashDamage;
         _splashRadius = splashRadius;
         _type.insert(ProjectileType::Splash);
     }
 
-    BurningSplashProjectile::BurningSplashProjectile(Rect *position, Texture *texture, int damage, int burnDamage, int burnDuration, int splashDamage, int splashRadius, Enemy *target):SplashProjectile(position,texture,damage,splashDamage,splashRadius,target) {
+    BurningSplashProjectile::BurningSplashProjectile(Rect *position, Texture *texture, int damage, int burnDamage,
+                                                     int burnDuration, int splashDamage, int splashRadius,
+                                                     Enemy *target) : SplashProjectile(position, texture, damage,
+                                                                                       splashDamage, splashRadius,
+                                                                                       target) {
         _burnDamage = burnDamage;
         _burnDuration = burnDuration;
         _type.insert(ProjectileType::Burn);
     }
 
     Status *BurningSplashProjectile::applyEffect(Enemy *target, u64 totalMSec) {
-        return new BurningStatus(_burnDamage,_burnDuration,_target,totalMSec);
+        return new BurningStatus(_burnDamage, _burnDuration, _target, totalMSec);
     }
 
-    SlowingSplashProjectile::SlowingSplashProjectile(Rect *position, Texture *texture, int damage, float slowFacotr, int slowDuration, int splashDamage, int splashRadius, Enemy *target):SplashProjectile(position,texture,damage,splashDamage,splashRadius,target) {
+    SlowingSplashProjectile::SlowingSplashProjectile(Rect *position, Texture *texture, int damage, float slowFacotr,
+                                                     int slowDuration, int splashDamage, int splashRadius,
+                                                     Enemy *target) : SplashProjectile(position, texture, damage,
+                                                                                       splashDamage, splashRadius,
+                                                                                       target) {
         _slowFactor = slowFacotr;
         _slowDuration = slowDuration;
         _type.insert(ProjectileType::Slow);
     }
 
     Status *SlowingSplashProjectile::applyEffect(Enemy *target, u64 totalMSec) {
-        return new SlowingStatus(_slowFactor,_slowDuration,_target,totalMSec);
+        return new SlowingStatus(_slowFactor, _slowDuration, _target, totalMSec);
     }
 
-    #pragma endregion
-    #pragma endregion
+#pragma endregion
+#pragma endregion
+
     void TdState::createTower(Tower::TowerType towerType, Rect *towerPosition) {
         switch (towerType) {
             case Tower::TowerType::Archer1: {
@@ -1103,12 +1139,12 @@ namespace JanSordid::SDL_Example {
         }
     }
 
-    bool checkRange(const Rect* src, const Rect* dst, int range, f32 scalingFactor) {
-        int xdist = (src->x+(src->w/2)) - (dst->x+(dst->w/2));
-        int ydist = (src->y+(src->h/2)) - (dst->y+(dst->h/2));
+    bool checkRange(const Rect *src, const Rect *dst, int range, f32 scalingFactor) {
+        int xdist = (src->x + (src->w / 2)) - (dst->x + (dst->w / 2));
+        int ydist = (src->y + (src->h / 2)) - (dst->y + (dst->h / 2));
 
         int distance = std::sqrt(xdist * xdist + ydist * ydist);
-        if (distance <= range*scalingFactor) {
+        if (distance <= range * scalingFactor) {
             return true;
         }
         return false;
@@ -1288,7 +1324,6 @@ namespace JanSordid::SDL_Example {
             _game.data.unlocks.insert(Tower::TowerType::Mage3_P2);
 
 
-
         }
 
         // Spawning temporary Dummies
@@ -1371,6 +1406,19 @@ namespace JanSordid::SDL_Example {
                         SDL_FreeSurface(btnSurf);
                     }
                     TTF_CloseFont(buttonFont);
+                }
+            }
+
+            if (!goldDisplayTexture) {
+                if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                    SDL_Color white = {255, 255, 255, 255};
+                    std::string goldText = "Gold: " + std::to_string(_game.data.gold);
+                    const char *goldChar = goldText.c_str();
+                    if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, goldChar, white)) {
+                        goldDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                        SDL_FreeSurface(btnSurf);
+                    }
+                    TTF_CloseFont(Font);
                 }
             }
         }
@@ -1471,7 +1519,7 @@ namespace JanSordid::SDL_Example {
                 Tower *soldTower = nullptr;
                 int towerIndex = 0;
                 Tower::TowerType towerType;
-                Rect* newTowerPosition = nullptr;
+                Rect *newTowerPosition = nullptr;
                 for (auto &tower: _game.data._towers) {
                     if (tower->_clicked) {
                         int i = 0;
@@ -1503,7 +1551,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Archer2_P1: {
                                             if (Archer2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer2_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1511,7 +1560,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Archer2_P2: {
                                             if (Archer2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer2_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1519,7 +1569,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Archer3_P1: {
                                             if (Archer3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer3_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1527,7 +1578,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Archer3_P2: {
                                             if (Archer3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Archer3_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1535,7 +1587,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Mage2_P1: {
                                             if (Mage2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage2_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1543,7 +1596,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Mage2_P2: {
                                             if (Mage2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage2_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1551,7 +1605,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Mage3_P1: {
                                             if (Mage3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage3_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1559,7 +1614,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Mage3_P2: {
                                             if (Mage3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Mage3_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1567,7 +1623,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Catapult2_P1: {
                                             if (Catapult2_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult2_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1575,7 +1632,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Catapult2_P2: {
                                             if (Catapult2_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult2_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1583,7 +1641,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Catapult3_P1: {
                                             if (Catapult3_P1::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult3_P1::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1591,7 +1650,8 @@ namespace JanSordid::SDL_Example {
                                         case Tower::TowerType::Catapult3_P2: {
                                             if (Catapult3_P2::_price <= _game.data.gold) {
                                                 _game.data.gold -= Catapult3_P2::_price;
-                                                newTowerPosition = new Rect(tower->_position->x,tower->_position->y,tower->_position->w,tower->_position->h);
+                                                newTowerPosition = new Rect(tower->_position->x, tower->_position->y,
+                                                                            tower->_position->w, tower->_position->h);
                                                 soldTower = tower;
                                             }
                                             break;
@@ -1669,46 +1729,45 @@ namespace JanSordid::SDL_Example {
         }
 
         for (auto projectile: _projectiles) {
-            if (projectile->move(deltaT, scalingFactor())){
+            if (projectile->move(deltaT, scalingFactor())) {
                 if (projectile->_type.contains(Projectile::ProjectileType::Splash)) {
                     if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
                         for (auto enemy: _enemies) {
                             if (enemy != projectile->_target) {
-                                auto* splashProjectile = static_cast<BurningSplashProjectile*>(projectile);
-                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                auto *splashProjectile = static_cast<BurningSplashProjectile *>(projectile);
+                                if (checkRange(splashProjectile->_position, enemy->_position,
+                                               splashProjectile->_splashRadius, scalingFactor())) {
                                     enemy->takeDamage(splashProjectile->_splashDamage);
-                                    _statuses.push_back(splashProjectile->applyEffect(enemy,totalMSec));
+                                    _statuses.push_back(splashProjectile->applyEffect(enemy, totalMSec));
                                 }
                             }
                         }
-                    }
-                    else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
+                    } else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
                         for (auto enemy: _enemies) {
                             if (enemy != projectile->_target) {
-                                auto* splashProjectile = static_cast<SlowingSplashProjectile*>(projectile);
-                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                auto *splashProjectile = static_cast<SlowingSplashProjectile *>(projectile);
+                                if (checkRange(splashProjectile->_position, enemy->_position,
+                                               splashProjectile->_splashRadius, scalingFactor())) {
                                     enemy->takeDamage(splashProjectile->_splashDamage);
-                                    _statuses.push_back(splashProjectile->applyEffect(enemy,totalMSec));
+                                    _statuses.push_back(splashProjectile->applyEffect(enemy, totalMSec));
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         for (auto enemy: _enemies) {
                             if (enemy != projectile->_target) {
-                                auto* splashProjectile = static_cast<SplashProjectile*>(projectile);
-                                if (checkRange(splashProjectile->_position,enemy->_position,splashProjectile->_splashRadius,scalingFactor())) {
+                                auto *splashProjectile = static_cast<SplashProjectile *>(projectile);
+                                if (checkRange(splashProjectile->_position, enemy->_position,
+                                               splashProjectile->_splashRadius, scalingFactor())) {
                                     enemy->takeDamage(splashProjectile->_splashDamage);
                                 }
                             }
                         }
                     }
-                }
-                else if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
-                    _statuses.push_back(static_cast<BurningProjectile*>(projectile)->applyEffect(totalMSec));
-                }
-                else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
-                    _statuses.push_back(static_cast<SlowingProjectile*>(projectile)->applyEffect(totalMSec));
+                } else if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
+                    _statuses.push_back(static_cast<BurningProjectile *>(projectile)->applyEffect(totalMSec));
+                } else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
+                    _statuses.push_back(static_cast<SlowingProjectile *>(projectile)->applyEffect(totalMSec));
                 }
             }
         }
@@ -1760,7 +1819,7 @@ namespace JanSordid::SDL_Example {
         for (auto tower: _game.data._towers) {
             for (auto enemy: _enemies) {
 
-                if (checkRange(tower->_position,enemy->_position,tower->getAttackRange(),scalingFactor())) {
+                if (checkRange(tower->_position, enemy->_position, tower->getAttackRange(), scalingFactor())) {
                     Projectile *temp = tower->shoot(enemy, totalMSec);
                     if (temp != nullptr)
                         _projectiles.push_back(temp);
@@ -1850,6 +1909,33 @@ namespace JanSordid::SDL_Example {
             SDL_RenderCopy(renderer(), overworldButtonTexture, nullptr, &destRect);
         }
 
+        if (goldDisplayTexture) {
+            SDL_DestroyTexture(goldDisplayTexture);
+            goldDisplayTexture = nullptr;
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string goldText = "Gold: " + std::to_string(_game.data.gold);
+                const char *goldChar = goldText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, goldChar, white)) {
+                    goldDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+
+            int texW, texH;
+            SDL_QueryTexture(goldDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10;
+            destRect.y = 10;
+            SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
+        }
         SDL_RenderPresent(renderer());
 
         Uint32 rendererTimeNeeded = SDL_GetTicks() - rendererStart;

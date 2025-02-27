@@ -13,18 +13,18 @@
 - ~~grobes UML erstellen~~
 - Tower State implementieren
     - Tower
-      - ~~Schießen~~
-      - ~~Cooldown~~
-      - ~~Range~~
-      - ~~Gegner finden~~
+        - ~~Schießen~~
+        - ~~Cooldown~~
+        - ~~Range~~
+        - ~~Gegner finden~~
     - Gegner
-      - ~~move function~~
-      - ~~Spawner~~
-      - Waves
+        - ~~move function~~
+        - ~~Spawner~~
+        - Waves
     - Placement
-      - ~~Basic Placement~~
-        - UI verschönern
-      - ~~Upgrades~~
+        - ~~Basic Placement~~
+            - UI verschönern
+        - ~~Upgrades~~
     - Projectiles
       - ~~Basic functions~~
       - ~~AoE~~
@@ -46,6 +46,7 @@
                 - ~~+1 gold pro level pro update tic~~
     - ~~Ressourcen~~
         - ~~Gold~~
+        - Gold Anzeige
 - ~~Menu State implementieren~~
 
 ## Meetings
