@@ -35,11 +35,16 @@ namespace JanSordid::SDL_Example {
 
     class Enemy {
     public:
+        enum class EnemyType {
+            Slime
+        };
 
+        int _maxHp;
         int _hp;
         float _maxSpeed;
         float _speed;
         bool _isAlive;
+        EnemyType _type;
 
         Rect *_position = nullptr;
         Rect *_textureSrcRect = nullptr;
@@ -47,11 +52,34 @@ namespace JanSordid::SDL_Example {
         std::vector<FPoint> _path;
         int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, EnemyType type = EnemyType::Slime);
 
-        void move(f32 deltaT, f32 scalingFactor);
+        bool move(f32 deltaT, f32 scalingFactor);
 
         bool takeDamage(int damage);
+    };
+
+    class WaveSystem {
+        public:
+        std::vector<FPoint> _path;
+        std::unordered_map<Enemy::EnemyType,Texture*> _enemyTextures;
+        std::vector<std::vector<std::pair<Enemy::EnemyType,int>>> _waves;
+        std::vector<Enemy*> _enemies;
+        std::vector<Enemy*> _deadEnemies;
+        FPoint _mapStart{};
+        int _cooldown = 0;
+        int _currentEnemy = 0;
+        int _currentWave = 0;
+
+        WaveSystem(const std::vector<FPoint> &path, FPoint mapStart, const std::unordered_map<Enemy::EnemyType,Texture*> &enemyTextures, const std::vector<std::vector<std::pair<Enemy::EnemyType,int>>>& waves);
+        bool spawn(u64 totalMSec, int tileSize, f32 scalingFactor);
+        bool wavesFinished();
+
+    protected:
+
+        void createEnemy(Enemy::EnemyType type, int tileSize, f32 scalingFactor);
+        void resetEnemy(Enemy* enemy, int tileSize, f32 scalingFactor);
+        bool enemiesAlive();
     };
 
 #pragma endregion
@@ -750,6 +778,8 @@ namespace JanSordid::SDL_Example {
         Texture *catapultTowerStoneTexture = nullptr;
         Texture *sellIconTexture = nullptr;
         Texture *enemyTexture = nullptr;
+        Texture *waveDisplayTexture = nullptr;
+        Texture *lifesDisplayTexture = nullptr;
 
         Music *_music = nullptr;
 
@@ -768,14 +798,15 @@ namespace JanSordid::SDL_Example {
 
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
         std::unordered_map<Texture *, Rect *> projectileSrcRectMap;
+        std::unordered_map<Enemy::EnemyType, Texture*> enemyTextureMap;
         std::unordered_map<Tower::TowerType, Texture *> projectileTextureMap;
 
+        WaveSystem *_waveSystem;
         std::vector<TowerSlot *> _towerSlots;
         std::vector<Projectile *> _projectiles;
         std::vector<Status *> _statuses;
-        std::vector<Enemy *> _enemies;
-        std::vector<Enemy *> _deadEnemies;
-        std::vector<Enemy *> _toRemove; // Hilfsvektor für zu entfernende Gegner
+
+        int lifes = 10;
 
         void createTower(Tower::TowerType towerType, Rect *towerPosition);
 
