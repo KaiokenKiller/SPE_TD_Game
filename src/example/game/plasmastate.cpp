@@ -780,15 +780,17 @@ namespace JanSordid::SDL_Example {
 
 #pragma region Enemys
 
-    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed) {
+    Enemy::Enemy(Rect *position, Texture *texture, const Vector<FPoint> &path, int hp, int speed, EnemyType type) {
         _isAlive = true;
         _position = position;
         _texture = texture;
+        _maxHp = hp;
         _hp = hp;
         _maxSpeed = speed;
         _speed = speed;
         _textureSrcRect = new Rect(46 * 5, 0, 46, 46);
         _path = path;
+        _type = type;
     }
 
     bool Enemy::takeDamage(int damage) {
@@ -829,6 +831,124 @@ namespace JanSordid::SDL_Example {
             }
         }
     }
+
+
+    WaveSystem::WaveSystem(const std::vector<FPoint> &path, FPoint mapStart,const std::unordered_map<Enemy::EnemyType,Texture*> &enemyTextures, const std::vector<std::vector<std::pair<Enemy::EnemyType,int>>>& waves) {
+        _path = path;
+        _enemyTextures = enemyTextures;
+        _waves = waves;
+        _mapStart = mapStart;
+    }
+
+    bool WaveSystem::spawn(u64 totalMSec, int tileSize, f32 scalingFactor) {
+        if (_currentWave < _waves.size()) {
+            if (_cooldown > totalMSec) {
+                return false;
+            }
+            if (_currentEnemy < _waves[_currentWave].size()) {
+                bool enemyCreated = false;
+                if (!_deadEnemies.empty()) {
+                    for (auto enemy: _deadEnemies) {
+                        if (enemy->_type == _waves[_currentWave][_currentEnemy].first) {
+                            resetEnemy(enemy, tileSize, scalingFactor);
+                            enemyCreated = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!enemyCreated) {
+                    createEnemy(_waves[_currentWave][_currentEnemy].first,tileSize,scalingFactor);
+                }
+                _cooldown = totalMSec + _waves[_currentWave][_currentEnemy].second;
+                _currentEnemy++;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool WaveSystem::wavesFinished() {
+        if (_currentEnemy >= _waves[_currentWave].size()) {
+            if (!enemiesAlive()) {
+                if (_currentWave + 1 >= _waves.size()) {
+                    return true;
+                }
+                _currentWave++;
+                _currentEnemy = 0;
+            }
+        }
+        return false;
+    }
+
+    void WaveSystem::createEnemy(Enemy::EnemyType type, int tileSize, f32 scalingFactor) {
+        Enemy* enemy;
+        switch (type) {
+            case Enemy::EnemyType::Slime: {
+                Rect *tempRect = new Rect(
+                    _mapStart.x * tileSize * scalingFactor,
+                    _mapStart.y * tileSize * scalingFactor,
+                    46,
+                    46
+                );
+                enemy = new Enemy(tempRect, _enemyTextures[Enemy::EnemyType::Slime], _path, 10, 1);
+                break;
+            }
+            default: {
+                Rect *tempRect = new Rect(
+                    _mapStart.x * tileSize * scalingFactor,
+                    _mapStart.y * tileSize * scalingFactor,
+                    46 / 2 * scalingFactor,
+                    46 / 2 * scalingFactor
+                );
+                enemy = new Enemy(tempRect, _enemyTextures[Enemy::EnemyType::Slime], _path, 10, 1);
+            }
+        }
+        _enemies.push_back(enemy);
+    }
+
+    void WaveSystem::resetEnemy(Enemy* enemy, int tileSize, f32 scalingFactor) {
+        switch (enemy->_type) {
+            case Enemy::EnemyType::Slime: {
+                enemy->_position->x = _mapStart.x * tileSize * scalingFactor;
+                enemy->_position->y = _mapStart.y * tileSize * scalingFactor;
+                enemy->_path = _path;
+                enemy->_currentPath = 0;
+                enemy->_isAlive = true;
+                enemy->_hp = enemy->_maxHp;
+                break;
+            }
+            default: {
+                enemy->_position->x = _mapStart.x * tileSize * scalingFactor;
+                enemy->_position->y = _mapStart.y * tileSize * scalingFactor;
+                enemy->_path = _path;
+                enemy->_currentPath = 0;
+                enemy->_isAlive = true;
+                enemy->_hp = enemy->_maxHp;
+            }
+        }
+        _enemies.push_back(enemy);
+
+        _deadEnemies.erase(
+                    std::remove_if(_deadEnemies.begin(), _deadEnemies.end(),
+                                   [](Enemy *enemy) {
+                                       if (enemy->_isAlive) {// Speicher freigeben
+                                           return true;  // Entfernen aus dem Vektor
+                                       }
+                                       return false;  // Behalten im Vektor
+                                   }),
+                    _deadEnemies.end());
+    }
+
+    bool WaveSystem::enemiesAlive() {
+        for (auto enemy: _enemies) {
+            if (enemy->_isAlive)
+                return true;
+        }
+        return false;
+    }
+
+
 
 #pragma endregion
 
@@ -1336,6 +1456,8 @@ namespace JanSordid::SDL_Example {
             projectileTextureMap[Tower::TowerType::Mage1] = mageTowerOrbTexture;
             projectileTextureMap[Tower::TowerType::Catapult1] = catapultTowerStoneTexture;
 
+            enemyTextureMap[Enemy::EnemyType::Slime] = enemyTexture;
+
             std::map<int, std::pair<int, int>> edges; // Automatisch sortiert nach Zahlen
 
             // 'S`, `Z` und Nummern für Pfad suchen
@@ -1422,6 +1544,22 @@ namespace JanSordid::SDL_Example {
                 }
             }
         }
+
+        // temporarily fills waves
+        std::vector<std::vector<std::pair<Enemy::EnemyType,int>>> waves;
+        int waveCount = 10;
+        int enemyCount = 10;
+        int delay = 1000;
+        for (int i = 0; i < waveCount; i++) {
+            std::vector<std::pair<Enemy::EnemyType,int>> tempWaves;
+            for (int j = 0; j < enemyCount; j++) {
+                tempWaves.emplace_back(Enemy::EnemyType::Slime,delay);
+            }
+            waves.push_back(tempWaves);
+            enemyCount *= 1.2;
+            delay *= 0.9;
+        }
+        _waveSystem = new WaveSystem(_mapPath,FPoint(_mapPathStart.second,_mapPathStart.first), enemyTextureMap,waves);
     }
 
     void TdState::Enter(bool stacking) {
@@ -1687,52 +1825,19 @@ namespace JanSordid::SDL_Example {
         }
         return false;
     }
-
     bool TdState::Input() {
         return false;
     }
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
 
-        // Most basic enemy spawner copied from Jan
-        if (respawnCD < totalMSec) {
-            if (!_deadEnemies.empty()) {
-                // Gegner aus der "Toten"-Liste holen
-                Enemy *tempEnemy = _deadEnemies.back();
-                _deadEnemies.pop_back();
-
-                // Gegner zurücksetzen
-                tempEnemy->_position->x = _mapPathStart.second * tileSize * scalingFactor();
-                tempEnemy->_position->y = _mapPathStart.first * tileSize * scalingFactor();
-                tempEnemy->_path = _mapPath;
-                tempEnemy->_currentPath = 0;
-                tempEnemy->_isAlive = true;
-                tempEnemy->_hp = 50;
-
-                // Gegner der _enemies-Liste hinzufügen
-                _enemies.push_back(tempEnemy);
-                std::cout << "Reused old enemie" << std::endl;
-
-            } else {
-                // Neuen Gegner erstellen, falls kein "toter" Gegner verfügbar ist
-                Rect *tempRect = new Rect(
-                        _mapPathStart.second * tileSize * scalingFactor(),
-                        _mapPathStart.first * tileSize * scalingFactor(),
-                        46,
-                        46
-                );
-                auto *tempEnemy = new Enemy(tempRect, enemyTexture, _mapPath, 50, 1);
-                _enemies.push_back(tempEnemy);
-            }
-
-            respawnCD = totalMSec + 2000;
-        }
+        _waveSystem->spawn(totalMSec,tileSize,scalingFactor());
 
         for (auto projectile: _projectiles) {
             if (projectile->move(deltaT, scalingFactor())) {
                 if (projectile->_type.contains(Projectile::ProjectileType::Splash)) {
                     if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
-                        for (auto enemy: _enemies) {
+                        for (auto enemy: _waveSystem->_enemies) {
                             if (enemy != projectile->_target) {
                                 auto *splashProjectile = static_cast<BurningSplashProjectile *>(projectile);
                                 if (checkRange(splashProjectile->_position, enemy->_position,
@@ -1743,7 +1848,7 @@ namespace JanSordid::SDL_Example {
                             }
                         }
                     } else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
-                        for (auto enemy: _enemies) {
+                        for (auto enemy: _waveSystem->_enemies) {
                             if (enemy != projectile->_target) {
                                 auto *splashProjectile = static_cast<SlowingSplashProjectile *>(projectile);
                                 if (checkRange(splashProjectile->_position, enemy->_position,
@@ -1754,7 +1859,7 @@ namespace JanSordid::SDL_Example {
                             }
                         }
                     } else {
-                        for (auto enemy: _enemies) {
+                        for (auto enemy: _waveSystem->_enemies) {
                             if (enemy != projectile->_target) {
                                 auto *splashProjectile = static_cast<SplashProjectile *>(projectile);
                                 if (checkRange(splashProjectile->_position, enemy->_position,
@@ -1802,32 +1907,38 @@ namespace JanSordid::SDL_Example {
                     _statuses.end());
         }
 
-        for (auto enemy: _enemies) {
+        for (auto enemy: _waveSystem->_enemies) {
             enemy->move(deltaT, scalingFactor());
             if (!enemy->_isAlive) {
-                _deadEnemies.push_back(enemy);
-                _toRemove.push_back(enemy); // Gegner zum Entfernen markieren
+                _waveSystem->_deadEnemies.push_back(enemy);
             }
         }
-
-        // Entferne die markierten Gegner aus _enemies
-        for (Enemy *enemy: _toRemove) {
-            _enemies.erase(std::remove(_enemies.begin(), _enemies.end(), enemy), _enemies.end());
-        }
-        _toRemove.clear(); // Hilfsvektor leeren
+        _waveSystem->_enemies.erase(
+                    std::remove_if(_waveSystem->_enemies.begin(), _waveSystem->_enemies.end(),
+                                   [](Enemy *enemy) {
+                                       if (!enemy->_isAlive) {// Speicher freigeben
+                                           return true;  // Entfernen aus dem Vektor
+                                       }
+                                       return false;  // Behalten im Vektor
+                                   }),
+                    _waveSystem->_enemies.end());
 
         for (auto tower: _game.data._towers) {
-            for (auto enemy: _enemies) {
-
-                if (checkRange(tower->_position, enemy->_position, tower->getAttackRange(), scalingFactor())) {
-                    Projectile *temp = tower->shoot(enemy, totalMSec);
-                    if (temp != nullptr)
-                        _projectiles.push_back(temp);
+            for (auto enemy: _waveSystem->_enemies) {
+                if (enemy->_isAlive) {
+                    if (checkRange(tower->_position, enemy->_position, tower->getAttackRange(), scalingFactor())) {
+                        Projectile *temp = tower->shoot(enemy, totalMSec);
+                        if (temp != nullptr)
+                            _projectiles.push_back(temp);
+                    }
                 }
             }
         }
-    }
 
+        if (_waveSystem->wavesFinished()) {
+            _game.PushState(MyGS::Overworld);
+        }
+    }
 
     void TdState::Render(const u64 frame, u64 totalMSec, const f32 deltaT) {
         // Try the limits, moments before wraparound
@@ -1875,7 +1986,7 @@ namespace JanSordid::SDL_Example {
                 }
             }
         }
-        for (const auto &element: _enemies) {
+        for (const auto &element: _waveSystem->_enemies) {
             if (element->_isAlive)
                 SDL_RenderCopy(renderer(), element->_texture, element->_textureSrcRect, element->_position);
         }
@@ -1932,10 +2043,39 @@ namespace JanSordid::SDL_Example {
             SDL_Rect destRect;
             destRect.w = texW;
             destRect.h = texH;
-            destRect.x = windowWidth - texW - 10;
-            destRect.y = 10;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 10* scalingFactor();
             SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
         }
+
+        if (waveDisplayTexture) {
+            SDL_DestroyTexture(waveDisplayTexture);
+            waveDisplayTexture = nullptr;
+        }
+        if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+            SDL_Color white = {255, 255, 255, 255};
+            std::string waveText = "Wave: " + std::to_string(_waveSystem->_currentWave+1) + "/" + std::to_string(_waveSystem->_waves.size());
+            const char *waveChar = waveText.c_str();
+            if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
+                waveDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                SDL_FreeSurface(btnSurf);
+            }
+            TTF_CloseFont(Font);
+        }
+
+        int texW, texH;
+        SDL_QueryTexture(waveDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+        int windowWidth, windowHeight;
+        SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+        SDL_Rect destRect;
+        destRect.w = texW;
+        destRect.h = texH;
+        destRect.x = windowWidth - texW - 10 * scalingFactor();
+        destRect.y = 20 * scalingFactor();
+        SDL_RenderCopy(renderer(), waveDisplayTexture, nullptr, &destRect);
+
         SDL_RenderPresent(renderer());
 
         Uint32 rendererTimeNeeded = SDL_GetTicks() - rendererStart;
