@@ -30,36 +30,6 @@ namespace JanSordid::SDL_Example {
         Invalid
     };
 
-    struct BuildingGUI {
-        SDL_Window *window = nullptr;
-        SDL_Renderer *renderer = nullptr;
-        TTF_Font *font = nullptr;
-
-        SDL_Texture *textTexture;
-        SDL_Rect textRect = {};
-
-        SDL_Texture *goldTexture;
-        SDL_Rect goldRect = {};
-
-        SDL_Texture *upgradeTexture;
-        SDL_Rect upgradeRect = {};
-        SDL_Rect upgradeButton = {20, 170, 60, 30};
-
-        SDL_Texture *mageTexture;
-        SDL_Rect mageRect = {};
-        SDL_Rect mageButton = {20, 170, 60, 30};
-
-        SDL_Texture *catapultTexture;
-        SDL_Rect catapultRect = {};
-        SDL_Rect catapultButton = {100, 170, 60, 30};
-
-        SDL_Rect exitButton = {20, 10, 60, 30};
-
-        bool shouldClose = false;
-
-        const char *title;
-    };
-
 #pragma region IngameObjects
 #pragma region Enemies
 
@@ -230,6 +200,7 @@ namespace JanSordid::SDL_Example {
         int _attackRange = 1;
         int _cooldown = 0;
         static int _price;
+        static int _unlockPrice;
 
         Tower(Rect *placement, Texture *texture, Texture *projectileTexture);
 
@@ -257,6 +228,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
 
         Archer1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                 const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -295,6 +267,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
 
         Archer2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                    const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -314,6 +287,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
 
         Archer3_P1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                    const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -333,6 +307,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
 
         Archer3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                    const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -352,6 +327,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
 
         Mage1(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
               const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -371,6 +347,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _burnDamage;
         static int _burnDuration;
 
@@ -392,6 +369,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static float _slowFactor;
         static int _slowDuration;
 
@@ -413,6 +391,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _burnDamage;
         static int _burnDuration;
         static int _splashDamage;
@@ -436,6 +415,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static float _slowFactor;
         static int _slowDuration;
 
@@ -457,6 +437,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _splashDamage;
         static int _splashRadius;
 
@@ -478,6 +459,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _splashDamage;
         static int _splashRadius;
 
@@ -499,6 +481,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         Enemy *_dummyEnemy;
 
         Catapult2_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
@@ -519,6 +502,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _splashDamage;
         static int _splashRadius;
 
@@ -540,6 +524,7 @@ namespace JanSordid::SDL_Example {
         static int _attackSpeed;
         static int _attackRange;
         static int _price;
+        static int _unlockPrice;
         static int _burnDamage;
         static int _burnDuration;
         Enemy *_dummyEnemy;
@@ -575,13 +560,79 @@ namespace JanSordid::SDL_Example {
         Rect *placeTower(f32 scalingFactor);
     };
 
+    struct UnlockButtons {
+        SDL_Rect button;
+        Tower::TowerType type;
+    };
+
+    struct BuildingGUI {
+        SDL_Window *window = nullptr;
+        SDL_Renderer *renderer = nullptr;
+        TTF_Font *font = nullptr;
+
+        SDL_Texture *textTexture;
+        SDL_Rect textRect = {};
+
+        SDL_Texture *goldTexture;
+        SDL_Rect goldRect = {};
+
+        SDL_Texture *upgradeTexture;
+        SDL_Rect upgradeRect = {};
+        SDL_Rect upgradeButton = {20, 170, 60, 30};
+
+        SDL_Texture *mageTexture;
+        SDL_Rect mageRect = {};
+        SDL_Rect mageButton = {20, 170, 60, 30};
+
+        SDL_Texture *catapultTexture;
+        SDL_Rect catapultRect = {};
+        SDL_Rect catapultButton = {100, 170, 60, 30};
+
+        SDL_Rect exitButton = {20, 10, 60, 30};
+
+        std::vector<UnlockButtons> unlockButtons;
+        bool shouldClose = false;
+
+        const char *title;
+    };
+
 #pragma endregion
     struct GameData {
         int gold = 10000;
 
         int mineLevel = 1;
         int day = 0;
-        std::unordered_set<Tower::TowerType> unlocks;
+        std::unordered_set<Tower::TowerType> unlocks = {
+                Tower::TowerType::Archer1
+        };
+        std::unordered_set<Tower::TowerType> availableUpgrades = {
+                Tower::TowerType::Archer2_P1,
+                Tower::TowerType::Archer3_P1,
+                Tower::TowerType::Mage1,
+                Tower::TowerType::Catapult1
+        };
+        std::unordered_map<Tower::TowerType, std::vector<Tower::TowerType>> upgradePaths = {
+                {Tower::TowerType::Archer1,      {Tower::TowerType::Archer2_P1,   Tower::TowerType::Archer3_P1}},
+                {Tower::TowerType::Archer2_P1,   {Tower::TowerType::Archer2_P2}},
+                {Tower::TowerType::Archer3_P1,   {Tower::TowerType::Archer3_P2}},
+                {Tower::TowerType::Mage1,        {Tower::TowerType::Mage2_P1,     Tower::TowerType::Mage3_P1}},
+                {Tower::TowerType::Mage2_P1,     {Tower::TowerType::Mage2_P2}},
+                {Tower::TowerType::Mage3_P1,     {Tower::TowerType::Mage3_P2}},
+                {Tower::TowerType::Catapult1,    {Tower::TowerType::Catapult2_P1, Tower::TowerType::Catapult3_P1}},
+                {Tower::TowerType::Catapult2_P1, {Tower::TowerType::Catapult2_P2}},
+                {Tower::TowerType::Catapult3_P1, {Tower::TowerType::Catapult3_P2}},
+        };
+        std::unordered_map<Tower::TowerType, int> upgradePrices = {
+                {Tower::TowerType::Archer1,      100},
+                {Tower::TowerType::Archer2_P1,   200},
+                {Tower::TowerType::Archer3_P1,   300},
+                {Tower::TowerType::Mage1,        150},
+                {Tower::TowerType::Mage2_P1,     250},
+                {Tower::TowerType::Mage3_P1,     350},
+                {Tower::TowerType::Catapult1,    200},
+                {Tower::TowerType::Catapult2_P1, 300},
+                {Tower::TowerType::Catapult3_P1, 400},
+        };
         std::vector<Tower *> _towers;
     };
 
@@ -792,8 +843,6 @@ namespace JanSordid::SDL_Example {
 
         void RenderBuildings(SDL_Renderer *renderer);
 
-        static bool IsMouseOver(const SDL_Rect &rect, Point mouse);
-
         BuildingGUI *OpenBuildingGUI(const char *windowTitle);
 
         void HandleGUIEvent(const Event &event);
@@ -801,5 +850,7 @@ namespace JanSordid::SDL_Example {
         void UpdateGUI();
 
         void RenderGUI();
+
+        bool unlockTower(Tower::TowerType tower, int unlockPrice);
     };
 }

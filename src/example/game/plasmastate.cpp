@@ -1308,6 +1308,7 @@ namespace JanSordid::SDL_Example {
             }
 
             // Temporary unlock everything
+            /*
             _game.data.unlocks.insert(Tower::TowerType::Archer2_P1);
             _game.data.unlocks.insert(Tower::TowerType::Archer2_P2);
             _game.data.unlocks.insert(Tower::TowerType::Archer3_P1);
@@ -1322,7 +1323,7 @@ namespace JanSordid::SDL_Example {
             _game.data.unlocks.insert(Tower::TowerType::Mage2_P2);
             _game.data.unlocks.insert(Tower::TowerType::Mage3_P1);
             _game.data.unlocks.insert(Tower::TowerType::Mage3_P2);
-
+            */
 
         }
 
@@ -1426,7 +1427,7 @@ namespace JanSordid::SDL_Example {
 
     void TdState::Enter(bool stacking) {
         Base::Enter(stacking);
-        Mix_PlayMusic(_music, -1);
+        //Mix_PlayMusic(_music, -1);
     }
 
     void TdState::Exit(bool stacking) {
@@ -1444,7 +1445,7 @@ namespace JanSordid::SDL_Example {
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             if (event.button.button == SDL_BUTTON_LEFT) {
                 Point mouse = {event.button.x, event.button.y};
-                if (OverworldState::IsMouseOver(overworldButton, mouse)) {
+                if (SDL_PointInRect(&mouse, &overworldButton)) {
                     _game.PushState(MyGS::Overworld);
                     return true;
                 }

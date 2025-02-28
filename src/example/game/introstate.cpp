@@ -42,7 +42,7 @@ namespace JanSordid::SDL_Example {
         }
 
         if (!_music) {
-            _music = Mix_LoadMUS(BasePath "asset/music/The True Story of Beelzebub.ogg");
+            //_music = Mix_LoadMUS(BasePath "asset/music/The True Story of Beelzebub.ogg");
             if (!_music)
                 print(stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError());
         }
@@ -117,10 +117,10 @@ namespace JanSordid::SDL_Example {
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     Point mouse = {event.button.x, event.button.y};
-                    if (OverworldState::IsMouseOver(startButton, mouse)) {
+                    if (SDL_PointInRect(&mouse, &startButton)) {
                         _game.PushState(MyGS::TdState);
                         return true;
-                    } else if (OverworldState::IsMouseOver(exitButton, mouse)) {
+                    } else if (SDL_PointInRect(&mouse, &exitButton)) {
                         SDL_Event quitEvent = {SDL_QUIT};
                         SDL_PushEvent(&quitEvent);
                     }

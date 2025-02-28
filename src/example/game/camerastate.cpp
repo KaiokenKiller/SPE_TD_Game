@@ -3,6 +3,59 @@
 
 namespace JanSordid::SDL_Example {
 
+    std::string TowerTypeToString(Tower::TowerType type) {
+        switch (type) {
+            case Tower::TowerType::Archer1:
+                return "Archer 1";
+            case Tower::TowerType::Archer2_P1:
+                return "Archer 2 P1";
+            case Tower::TowerType::Archer3_P1:
+                return "Archer 3 P1";
+            case Tower::TowerType::Archer2_P2:
+                return "Archer 2 P2";
+            case Tower::TowerType::Archer3_P2:
+                return "Archer 3 P2";
+            case Tower::TowerType::Mage1:
+                return "Mage 1";
+            case Tower::TowerType::Mage2_P1:
+                return "Mage 2 P1";
+            case Tower::TowerType::Mage3_P1:
+                return "Mage 3 P1";
+            case Tower::TowerType::Mage2_P2:
+                return "Mage 2 P2";
+            case Tower::TowerType::Mage3_P2:
+                return "Mage 3 P2";
+            case Tower::TowerType::Catapult1:
+                return "Catapult 1";
+            case Tower::TowerType::Catapult2_P1:
+                return "Catapult 2 P1";
+            case Tower::TowerType::Catapult3_P1:
+                return "Catapult 3 P1";
+            case Tower::TowerType::Catapult2_P2:
+                return "Catapult 2 P2";
+            case Tower::TowerType::Catapult3_P2:
+                return "Catapult 3 P2";
+            default:
+                return "Unknown Tower";
+        }
+    }
+
+    bool OverworldState::unlockTower(Tower::TowerType tower, int unlockPrice) {
+        if (_game.data.gold < unlockPrice)
+            return false;
+
+
+        _game.data.gold -= unlockPrice;
+        _game.data.unlocks.insert(tower);
+        if (_game.data.upgradePaths.contains(tower)) {
+            for (const auto &upgrade: _game.data.upgradePaths[tower]) {
+                _game.data.availableUpgrades.insert(upgrade);
+            }
+        }
+        std::cout << "Unlocked: " + TowerTypeToString(tower) << std::endl;
+        return true;
+    }
+
     void OverworldState::Init() {
         Base::Init();
         TTF_Init();
@@ -86,13 +139,13 @@ namespace JanSordid::SDL_Example {
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
             if (event.button.button == SDL_BUTTON_LEFT) {
                 Point mouse = {event.button.x, event.button.y};
-                for (int i = 0; i < 3; ++i) {
-                    if (IsMouseOver(buildings[i], mouse)) {
+                for (auto &buildingTitle: buildingTitles) {
+                    if (SDL_PointInRect(&mouse, &tdButton)) {
                         if (gui == nullptr)
-                            gui = OpenBuildingGUI(buildingTitles[i]);
+                            gui = OpenBuildingGUI(buildingTitle);
                     }
                 }
-                if (IsMouseOver(tdButton, mouse)) {
+                if (SDL_PointInRect(&mouse, &tdButton)) {
                     _game.PushState(MyGS::TdState);
                     return true;
                 }
@@ -183,11 +236,6 @@ namespace JanSordid::SDL_Example {
         SDL_RenderCopy(renderer(), bg[index], EntireRect, nullptr);
     }
 
-    bool OverworldState::IsMouseOver(const SDL_Rect &rect, Point mouse) {
-        return mouse.x >= rect.x && mouse.x < (rect.x + rect.w) &&
-               mouse.y >= rect.y && mouse.y < (rect.y + rect.h);
-    }
-
     void OverworldState::RenderBuildings(SDL_Renderer *renderer) {
         Point mouse;
         SDL_GetMouseState(&mouse.x, &mouse.y);
@@ -197,7 +245,7 @@ namespace JanSordid::SDL_Example {
 
             SDL_RenderCopy(renderer, buildingSprites[i], nullptr, &buildings[i]);
 
-            if (IsMouseOver(buildings[i], mouse))
+            if (SDL_PointInRect(&mouse, &buildings[i]))
                 SDL_RenderDrawRect(renderer, &buildings[i]);
         }
     }
@@ -304,18 +352,26 @@ namespace JanSordid::SDL_Example {
                 Point mouse = {event.button.x, event.button.y};
                 SDL_Rect & button = gui->exitButton;
                 SDL_Rect & upgradeButton = gui->upgradeButton;
-                if (IsMouseOver(button, mouse))
+                if (SDL_PointInRect(&mouse, &button))
                     gui->shouldClose = true;
 
                 if (std::string(gui->title) == "Mine") {
                     //dummy upgrade cost
-                    if (IsMouseOver(upgradeButton, mouse)) {
+                    if (SDL_PointInRect(&mouse, &upgradeButton)) {
                         if (_game.data.gold >= _game.data.mineLevel * 3) {
                             _game.data.gold -= _game.data.mineLevel * 3;
                             _game.data.mineLevel += 1;
                         }
                     }
                 } else if (std::string(gui->title) == "Research") {
+
+                    for (const auto &unlockButton: gui->unlockButtons) {
+                        if (SDL_PointInRect(&mouse, &unlockButton.button)) {
+                            unlockTower(unlockButton.type, _game.data.upgradePrices[unlockButton.type]);
+                        }
+                    }
+
+                    /*
                     if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
                         if (IsMouseOver(gui->mageButton, mouse)) {
                             if (_game.data.gold >= 100) {
@@ -332,6 +388,8 @@ namespace JanSordid::SDL_Example {
                             }
                         }
                     }
+                     */
+
                 }
             }
         }
@@ -412,6 +470,40 @@ namespace JanSordid::SDL_Example {
             SDL_RenderDrawRect(gui->renderer, &upgradeButton);
 
         } else if (std::string(gui->title) == "Research") {
+            std::vector<UnlockButtons> buttonRects;
+
+            int buttonY = 120;
+
+            for (const auto &upgrade: _game.data.availableUpgrades) {
+                UnlockButtons button;
+                if (_game.data.unlocks.contains(upgrade))
+                    continue;
+
+                button.type = upgrade;
+                std::string unlockString =
+                        TowerTypeToString(upgrade) + " Cost : " + std::to_string(_game.data.upgradePrices[upgrade]);
+                SDL_Surface *surf = TTF_RenderText_Blended(gui->font, unlockString.c_str(),
+                                                           {255, 255, 255, 255});
+
+                if (surf) {
+                    SDL_Texture *texture = SDL_CreateTextureFromSurface(gui->renderer, surf);
+                    int texW, texH;
+                    SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
+
+                    SDL_Rect buttonRect = {20, buttonY, texW, texH};
+                    button.button = buttonRect;
+
+                    SDL_RenderCopy(gui->renderer, texture, nullptr, &buttonRect);
+
+                    SDL_FreeSurface(surf);
+                    SDL_DestroyTexture(texture);
+                }
+                buttonRects.push_back(button);
+                buttonY += 40;
+            }
+
+            gui->unlockButtons = buttonRects;
+            /*
             if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
                 if (gui->mageTexture) {
                     SDL_RenderCopy(gui->renderer, gui->mageTexture, nullptr, &gui->mageRect);
@@ -435,6 +527,7 @@ namespace JanSordid::SDL_Example {
                 SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
                 SDL_RenderDrawRect(gui->renderer, &gui->catapultButton);
             }
+            */
         }
 
         SDL_Rect button = gui->exitButton;
