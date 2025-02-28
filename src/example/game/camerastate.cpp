@@ -56,6 +56,10 @@ namespace JanSordid::SDL_Example {
         return true;
     }
 
+    bool CompareUnlockButtonNames(const UnlockButtons &a, const UnlockButtons &b) {
+        return TowerTypeToString(a.type) < TowerTypeToString(b.type);
+    }
+
     void OverworldState::Init() {
         Base::Init();
         TTF_Init();
@@ -114,6 +118,76 @@ namespace JanSordid::SDL_Example {
             }
         }
 
+        /*
+        if (!archerTowerTexture) {
+            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
+            towerSrcRectMap[Tower::TowerType::Archer1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!archerTower_2P1_Texture) {
+            archerTower_2P1_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
+            towerSrcRectMap[Tower::TowerType::Archer2_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!archerTower_2P2_Texture) {
+            archerTower_2P2_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_crossbow.png");
+            towerSrcRectMap[Tower::TowerType::Archer2_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!archerTower_3P1_Texture) {
+            archerTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
+            towerSrcRectMap[Tower::TowerType::Archer3_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!archerTower_3P2_Texture) {
+            archerTower_3P2_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_ballista.png");
+            towerSrcRectMap[Tower::TowerType::Archer3_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!mageTowerTexture) {
+            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
+            towerSrcRectMap[Tower::TowerType::Mage1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!mageTower_2P1_Texture) {
+            mageTower_2P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
+            towerSrcRectMap[Tower::TowerType::Mage2_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!mageTower_2P2_Texture) {
+            mageTower_2P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
+            towerSrcRectMap[Tower::TowerType::Mage2_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!mageTower_3P1_Texture) {
+            mageTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
+            towerSrcRectMap[Tower::TowerType::Mage3_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!mageTower_3P2_Texture) {
+            mageTower_3P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
+            towerSrcRectMap[Tower::TowerType::Mage3_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!catapultTowerTexture) {
+            catapultTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!catapultTower_2P1_Texture) {
+            catapultTower_2P1_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult2_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!catapultTower_2P2_Texture) {
+            catapultTower_2P2_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult2_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!catapultTower_3P1_Texture) {
+            catapultTower_3P1_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult3_P1] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+        if (!catapultTower_3P2_Texture) {
+            catapultTower_3P2_Texture = IMG_LoadTexture(renderer(),
+                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
+            towerSrcRectMap[Tower::TowerType::Catapult3_P2] = new Rect(0, 0, towerWidth, towerHeight);
+        }
+
+        */
         _game.data.day += 1;
         _game.data.gold += _game.data.mineLevel * 10;
         std::cout << _game.data.gold << std::endl;
@@ -141,8 +215,18 @@ namespace JanSordid::SDL_Example {
                 Point mouse = {event.button.x, event.button.y};
                 for (int i = 0; i < 3; ++i) {
                     if (SDL_PointInRect(&mouse, &buildings[i])) {
+                        if (std::string(buildingTitles[i]) == "Research")
+                            showResearchIcons = !showResearchIcons;
                         if (gui == nullptr)
                             gui = OpenBuildingGUI(buildingTitles[i]);
+                    }
+                }
+
+                if (showResearchIcons) {
+                    for (const auto &unlockButton: buttonRects) {
+                        if (SDL_PointInRect(&mouse, &unlockButton.button)) {
+                            unlockTower(unlockButton.type, _game.data.upgradePrices[unlockButton.type]);
+                        }
                     }
                 }
                 if (SDL_PointInRect(&mouse, &tdButton)) {
@@ -190,11 +274,8 @@ namespace JanSordid::SDL_Example {
             int texW, texH;
             SDL_QueryTexture(tdButtonTexture, nullptr, nullptr, &texW, &texH);
 
-            SDL_Rect destRect;
-            destRect.w = texW;
-            destRect.h = texH;
-            destRect.x = tdButton.x + (tdButton.w - texW) / 2;
-            destRect.y = tdButton.y + (tdButton.h - texH) / 2;
+            SDL_Rect destRect = {tdButton.x + (tdButton.w - texW) / 2, tdButton.y + (tdButton.h - texH) / 2, texW,
+                                 texH};
             SDL_RenderCopy(renderer(), tdButtonTexture, nullptr, &destRect);
         }
 
@@ -218,17 +299,44 @@ namespace JanSordid::SDL_Example {
             int windowWidth, windowHeight;
             SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
 
-            SDL_Rect destRect;
-            destRect.w = texW;
-            destRect.h = texH;
-            destRect.x = windowWidth - texW - 10;
-            destRect.y = 10;
+            SDL_Rect destRect = {windowWidth - texW - 10, 10, texW, texH};
             SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
         }
 
-        SDL_RenderPresent(renderer());
-        if (gui != nullptr) {
-            RenderGUI();
+        if (showResearchIcons) {
+            int buttonY = 120;
+            buttonRects.clear();
+            for (const auto &upgrade: _game.data.availableUpgrades) {
+                if (_game.data.unlocks.contains(upgrade))
+                    continue;
+
+                UnlockButtons button;
+                button.type = upgrade;
+                std::string upgradeString =
+                        TowerTypeToString(upgrade) + " - Cost: " + std::to_string(_game.data.upgradePrices[upgrade]);
+
+                TTF_Font *font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
+                SDL_Surface *surf = TTF_RenderText_Blended(font, upgradeString.c_str(), {255, 255, 255, 255});
+
+                if (surf) {
+                    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer(), surf);
+                    int texW, texH;
+                    SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
+                    SDL_Rect buttonRect = {20, buttonY, texW, texH};
+                    button.button = buttonRect;
+                    SDL_RenderCopy(renderer(), texture, nullptr, &buttonRect);
+                    SDL_FreeSurface(surf);
+                    SDL_DestroyTexture(texture);
+                }
+                buttonY += 40;
+                buttonRects.push_back(button);
+            }
+
+
+            SDL_RenderPresent(renderer());
+            //if (gui != nullptr) {
+            //    RenderGUI();
+            //}
         }
     }
 
@@ -370,26 +478,6 @@ namespace JanSordid::SDL_Example {
                             unlockTower(unlockButton.type, _game.data.upgradePrices[unlockButton.type]);
                         }
                     }
-
-                    /*
-                    if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
-                        if (IsMouseOver(gui->mageButton, mouse)) {
-                            if (_game.data.gold >= 100) {
-                                _game.data.unlocks.insert(Tower::TowerType::Mage1);
-                                std::cout << "Unlocked Mage tower" << std::endl;
-                            }
-                        }
-                    }
-                    if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
-                        if (IsMouseOver(gui->catapultButton, mouse)) {
-                            if (_game.data.gold >= 500) {
-                                _game.data.unlocks.insert(Tower::TowerType::Catapult1);
-                                std::cout << "Unlocked Catapult tower." << std::endl;
-                            }
-                        }
-                    }
-                     */
-
                 }
             }
         }
@@ -470,7 +558,6 @@ namespace JanSordid::SDL_Example {
             SDL_RenderDrawRect(gui->renderer, &upgradeButton);
 
         } else if (std::string(gui->title) == "Research") {
-            std::vector<UnlockButtons> buttonRects;
 
             int buttonY = 120;
 

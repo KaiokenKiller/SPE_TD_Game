@@ -4,6 +4,7 @@
 
 #include <sor/sdl_game.hpp>
 #include <sor/sdl_shapeops.hpp>
+#include <set>
 //#include <autocast_ptr.h>
 //#include <sor/tiles.h>
 
@@ -52,7 +53,8 @@ namespace JanSordid::SDL_Example {
         std::vector<FPoint> _path;
         int _currentPath = 0;
 
-        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, EnemyType type = EnemyType::Slime);
+        Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed,
+              EnemyType type = EnemyType::Slime);
 
         bool move(f32 deltaT, f32 scalingFactor);
 
@@ -60,25 +62,31 @@ namespace JanSordid::SDL_Example {
     };
 
     class WaveSystem {
-        public:
+    public:
         std::vector<FPoint> _path;
-        std::unordered_map<Enemy::EnemyType,Texture*> _enemyTextures;
-        std::vector<std::vector<std::pair<Enemy::EnemyType,int>>> _waves;
-        std::vector<Enemy*> _enemies;
-        std::vector<Enemy*> _deadEnemies;
+        std::unordered_map<Enemy::EnemyType, Texture *> _enemyTextures;
+        std::vector<std::vector<std::pair<Enemy::EnemyType, int>>> _waves;
+        std::vector<Enemy *> _enemies;
+        std::vector<Enemy *> _deadEnemies;
         FPoint _mapStart{};
         int _cooldown = 0;
         int _currentEnemy = 0;
         int _currentWave = 0;
 
-        WaveSystem(const std::vector<FPoint> &path, FPoint mapStart, const std::unordered_map<Enemy::EnemyType,Texture*> &enemyTextures, const std::vector<std::vector<std::pair<Enemy::EnemyType,int>>>& waves);
+        WaveSystem(const std::vector<FPoint> &path, FPoint mapStart,
+                   const std::unordered_map<Enemy::EnemyType, Texture *> &enemyTextures,
+                   const std::vector<std::vector<std::pair<Enemy::EnemyType, int>>> &waves);
+
         bool spawn(u64 totalMSec, int tileSize, f32 scalingFactor);
+
         bool wavesFinished();
 
     protected:
 
         void createEnemy(Enemy::EnemyType type, int tileSize, f32 scalingFactor);
-        void resetEnemy(Enemy* enemy, int tileSize, f32 scalingFactor);
+
+        void resetEnemy(Enemy *enemy, int tileSize, f32 scalingFactor);
+
         bool enemiesAlive();
     };
 
@@ -591,6 +599,7 @@ namespace JanSordid::SDL_Example {
     struct UnlockButtons {
         SDL_Rect button;
         Tower::TowerType type;
+        SDL_Texture *texture = nullptr;
     };
 
     struct BuildingGUI {
@@ -633,7 +642,7 @@ namespace JanSordid::SDL_Example {
         std::unordered_set<Tower::TowerType> unlocks = {
                 Tower::TowerType::Archer1
         };
-        std::unordered_set<Tower::TowerType> availableUpgrades = {
+        std::set<Tower::TowerType> availableUpgrades = {
                 Tower::TowerType::Archer2_P1,
                 Tower::TowerType::Archer3_P1,
                 Tower::TowerType::Mage1,
@@ -798,7 +807,7 @@ namespace JanSordid::SDL_Example {
 
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
         std::unordered_map<Texture *, Rect *> projectileSrcRectMap;
-        std::unordered_map<Enemy::EnemyType, Texture*> enemyTextureMap;
+        std::unordered_map<Enemy::EnemyType, Texture *> enemyTextureMap;
         std::unordered_map<Tower::TowerType, Texture *> projectileTextureMap;
 
         WaveSystem *_waveSystem;
@@ -838,6 +847,22 @@ namespace JanSordid::SDL_Example {
         Texture *goldDisplayTexture = nullptr;
         Texture *bg[4] = {nullptr};
         Texture *buildingSprites[4] = {nullptr};
+        Texture *archerTowerTexture = nullptr;
+        Texture *archerTower_2P1_Texture = nullptr;
+        Texture *archerTower_2P2_Texture = nullptr;
+        Texture *archerTower_3P1_Texture = nullptr;
+        Texture *archerTower_3P2_Texture = nullptr;
+        Texture *mageTowerTexture = nullptr;
+        Texture *mageTower_2P1_Texture = nullptr;
+        Texture *mageTower_2P2_Texture = nullptr;
+        Texture *mageTower_3P1_Texture = nullptr;
+        Texture *mageTower_3P2_Texture = nullptr;
+        Texture *catapultTowerTexture = nullptr;
+        Texture *catapultTower_2P1_Texture = nullptr;
+        Texture *catapultTower_2P2_Texture = nullptr;
+        Texture *catapultTower_3P1_Texture = nullptr;
+        Texture *catapultTower_3P2_Texture = nullptr;
+        std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
         Point bgSize[4]; // Is initialized in Init()
         bool bgIsVisible[4] = {
                 true,
@@ -854,6 +879,8 @@ namespace JanSordid::SDL_Example {
         BuildingGUI *gui = nullptr;
         SDL_Rect tdButton = {50, 50, 120, 40};
         Texture *tdButtonTexture = nullptr;
+        bool showResearchIcons = false;
+        std::vector<UnlockButtons> buttonRects;
     public:
         // ctor
         using Base::Base;
