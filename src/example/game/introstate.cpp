@@ -201,6 +201,8 @@ namespace JanSordid::SDL_Example {
         if (_logo) {
             SDL_Rect logoRect;
             SDL_QueryTexture(_logo, nullptr, nullptr, &logoRect.w, &logoRect.h);
+            logoRect.w = (logoRect.w/3) * scalingFactor();
+            logoRect.w = (logoRect.w/3) * scalingFactor();
             logoRect.x = (windowSize.x - logoRect.w) / 2;
             logoRect.y = (windowSize.y - logoRect.h) / 8;
             SDL_RenderCopy(renderer(), _logo, EntireRect, &logoRect);

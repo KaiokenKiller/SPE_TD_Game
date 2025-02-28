@@ -454,6 +454,7 @@ namespace JanSordid::SDL_Example {
         static int _unlockPrice;
         static float _slowFactor;
         static int _slowDuration;
+        static int _splashRadius;
 
         Mage3_P2(Rect *placement, Texture *texture, Texture *projectileTexture, const Vector<Rect *> &towerIconSrc,
                  const Vector<Texture *> &towerIconTextures, f32 scalingFactor);
@@ -762,6 +763,9 @@ namespace JanSordid::SDL_Example {
     protected:
         //Eigener Stuff:
         SDL_Rect overworldButton = {50, 50, 120, 40};
+        Rect* infoBackground;
+        SDL_Rect infoBackgroundSrc = {33, 0, 32, 32};
+        Texture *infoBackgroundTexture = nullptr;
         Texture *overworldButtonTexture = nullptr;
         Texture *goldDisplayTexture = nullptr;
         Texture *enemyPathTile = nullptr;
