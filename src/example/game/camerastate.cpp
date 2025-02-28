@@ -139,10 +139,10 @@ namespace JanSordid::SDL_Example {
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
             if (event.button.button == SDL_BUTTON_LEFT) {
                 Point mouse = {event.button.x, event.button.y};
-                for (auto &buildingTitle: buildingTitles) {
-                    if (SDL_PointInRect(&mouse, &tdButton)) {
+                for (int i = 0; i < 3; ++i) {
+                    if (SDL_PointInRect(&mouse, &buildings[i])) {
                         if (gui == nullptr)
-                            gui = OpenBuildingGUI(buildingTitle);
+                            gui = OpenBuildingGUI(buildingTitles[i]);
                     }
                 }
                 if (SDL_PointInRect(&mouse, &tdButton)) {
