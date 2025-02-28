@@ -800,8 +800,8 @@ namespace JanSordid::SDL_Example {
         return _isAlive;
     }
 
-    void Enemy::move(const f32 deltaT, f32 scalingFactor) {
-        if (!_isAlive || _currentPath >= _path.size()) return;
+    bool Enemy::move(const f32 deltaT, f32 scalingFactor) {
+        if (!_isAlive || _currentPath >= _path.size()) return false;
 
         int movement = static_cast<int>(deltaT * 100.0f * _speed * scalingFactor);
 
@@ -826,10 +826,11 @@ namespace JanSordid::SDL_Example {
                 _currentPath++;
                 if (_currentPath >= _path.size()) {
                     _isAlive = false; // Gegner hat Ziel erreicht
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
 
@@ -1556,10 +1557,12 @@ namespace JanSordid::SDL_Example {
                 tempWaves.emplace_back(Enemy::EnemyType::Slime,delay);
             }
             waves.push_back(tempWaves);
-            enemyCount *= 1.2;
-            delay *= 0.9;
+            enemyCount *= 1.5;
+            delay *= 0.8;
         }
         _waveSystem = new WaveSystem(_mapPath,FPoint(_mapPathStart.second,_mapPathStart.first), enemyTextureMap,waves);
+
+        lifes = 10;
     }
 
     void TdState::Enter(bool stacking) {
@@ -1908,10 +1911,15 @@ namespace JanSordid::SDL_Example {
         }
 
         for (auto enemy: _waveSystem->_enemies) {
-            enemy->move(deltaT, scalingFactor());
+            if (enemy->move(deltaT, scalingFactor()))
+                lifes--;
             if (!enemy->_isAlive) {
                 _waveSystem->_deadEnemies.push_back(enemy);
             }
+        }
+        if (lifes <= 0) {
+            print("Player died!\n");
+            _game.PushState(MyGS::Overworld);
         }
         _waveSystem->_enemies.erase(
                     std::remove_if(_waveSystem->_enemies.begin(), _waveSystem->_enemies.end(),
@@ -2047,34 +2055,65 @@ namespace JanSordid::SDL_Example {
             destRect.y = 10* scalingFactor();
             SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
         }
-
-        if (waveDisplayTexture) {
-            SDL_DestroyTexture(waveDisplayTexture);
-            waveDisplayTexture = nullptr;
-        }
-        if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
-            SDL_Color white = {255, 255, 255, 255};
-            std::string waveText = "Wave: " + std::to_string(_waveSystem->_currentWave+1) + "/" + std::to_string(_waveSystem->_waves.size());
-            const char *waveChar = waveText.c_str();
-            if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
-                waveDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
-                SDL_FreeSurface(btnSurf);
+        {
+            if (waveDisplayTexture) {
+                SDL_DestroyTexture(waveDisplayTexture);
+                waveDisplayTexture = nullptr;
             }
-            TTF_CloseFont(Font);
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string waveText = "Wave: " + std::to_string(_waveSystem->_currentWave+1) + "/" + std::to_string(_waveSystem->_waves.size());
+                const char *waveChar = waveText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
+                    waveDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+
+            int texW, texH;
+            SDL_QueryTexture(waveDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 20 * scalingFactor();
+            SDL_RenderCopy(renderer(), waveDisplayTexture, nullptr, &destRect);
         }
 
-        int texW, texH;
-        SDL_QueryTexture(waveDisplayTexture, nullptr, nullptr, &texW, &texH);
+        {
+            if (lifesDisplayTexture) {
+                SDL_DestroyTexture(lifesDisplayTexture);
+                lifesDisplayTexture = nullptr;
+            }
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string waveText = "Lifes: " + std::to_string(lifes);
+                const char *waveChar = waveText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
+                    lifesDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
 
-        int windowWidth, windowHeight;
-        SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+            int texW, texH;
+            SDL_QueryTexture(lifesDisplayTexture, nullptr, nullptr, &texW, &texH);
 
-        SDL_Rect destRect;
-        destRect.w = texW;
-        destRect.h = texH;
-        destRect.x = windowWidth - texW - 10 * scalingFactor();
-        destRect.y = 20 * scalingFactor();
-        SDL_RenderCopy(renderer(), waveDisplayTexture, nullptr, &destRect);
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 30 * scalingFactor();
+            SDL_RenderCopy(renderer(), lifesDisplayTexture, nullptr, &destRect);
+        }
 
         SDL_RenderPresent(renderer());
 

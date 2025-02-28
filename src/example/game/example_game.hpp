@@ -84,7 +84,7 @@ namespace JanSordid::SDL_Example {
 
         Enemy(Rect *position, Texture *texture, const std::vector<FPoint> &path, int hp, int speed, EnemyType type = EnemyType::Slime);
 
-        void move(f32 deltaT, f32 scalingFactor);
+        bool move(f32 deltaT, f32 scalingFactor);
 
         bool takeDamage(int damage);
     };
@@ -96,7 +96,7 @@ namespace JanSordid::SDL_Example {
         std::vector<std::vector<std::pair<Enemy::EnemyType,int>>> _waves;
         std::vector<Enemy*> _enemies;
         std::vector<Enemy*> _deadEnemies;
-        FPoint _mapStart;
+        FPoint _mapStart{};
         int _cooldown = 0;
         int _currentEnemy = 0;
         int _currentWave = 0;
