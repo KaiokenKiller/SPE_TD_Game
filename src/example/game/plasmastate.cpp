@@ -496,7 +496,8 @@ namespace JanSordid::SDL_Example {
         if (checkCooldown(totalMSec)) {
             Rect *startPosition = new Rect(_position->x + (_position->w / 2), _position->y + (_position->h / 2), 32,
                                            32);
-            return new SlowingSplashProjectile(startPosition, _projectileTexture, _attackDamage, _slowFactor, _slowDuration, 0, _splashRadius, target);
+            return new SlowingSplashProjectile(startPosition, _projectileTexture, _attackDamage, _slowFactor,
+                                               _slowDuration, 0, _splashRadius, target);
         }
         return nullptr;
     }
@@ -834,7 +835,9 @@ namespace JanSordid::SDL_Example {
     }
 
 
-    WaveSystem::WaveSystem(const std::vector<FPoint> &path, FPoint mapStart,const std::unordered_map<Enemy::EnemyType,Texture*> &enemyTextures, const std::vector<std::vector<std::pair<Enemy::EnemyType,int>>>& waves) {
+    WaveSystem::WaveSystem(const std::vector<FPoint> &path, FPoint mapStart,
+                           const std::unordered_map<Enemy::EnemyType, Texture *> &enemyTextures,
+                           const std::vector<std::vector<std::pair<Enemy::EnemyType, int>>> &waves) {
         _path = path;
         _enemyTextures = enemyTextures;
         _waves = waves;
@@ -859,7 +862,7 @@ namespace JanSordid::SDL_Example {
                 }
 
                 if (!enemyCreated) {
-                    createEnemy(_waves[_currentWave][_currentEnemy].first,tileSize,scalingFactor);
+                    createEnemy(_waves[_currentWave][_currentEnemy].first, tileSize, scalingFactor);
                 }
                 _cooldown = totalMSec + _waves[_currentWave][_currentEnemy].second;
                 _currentEnemy++;
@@ -876,6 +879,7 @@ namespace JanSordid::SDL_Example {
                     return true;
                 }
                 _currentWave++;
+
                 _currentEnemy = 0;
             }
         }
@@ -883,24 +887,24 @@ namespace JanSordid::SDL_Example {
     }
 
     void WaveSystem::createEnemy(Enemy::EnemyType type, int tileSize, f32 scalingFactor) {
-        Enemy* enemy;
+        Enemy *enemy;
         switch (type) {
             case Enemy::EnemyType::Slime: {
                 Rect *tempRect = new Rect(
-                    _mapStart.x * tileSize * scalingFactor,
-                    _mapStart.y * tileSize * scalingFactor,
-                    46,
-                    46
+                        _mapStart.x * tileSize * scalingFactor,
+                        _mapStart.y * tileSize * scalingFactor,
+                        46,
+                        46
                 );
                 enemy = new Enemy(tempRect, _enemyTextures[Enemy::EnemyType::Slime], _path, 15, 1);
                 break;
             }
             default: {
                 Rect *tempRect = new Rect(
-                    _mapStart.x * tileSize * scalingFactor,
-                    _mapStart.y * tileSize * scalingFactor,
-                    46 / 2 * scalingFactor,
-                    46 / 2 * scalingFactor
+                        _mapStart.x * tileSize * scalingFactor,
+                        _mapStart.y * tileSize * scalingFactor,
+                        46 / 2 * scalingFactor,
+                        46 / 2 * scalingFactor
                 );
                 enemy = new Enemy(tempRect, _enemyTextures[Enemy::EnemyType::Slime], _path, 15, 1);
             }
@@ -908,7 +912,7 @@ namespace JanSordid::SDL_Example {
         _enemies.push_back(enemy);
     }
 
-    void WaveSystem::resetEnemy(Enemy* enemy, int tileSize, f32 scalingFactor) {
+    void WaveSystem::resetEnemy(Enemy *enemy, int tileSize, f32 scalingFactor) {
         switch (enemy->_type) {
             case Enemy::EnemyType::Slime: {
                 enemy->_position->x = _mapStart.x * tileSize * scalingFactor;
@@ -931,14 +935,14 @@ namespace JanSordid::SDL_Example {
         _enemies.push_back(enemy);
 
         _deadEnemies.erase(
-                    std::remove_if(_deadEnemies.begin(), _deadEnemies.end(),
-                                   [](Enemy *enemy) {
-                                       if (enemy->_isAlive) {// Speicher freigeben
-                                           return true;  // Entfernen aus dem Vektor
-                                       }
-                                       return false;  // Behalten im Vektor
-                                   }),
-                    _deadEnemies.end());
+                std::remove_if(_deadEnemies.begin(), _deadEnemies.end(),
+                               [](Enemy *enemy) {
+                                   if (enemy->_isAlive) {// Speicher freigeben
+                                       return true;  // Entfernen aus dem Vektor
+                                   }
+                                   return false;  // Behalten im Vektor
+                               }),
+                _deadEnemies.end());
     }
 
     bool WaveSystem::enemiesAlive() {
@@ -948,7 +952,6 @@ namespace JanSordid::SDL_Example {
         }
         return false;
     }
-
 
 
 #pragma endregion
@@ -1299,7 +1302,8 @@ namespace JanSordid::SDL_Example {
             towerSrcRectMap[Tower::TowerType::Archer2_P2] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_3P1_Texture) {
-            archerTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
+            archerTower_3P1_Texture = IMG_LoadTexture(renderer(),
+                                                      BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
             towerSrcRectMap[Tower::TowerType::Archer3_P1] = new Rect(0, 0, towerWidth, towerHeight);
         }
         if (!archerTower_3P2_Texture) {
@@ -1377,7 +1381,7 @@ namespace JanSordid::SDL_Example {
         }
 
         if (!infoBackgroundTexture) {
-            infoBackgroundTexture = IMG_LoadTexture(renderer(),BasePathGraphic "ui-elements.png");
+            infoBackgroundTexture = IMG_LoadTexture(renderer(), BasePathGraphic "ui-elements.png");
         }
 
         // Read map from file
@@ -1411,10 +1415,10 @@ namespace JanSordid::SDL_Example {
             int windowWidth, windowHeight;
             SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
             infoBackground = new Rect(
-                windowWidth - (62*scalingFactor()),
-                8*scalingFactor(),
-                60*scalingFactor(),
-                36*scalingFactor());
+                    windowWidth - (85 * scalingFactor()),
+                    8 * scalingFactor(),
+                    85 * scalingFactor(),
+                    42 * scalingFactor());
 
             Rect *towerIconSrc[3] = {
                     towerSrcRectMap[Tower::TowerType::Mage1], towerSrcRectMap[Tower::TowerType::Archer1],
@@ -1559,20 +1563,21 @@ namespace JanSordid::SDL_Example {
         }
 
         // temporarily fills waves
-        std::vector<std::vector<std::pair<Enemy::EnemyType,int>>> waves;
+        std::vector<std::vector<std::pair<Enemy::EnemyType, int>>> waves;
         int waveCount = 10;
         int enemyCount = 10;
         int delay = 1000;
         for (int i = 0; i < waveCount; i++) {
-            std::vector<std::pair<Enemy::EnemyType,int>> tempWaves;
+            std::vector<std::pair<Enemy::EnemyType, int>> tempWaves;
             for (int j = 0; j < enemyCount; j++) {
-                tempWaves.emplace_back(Enemy::EnemyType::Slime,delay);
+                tempWaves.emplace_back(Enemy::EnemyType::Slime, delay);
             }
             waves.push_back(tempWaves);
             enemyCount *= 1.5;
             delay *= 0.8;
         }
-        _waveSystem = new WaveSystem(_mapPath,FPoint(_mapPathStart.second,_mapPathStart.first), enemyTextureMap,waves);
+        _waveSystem = new WaveSystem(_mapPath, FPoint(_mapPathStart.second, _mapPathStart.first), enemyTextureMap,
+                                     waves);
 
         lifes = 10;
     }
@@ -1840,20 +1845,22 @@ namespace JanSordid::SDL_Example {
         }
         return false;
     }
+
     bool TdState::Input() {
         return false;
     }
 
     void TdState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
-
-        _waveSystem->spawn(totalMSec,tileSize,scalingFactor());
+        _game.data.wave = _waveSystem->_currentWave;
+        _game.data.life = lifes;
+        _waveSystem->spawn(totalMSec, tileSize, scalingFactor());
 
         for (auto projectile: _projectiles) {
             if (projectile->move(deltaT, scalingFactor())) {
                 if (projectile->_type.contains(Projectile::ProjectileType::Splash)) {
                     if (projectile->_type.contains(Projectile::ProjectileType::Burn)) {
                         auto *splashProjectile = static_cast<BurningSplashProjectile *>(projectile);
-                        _statuses.push_back(splashProjectile->applyEffect(splashProjectile->_target,totalMSec));
+                        _statuses.push_back(splashProjectile->applyEffect(splashProjectile->_target, totalMSec));
                         for (auto enemy: _waveSystem->_enemies) {
                             if (enemy != projectile->_target) {
                                 if (checkRange(splashProjectile->_position, enemy->_position,
@@ -1865,7 +1872,7 @@ namespace JanSordid::SDL_Example {
                         }
                     } else if (projectile->_type.contains(Projectile::ProjectileType::Slow)) {
                         auto *splashProjectile = static_cast<SlowingSplashProjectile *>(projectile);
-                        _statuses.push_back(splashProjectile->applyEffect(splashProjectile->_target,totalMSec));
+                        _statuses.push_back(splashProjectile->applyEffect(splashProjectile->_target, totalMSec));
                         for (auto enemy: _waveSystem->_enemies) {
                             if (enemy != projectile->_target) {
                                 if (checkRange(splashProjectile->_position, enemy->_position,
@@ -1936,14 +1943,14 @@ namespace JanSordid::SDL_Example {
             _game.PushState(MyGS::Overworld);
         }
         _waveSystem->_enemies.erase(
-                    std::remove_if(_waveSystem->_enemies.begin(), _waveSystem->_enemies.end(),
-                                   [](Enemy *enemy) {
-                                       if (!enemy->_isAlive) {// Speicher freigeben
-                                           return true;  // Entfernen aus dem Vektor
-                                       }
-                                       return false;  // Behalten im Vektor
-                                   }),
-                    _waveSystem->_enemies.end());
+                std::remove_if(_waveSystem->_enemies.begin(), _waveSystem->_enemies.end(),
+                               [](Enemy *enemy) {
+                                   if (!enemy->_isAlive) {// Speicher freigeben
+                                       return true;  // Entfernen aus dem Vektor
+                                   }
+                                   return false;  // Behalten im Vektor
+                               }),
+                _waveSystem->_enemies.end());
 
         for (auto tower: _game.data._towers) {
             for (auto enemy: _waveSystem->_enemies) {
@@ -2016,12 +2023,14 @@ namespace JanSordid::SDL_Example {
         for (auto &element: _projectiles) {
             if (element->_isVisible)
                 if (element->_texture == archerTowerArrowTexture) {
-                    SDL_Point center = SDL_Point(element->_position->w/2,element->_position->h/2);
-                    SDL_RenderCopyEx(renderer(),element->_texture,projectileSrcRectMap[element->_texture],element->_position,(atan2(element->_direction.y, element->_direction.x) * (180/M_PI))+90,&center,SDL_FLIP_NONE);
-                }
-                else {
-                SDL_RenderCopy(renderer(), element->_texture, projectileSrcRectMap[element->_texture],
-                               element->_position);
+                    SDL_Point center = SDL_Point(element->_position->w / 2, element->_position->h / 2);
+                    SDL_RenderCopyEx(renderer(), element->_texture, projectileSrcRectMap[element->_texture],
+                                     element->_position,
+                                     (atan2(element->_direction.y, element->_direction.x) * (180 / M_PI)) + 90, &center,
+                                     SDL_FLIP_NONE);
+                } else {
+                    SDL_RenderCopy(renderer(), element->_texture, projectileSrcRectMap[element->_texture],
+                                   element->_position);
                 }
         }
 
@@ -2048,7 +2057,7 @@ namespace JanSordid::SDL_Example {
             SDL_RenderCopy(renderer(), overworldButtonTexture, nullptr, &destRect);
         }
 
-        SDL_RenderCopy(renderer(),infoBackgroundTexture,&infoBackgroundSrc,infoBackground);
+        SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, infoBackground);
 
         if (goldDisplayTexture) {
             SDL_DestroyTexture(goldDisplayTexture);
@@ -2074,7 +2083,7 @@ namespace JanSordid::SDL_Example {
             destRect.w = texW;
             destRect.h = texH;
             destRect.x = windowWidth - texW - 10 * scalingFactor();
-            destRect.y = 10* scalingFactor();
+            destRect.y = 10 * scalingFactor();
             SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
         }
         {
@@ -2084,7 +2093,8 @@ namespace JanSordid::SDL_Example {
             }
             if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
                 SDL_Color white = {255, 255, 255, 255};
-                std::string waveText = "Wave: " + std::to_string(_waveSystem->_currentWave+1) + "/" + std::to_string(_waveSystem->_waves.size());
+                std::string waveText = "Wave: " + std::to_string(_waveSystem->_currentWave + 1) + "/" +
+                                       std::to_string(_waveSystem->_waves.size());
                 const char *waveChar = waveText.c_str();
                 if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
                     waveDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);

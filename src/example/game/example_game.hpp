@@ -640,6 +640,9 @@ namespace JanSordid::SDL_Example {
 
         int mineLevel = 1;
         int day = 0;
+        int wave = 0;
+        int totalWaves = 10;
+        int life;
         std::unordered_set<Tower::TowerType> unlocks = {
                 Tower::TowerType::Archer1
         };
@@ -763,7 +766,7 @@ namespace JanSordid::SDL_Example {
     protected:
         //Eigener Stuff:
         SDL_Rect overworldButton = {50, 50, 120, 40};
-        Rect* infoBackground;
+        Rect *infoBackground;
         SDL_Rect infoBackgroundSrc = {33, 0, 32, 32};
         Texture *infoBackgroundTexture = nullptr;
         Texture *overworldButtonTexture = nullptr;
@@ -851,6 +854,13 @@ namespace JanSordid::SDL_Example {
         Texture *goldDisplayTexture = nullptr;
         Texture *bg[4] = {nullptr};
         Texture *buildingSprites[4] = {nullptr};
+        Rect *infoBackground;
+        Rect *mineBackground;
+        Rect *researchBackground;
+        SDL_Rect infoBackgroundSrc = {33, 0, 32, 32};
+        Texture *infoBackgroundTexture = nullptr;
+        Texture *waveDisplayTexture = nullptr;
+        Texture *lifesDisplayTexture = nullptr;
         Texture *archerTowerTexture = nullptr;
         Texture *archerTower_2P1_Texture = nullptr;
         Texture *archerTower_2P2_Texture = nullptr;
@@ -867,6 +877,9 @@ namespace JanSordid::SDL_Example {
         Texture *catapultTower_3P1_Texture = nullptr;
         Texture *catapultTower_3P2_Texture = nullptr;
         std::unordered_map<Tower::TowerType, Rect *> towerSrcRectMap;
+        SDL_Texture *upgradeTexture = nullptr;
+        SDL_Rect upgradeRect = {};
+        SDL_Rect upgradeButton = {20, 170, 60, 30};
         Point bgSize[4]; // Is initialized in Init()
         bool bgIsVisible[4] = {
                 true,
@@ -884,6 +897,7 @@ namespace JanSordid::SDL_Example {
         SDL_Rect tdButton = {50, 50, 120, 40};
         Texture *tdButtonTexture = nullptr;
         bool showResearchIcons = false;
+        bool showMineGui = false;
         std::vector<UnlockButtons> buttonRects;
     public:
         // ctor

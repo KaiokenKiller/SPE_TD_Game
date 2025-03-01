@@ -56,10 +56,6 @@ namespace JanSordid::SDL_Example {
         return true;
     }
 
-    bool CompareUnlockButtonNames(const UnlockButtons &a, const UnlockButtons &b) {
-        return TowerTypeToString(a.type) < TowerTypeToString(b.type);
-    }
-
     void OverworldState::Init() {
         Base::Init();
         TTF_Init();
@@ -87,10 +83,25 @@ namespace JanSordid::SDL_Example {
 
         Point windowSize;
         SDL_GetWindowSize(window(), &windowSize.x, &windowSize.y);
-
+        int windowWidth, windowHeight;
+        SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
         buildings[0] = {50, windowSize.y - 250, 400, 200};
         buildings[1] = {500, windowSize.y - 230, 300, 200};
         buildings[2] = {1000, windowSize.y - 250, 200, 200};
+
+        infoBackground = new Rect(
+                windowWidth - (85 * scalingFactor()),
+                8 * scalingFactor(),
+                85 * scalingFactor(),
+                42 * scalingFactor());
+
+        mineBackground = new Rect({20, 120, 300, 400});
+
+        researchBackground = new Rect({20, 120, 300, 400});
+
+        if (!infoBackgroundTexture) {
+            infoBackgroundTexture = IMG_LoadTexture(renderer(), BasePathGraphic "ui-elements.png");
+        }
 
         if (!tdButtonTexture) {
             TTF_Font *buttonFont = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
@@ -118,76 +129,6 @@ namespace JanSordid::SDL_Example {
             }
         }
 
-        /*
-        if (!archerTowerTexture) {
-            archerTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
-            towerSrcRectMap[Tower::TowerType::Archer1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!archerTower_2P1_Texture) {
-            archerTower_2P1_Texture = IMG_LoadTexture(renderer(),
-                                                      BasePathGraphic "/Archer-Tower/archer_tower_faster.png");
-            towerSrcRectMap[Tower::TowerType::Archer2_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!archerTower_2P2_Texture) {
-            archerTower_2P2_Texture = IMG_LoadTexture(renderer(),
-                                                      BasePathGraphic "/Archer-Tower/archer_tower_crossbow.png");
-            towerSrcRectMap[Tower::TowerType::Archer2_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!archerTower_3P1_Texture) {
-            archerTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
-            towerSrcRectMap[Tower::TowerType::Archer3_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!archerTower_3P2_Texture) {
-            archerTower_3P2_Texture = IMG_LoadTexture(renderer(),
-                                                      BasePathGraphic "/Archer-Tower/archer_tower_ballista.png");
-            towerSrcRectMap[Tower::TowerType::Archer3_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!mageTowerTexture) {
-            mageTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!mageTower_2P1_Texture) {
-            mageTower_2P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage2_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!mageTower_2P2_Texture) {
-            mageTower_2P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage2_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!mageTower_3P1_Texture) {
-            mageTower_3P1_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage3_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!mageTower_3P2_Texture) {
-            mageTower_3P2_Texture = IMG_LoadTexture(renderer(), BasePathGraphic "/Mage-Tower/mage_tower.png");
-            towerSrcRectMap[Tower::TowerType::Mage3_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!catapultTowerTexture) {
-            catapultTowerTexture = IMG_LoadTexture(renderer(), BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!catapultTower_2P1_Texture) {
-            catapultTower_2P1_Texture = IMG_LoadTexture(renderer(),
-                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult2_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!catapultTower_2P2_Texture) {
-            catapultTower_2P2_Texture = IMG_LoadTexture(renderer(),
-                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult2_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!catapultTower_3P1_Texture) {
-            catapultTower_3P1_Texture = IMG_LoadTexture(renderer(),
-                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult3_P1] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-        if (!catapultTower_3P2_Texture) {
-            catapultTower_3P2_Texture = IMG_LoadTexture(renderer(),
-                                                        BasePathGraphic "Catapult-Tower/catapult_tower.png");
-            towerSrcRectMap[Tower::TowerType::Catapult3_P2] = new Rect(0, 0, towerWidth, towerHeight);
-        }
-
-        */
         _game.data.day += 1;
         _game.data.gold += _game.data.mineLevel * 10;
         std::cout << _game.data.gold << std::endl;
@@ -215,10 +156,17 @@ namespace JanSordid::SDL_Example {
                 Point mouse = {event.button.x, event.button.y};
                 for (int i = 0; i < 3; ++i) {
                     if (SDL_PointInRect(&mouse, &buildings[i])) {
-                        if (std::string(buildingTitles[i]) == "Research")
+                        if (std::string(buildingTitles[i]) == "Research") {
                             showResearchIcons = !showResearchIcons;
-                        if (gui == nullptr)
-                            gui = OpenBuildingGUI(buildingTitles[i]);
+                            if (showMineGui)
+                                showMineGui = !showMineGui;
+                        }
+
+                        if (std::string(buildingTitles[i]) == "Mine") {
+                            showMineGui = !showMineGui;
+                            if (showResearchIcons)
+                                showResearchIcons = !showResearchIcons;
+                        }
                     }
                 }
 
@@ -229,14 +177,23 @@ namespace JanSordid::SDL_Example {
                         }
                     }
                 }
+
+                if (showMineGui) {
+                    for (const auto &unlockButton: buttonRects) {
+                        if (SDL_PointInRect(&mouse, &unlockButton.button)) {
+                            if (_game.data.gold >= _game.data.mineLevel * 3) {
+                                _game.data.gold -= _game.data.mineLevel * 3;
+                                _game.data.mineLevel += 1;
+                            }
+                        }
+                    }
+                }
+
                 if (SDL_PointInRect(&mouse, &tdButton)) {
                     _game.PushState(MyGS::TdState);
                     return true;
                 }
             }
-        }
-        if (gui != nullptr) {
-            HandleGUIEvent(event);
         }
         return false;
     }
@@ -246,9 +203,6 @@ namespace JanSordid::SDL_Example {
     }
 
     void OverworldState::Update(const u64 frame, const u64 totalMSec, const f32 deltaT) {
-
-        if (gui != nullptr)
-            UpdateGUI();
     }
 
     void OverworldState::Render(const u64 frame, u64 totalMSec, const f32 deltaT) {
@@ -278,6 +232,7 @@ namespace JanSordid::SDL_Example {
                                  texH};
             SDL_RenderCopy(renderer(), tdButtonTexture, nullptr, &destRect);
         }
+        SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, infoBackground);
 
         if (goldDisplayTexture) {
             SDL_DestroyTexture(goldDisplayTexture);
@@ -299,11 +254,76 @@ namespace JanSordid::SDL_Example {
             int windowWidth, windowHeight;
             SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
 
-            SDL_Rect destRect = {windowWidth - texW - 10, 10, texW, texH};
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 10 * scalingFactor();
             SDL_RenderCopy(renderer(), goldDisplayTexture, nullptr, &destRect);
+        }
+        {
+            if (waveDisplayTexture) {
+                SDL_DestroyTexture(waveDisplayTexture);
+                waveDisplayTexture = nullptr;
+            }
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string waveText = "Wave: " + std::to_string(_game.data.wave + 1) + "/" +
+                                       std::to_string(_game.data.totalWaves);
+                const char *waveChar = waveText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
+                    waveDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+
+            int texW, texH;
+            SDL_QueryTexture(waveDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 20 * scalingFactor();
+            SDL_RenderCopy(renderer(), waveDisplayTexture, nullptr, &destRect);
+        }
+
+        {
+            if (lifesDisplayTexture) {
+                SDL_DestroyTexture(lifesDisplayTexture);
+                lifesDisplayTexture = nullptr;
+            }
+            if (TTF_Font *Font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24)) {
+                SDL_Color white = {255, 255, 255, 255};
+                std::string waveText = "Lifes: " + std::to_string(_game.data.life);
+                const char *waveChar = waveText.c_str();
+                if (SDL_Surface *btnSurf = TTF_RenderText_Blended(Font, waveChar, white)) {
+                    lifesDisplayTexture = SDL_CreateTextureFromSurface(renderer(), btnSurf);
+                    SDL_FreeSurface(btnSurf);
+                }
+                TTF_CloseFont(Font);
+            }
+
+            int texW, texH;
+            SDL_QueryTexture(lifesDisplayTexture, nullptr, nullptr, &texW, &texH);
+
+            int windowWidth, windowHeight;
+            SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
+
+            SDL_Rect destRect;
+            destRect.w = texW;
+            destRect.h = texH;
+            destRect.x = windowWidth - texW - 10 * scalingFactor();
+            destRect.y = 30 * scalingFactor();
+            SDL_RenderCopy(renderer(), lifesDisplayTexture, nullptr, &destRect);
         }
 
         if (showResearchIcons) {
+            //SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, researchBackground);
             int buttonY = 120;
             buttonRects.clear();
             for (const auto &upgrade: _game.data.availableUpgrades) {
@@ -332,12 +352,34 @@ namespace JanSordid::SDL_Example {
                 buttonRects.push_back(button);
             }
 
-
             SDL_RenderPresent(renderer());
-            //if (gui != nullptr) {
-            //    RenderGUI();
-            //}
         }
+
+        if (showMineGui) {
+            //SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, mineBackground);
+            int buttonY = 120;
+            buttonRects.clear();
+
+            UnlockButtons button;
+            std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
+
+            SDL_Color white = {255, 255, 255, 255};
+            TTF_Font *font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
+            SDL_Surface *upgradeSurf = TTF_RenderText_Blended(font, upgradeString.c_str(), white);
+            if (upgradeSurf) {
+                SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer(), upgradeSurf);
+                int texW, texH;
+                SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
+                SDL_Rect buttonRect = {20, buttonY, texW, texH};
+                button.button = buttonRect;
+                SDL_RenderCopy(renderer(), texture, nullptr, &buttonRect);
+                SDL_FreeSurface(upgradeSurf);
+                SDL_DestroyTexture(texture);
+            }
+            buttonRects.push_back(button);
+            SDL_RenderPresent(renderer());
+        }
+
     }
 
     void OverworldState::RenderLayer(const Point /*windowSize*/, const int index) const {
@@ -357,275 +399,4 @@ namespace JanSordid::SDL_Example {
                 SDL_RenderDrawRect(renderer, &buildings[i]);
         }
     }
-
-    BuildingGUI *OverworldState::OpenBuildingGUI(const char *windowTitle) {
-
-        BuildingGUI *bgui = new BuildingGUI();
-        bgui->title = windowTitle;
-        bgui->shouldClose = false;
-        bgui->window = SDL_CreateWindow(
-                bgui->title,
-                SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED,
-                400,
-                300,
-                SDL_WINDOW_SHOWN
-        );
-
-        if (!bgui->window) {
-            std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
-            delete bgui;
-            return nullptr;
-        }
-
-        bgui->renderer = SDL_CreateRenderer(bgui->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-        if (!bgui->renderer) {
-            std::cerr << "Failed to create renderer: " << SDL_GetError() << std::endl;
-            SDL_DestroyWindow(bgui->window);
-            delete bgui;
-            return nullptr;
-        }
-
-
-        bgui->font = TTF_OpenFont(BasePathFont "RobotoSlab-Bold.ttf", 24);
-        if (!bgui->font) {
-            std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
-        } else {
-            SDL_Color white = {255, 255, 255, 255};
-            SDL_Surface *surf = TTF_RenderText_Blended(bgui->font, windowTitle, white);
-
-            if (!surf) {
-                std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
-            } else {
-                bgui->textTexture = SDL_CreateTextureFromSurface(bgui->renderer, surf);
-                bgui->textRect = {20, 60, surf->w, surf->h}; // place the text
-                SDL_FreeSurface(surf);
-            }
-
-            if (std::string(windowTitle) == "Mine") {
-                std::cout << _game.data.gold << std::endl;
-                std::string goldString = "Current Gold: " + std::to_string(_game.data.gold);
-                const char *c_goldString = goldString.c_str();
-                SDL_Surface *goldSurf = TTF_RenderText_Blended(bgui->font, c_goldString, white);
-                if (!goldSurf) {
-                    std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
-                } else {
-                    bgui->goldTexture = SDL_CreateTextureFromSurface(bgui->renderer, goldSurf);
-                    bgui->goldRect = {20, 120, goldSurf->w, goldSurf->h}; // place the text
-                    SDL_FreeSurface(goldSurf);
-                }
-                std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
-                const char *c_upgradeString = upgradeString.c_str();
-                SDL_Surface *upgradeSurf = TTF_RenderText_Blended(bgui->font, c_upgradeString, white);
-                if (upgradeSurf) {
-                    bgui->upgradeTexture = SDL_CreateTextureFromSurface(bgui->renderer, upgradeSurf);
-                    bgui->upgradeRect = {20, 240, upgradeSurf->w, upgradeSurf->h}; // place the text
-                    SDL_FreeSurface(upgradeSurf);
-                }
-            } else if (std::string(windowTitle) == "Research") {
-                if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
-                    SDL_Surface *mageSurf = TTF_RenderText_Blended(bgui->font, "Mage", white);
-                    if (mageSurf) {
-                        bgui->mageTexture = SDL_CreateTextureFromSurface(bgui->renderer, mageSurf);
-                        bgui->mageRect = {20, 120, mageSurf->w, mageSurf->h};
-                        SDL_FreeSurface(mageSurf);
-                    }
-                }
-
-                if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
-                    SDL_Surface *catapultSurf = TTF_RenderText_Blended(bgui->font, "Catapult", white);
-                    if (catapultSurf) {
-                        bgui->catapultTexture = SDL_CreateTextureFromSurface(bgui->renderer, catapultSurf);
-                        bgui->catapultRect = {100, 120, catapultSurf->w, catapultSurf->h};
-                        SDL_FreeSurface(catapultSurf);
-                    }
-                }
-            }
-        }
-
-        return bgui;
-    }
-
-    void OverworldState::HandleGUIEvent(const JanSordid::SDL::Event &event) {
-        if (gui == nullptr || gui->shouldClose)
-            return;
-
-        if (event.type == SDL_WINDOWEVENT) {
-            if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                gui->shouldClose = true;
-            }
-        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-            if (event.button.windowID == SDL_GetWindowID(gui->window)) {
-                Point mouse = {event.button.x, event.button.y};
-                SDL_Rect & button = gui->exitButton;
-                SDL_Rect & upgradeButton = gui->upgradeButton;
-                if (SDL_PointInRect(&mouse, &button))
-                    gui->shouldClose = true;
-
-                if (std::string(gui->title) == "Mine") {
-                    //dummy upgrade cost
-                    if (SDL_PointInRect(&mouse, &upgradeButton)) {
-                        if (_game.data.gold >= _game.data.mineLevel * 3) {
-                            _game.data.gold -= _game.data.mineLevel * 3;
-                            _game.data.mineLevel += 1;
-                        }
-                    }
-                } else if (std::string(gui->title) == "Research") {
-
-                    for (const auto &unlockButton: gui->unlockButtons) {
-                        if (SDL_PointInRect(&mouse, &unlockButton.button)) {
-                            unlockTower(unlockButton.type, _game.data.upgradePrices[unlockButton.type]);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    void OverworldState::UpdateGUI() {
-        if (gui->shouldClose) {
-            if (gui->textTexture) SDL_DestroyTexture(gui->textTexture);
-            if (gui->goldTexture) SDL_DestroyTexture(gui->goldTexture);
-            if (gui->upgradeTexture) SDL_DestroyTexture(gui->upgradeTexture);
-            if (gui->mageTexture) SDL_DestroyTexture(gui->mageTexture);
-            if (gui->catapultTexture) SDL_DestroyTexture(gui->catapultTexture);
-            if (gui->font) TTF_CloseFont(gui->font);
-            if (gui->renderer) SDL_DestroyRenderer(gui->renderer);
-            if (gui->window) SDL_DestroyWindow(gui->window);
-            delete gui;
-            gui = nullptr;
-        }
-    }
-
-    void OverworldState::RenderGUI() {
-        if (!gui || gui->shouldClose) return;
-
-        SDL_SetRenderDrawColor(gui->renderer, 40, 40, 40, 255);
-        SDL_RenderClear(gui->renderer);
-
-        if (gui->textTexture) {
-            SDL_RenderCopy(gui->renderer, gui->textTexture, nullptr, &gui->textRect);
-        }
-
-        if (std::string(gui->title) == "Mine") {
-            if (gui->goldTexture) {
-                SDL_DestroyTexture(gui->goldTexture);
-                gui->goldTexture = nullptr;
-
-                std::string goldString = "Current Gold: " + std::to_string(_game.data.gold);
-                const char *c_goldString = goldString.c_str();
-
-                SDL_Color white = {255, 255, 255, 255};
-                SDL_Surface *goldSurf = TTF_RenderText_Blended(gui->font, c_goldString, white);
-                if (!goldSurf) {
-                    std::cerr << "Failed to create gold text surface: " << TTF_GetError() << std::endl;
-                } else {
-                    gui->goldTexture = SDL_CreateTextureFromSurface(gui->renderer, goldSurf);
-                    gui->goldRect = {20, 120, goldSurf->w, goldSurf->h};
-                    SDL_FreeSurface(goldSurf);
-                }
-
-                SDL_RenderCopy(gui->renderer, gui->goldTexture, nullptr, &gui->goldRect);
-
-            }
-
-            if (gui->upgradeTexture) {
-                SDL_DestroyTexture(gui->upgradeTexture);
-                gui->upgradeTexture = nullptr;
-                std::string upgradeString = "Current Upgrade Level: " + std::to_string(_game.data.mineLevel);
-                const char *c_upgradeString = upgradeString.c_str();
-                SDL_Color white = {255, 255, 255, 255};
-                SDL_Surface *upgradeSurf = TTF_RenderText_Blended(gui->font, c_upgradeString, white);
-                if (!upgradeSurf) {
-                    std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
-                } else {
-                    gui->upgradeTexture = SDL_CreateTextureFromSurface(gui->renderer, upgradeSurf);
-                    gui->upgradeRect = {20, 240, upgradeSurf->w, upgradeSurf->h}; // place the text
-                    SDL_FreeSurface(upgradeSurf);
-                }
-
-
-                SDL_RenderCopy(gui->renderer, gui->upgradeTexture, nullptr, &gui->upgradeRect);
-
-            }
-
-            SDL_Rect upgradeButton = gui->upgradeButton;
-            SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-            SDL_RenderFillRect(gui->renderer, &upgradeButton);
-
-            SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-            SDL_RenderDrawRect(gui->renderer, &upgradeButton);
-
-        } else if (std::string(gui->title) == "Research") {
-
-            int buttonY = 120;
-
-            for (const auto &upgrade: _game.data.availableUpgrades) {
-                UnlockButtons button;
-                if (_game.data.unlocks.contains(upgrade))
-                    continue;
-
-                button.type = upgrade;
-                std::string unlockString =
-                        TowerTypeToString(upgrade) + " Cost : " + std::to_string(_game.data.upgradePrices[upgrade]);
-                SDL_Surface *surf = TTF_RenderText_Blended(gui->font, unlockString.c_str(),
-                                                           {255, 255, 255, 255});
-
-                if (surf) {
-                    SDL_Texture *texture = SDL_CreateTextureFromSurface(gui->renderer, surf);
-                    int texW, texH;
-                    SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
-
-                    SDL_Rect buttonRect = {20, buttonY, texW, texH};
-                    button.button = buttonRect;
-
-                    SDL_RenderCopy(gui->renderer, texture, nullptr, &buttonRect);
-
-                    SDL_FreeSurface(surf);
-                    SDL_DestroyTexture(texture);
-                }
-                buttonRects.push_back(button);
-                buttonY += 40;
-            }
-
-            gui->unlockButtons = buttonRects;
-            /*
-            if (!_game.data.unlocks.contains(Tower::TowerType::Mage1)) {
-                if (gui->mageTexture) {
-                    SDL_RenderCopy(gui->renderer, gui->mageTexture, nullptr, &gui->mageRect);
-                }
-                // Mage Button
-                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-                SDL_RenderFillRect(gui->renderer, &gui->mageButton);
-
-                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-                SDL_RenderDrawRect(gui->renderer, &gui->mageButton);
-            }
-
-            if (!_game.data.unlocks.contains(Tower::TowerType::Catapult1)) {
-                if (gui->catapultTexture) {
-                    SDL_RenderCopy(gui->renderer, gui->catapultTexture, nullptr, &gui->catapultRect);
-                }
-                // Catapult Button
-                SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-                SDL_RenderFillRect(gui->renderer, &gui->catapultButton);
-
-                SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-                SDL_RenderDrawRect(gui->renderer, &gui->catapultButton);
-            }
-            */
-        }
-
-        SDL_Rect button = gui->exitButton;
-        SDL_SetRenderDrawColor(gui->renderer, 80, 80, 80, 255);
-        SDL_RenderFillRect(gui->renderer, &button);
-
-        SDL_SetRenderDrawColor(gui->renderer, 255, 255, 255, 255);
-        SDL_RenderDrawRect(gui->renderer, &button);
-
-        SDL_RenderPresent(gui->renderer);
-    }
-
-
 } // namespace
