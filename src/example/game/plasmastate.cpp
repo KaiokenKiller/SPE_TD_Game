@@ -760,8 +760,8 @@ namespace JanSordid::SDL_Example {
             _towerIconSrc[i] = towerIconSrc[i];
             _towerIconTextures[i] = towerIconTextures[i];
         }
-        int iconWidth = 32 * scalingFactor;
-        int iconHeight = 64 * scalingFactor;
+        int iconWidth = 16 * scalingFactor;
+        int iconHeight = 32 * scalingFactor;
         _towerIconPosition[0] = new Rect(_position->x - iconWidth, _position->y - iconHeight, iconWidth, iconHeight);
         _towerIconPosition[1] = new Rect(_position->x + ((_position->w / 2) - (iconWidth / 2)),
                                          _position->y - (iconHeight + (8 * scalingFactor)), iconWidth, iconHeight);
@@ -1367,9 +1367,11 @@ namespace JanSordid::SDL_Example {
                     renderer(), BasePathGraphic "Catapult-Tower/catapult_tower_stone.png");
         }
 
+        /*
         if (!sellIconTexture) {
             sellIconTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Archer-Tower/archer_tower.png");
         }
+        */
         if (!enemyTexture) {
             enemyTexture = IMG_LoadTexture(renderer(), BasePathGraphic "/Enemies/slime_walk.png");
         }
@@ -2009,6 +2011,14 @@ namespace JanSordid::SDL_Example {
             if (element->_clicked) {
                 int i = 0;
                 for (auto &icon_position: element->_towerIconPosition) {
+                    int x = icon_position->x-1*scalingFactor();
+                    int y = icon_position->y+4*scalingFactor();
+                    int w = icon_position->w+2*scalingFactor();
+                    int h = icon_position->h;
+
+                    SDL_Rect backgroundPosition = {x,y,w,h};
+                    SDL_RenderCopy(renderer(), infoBackgroundTexture, &upgradeBackgroundSrc,
+                                   &backgroundPosition);
                     SDL_RenderCopy(renderer(), element->_towerIconTextures[i], element->_towerIconSrc[i],
                                    icon_position);
                     i++;
@@ -2038,6 +2048,14 @@ namespace JanSordid::SDL_Example {
             if (!element->_used) {
                 if (element->_clicked) {
                     for (int i = 0; i < 3; ++i) {
+                        int x = element->_towerIconPosition[i]->x-1*scalingFactor();
+                        int y = element->_towerIconPosition[i]->y+4*scalingFactor();
+                        int w = element->_towerIconPosition[i]->w+2*scalingFactor();
+                        int h = element->_towerIconPosition[i]->h;
+
+                        SDL_Rect backgroundPosition = {x,y,w,h};
+                        SDL_RenderCopy(renderer(), infoBackgroundTexture, &upgradeBackgroundSrc,
+                                       &backgroundPosition);
                         SDL_RenderCopy(renderer(), element->_towerIconTextures[i], element->_towerIconSrc[i],
                                        element->_towerIconPosition[i]);
                     }

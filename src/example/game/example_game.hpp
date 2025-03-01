@@ -768,6 +768,7 @@ namespace JanSordid::SDL_Example {
         SDL_Rect overworldButton = {50, 50, 120, 40};
         Rect *infoBackground;
         SDL_Rect infoBackgroundSrc = {33, 0, 32, 32};
+        SDL_Rect upgradeBackgroundSrc = {99, 0, 32, 32};
         Texture *infoBackgroundTexture = nullptr;
         Texture *overworldButtonTexture = nullptr;
         Texture *goldDisplayTexture = nullptr;
