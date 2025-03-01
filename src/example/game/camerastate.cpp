@@ -95,9 +95,9 @@ namespace JanSordid::SDL_Example {
                 85 * scalingFactor(),
                 42 * scalingFactor());
 
-        mineBackground = new Rect({20, 120, 300, 400});
+        mineBackground = new Rect({5, 120, 500, 330});
 
-        researchBackground = new Rect({20, 120, 300, 400});
+        researchBackground = new Rect({5, 120, 500, 330});
 
         if (!infoBackgroundTexture) {
             infoBackgroundTexture = IMG_LoadTexture(renderer(), BasePathGraphic "ui-elements.png");
@@ -323,8 +323,8 @@ namespace JanSordid::SDL_Example {
         }
 
         if (showResearchIcons) {
-            //SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, researchBackground);
-            int buttonY = 120;
+            SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, researchBackground);
+            int buttonY = 160;
             buttonRects.clear();
             for (const auto &upgrade: _game.data.availableUpgrades) {
                 if (_game.data.unlocks.contains(upgrade))
@@ -342,7 +342,7 @@ namespace JanSordid::SDL_Example {
                     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer(), surf);
                     int texW, texH;
                     SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
-                    SDL_Rect buttonRect = {20, buttonY, texW, texH};
+                    SDL_Rect buttonRect = {80, buttonY, texW, texH};
                     button.button = buttonRect;
                     SDL_RenderCopy(renderer(), texture, nullptr, &buttonRect);
                     SDL_FreeSurface(surf);
@@ -356,8 +356,8 @@ namespace JanSordid::SDL_Example {
         }
 
         if (showMineGui) {
-            //SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, mineBackground);
-            int buttonY = 120;
+            SDL_RenderCopy(renderer(), infoBackgroundTexture, &infoBackgroundSrc, mineBackground);
+            int buttonY = 160;
             buttonRects.clear();
 
             UnlockButtons button;
@@ -370,7 +370,7 @@ namespace JanSordid::SDL_Example {
                 SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer(), upgradeSurf);
                 int texW, texH;
                 SDL_QueryTexture(texture, nullptr, nullptr, &texW, &texH);
-                SDL_Rect buttonRect = {20, buttonY, texW, texH};
+                SDL_Rect buttonRect = {80, buttonY, texW, texH};
                 button.button = buttonRect;
                 SDL_RenderCopy(renderer(), texture, nullptr, &buttonRect);
                 SDL_FreeSurface(upgradeSurf);

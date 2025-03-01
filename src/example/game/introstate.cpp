@@ -42,7 +42,7 @@ namespace JanSordid::SDL_Example {
         }
 
         if (!_music) {
-            //_music = Mix_LoadMUS(BasePath "asset/music/The True Story of Beelzebub.ogg");
+            _music = Mix_LoadMUS(BasePath "asset/music/The True Story of Beelzebub.ogg");
             if (!_music)
                 print(stderr, "Mix_LoadMUS failed: {}\n", Mix_GetError());
         }

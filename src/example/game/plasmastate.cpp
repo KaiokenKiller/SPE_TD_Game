@@ -1586,7 +1586,7 @@ namespace JanSordid::SDL_Example {
 
     void TdState::Enter(bool stacking) {
         Base::Enter(stacking);
-        //Mix_PlayMusic(_music, -1);
+        Mix_PlayMusic(_music, -1);
     }
 
     void TdState::Exit(bool stacking) {
