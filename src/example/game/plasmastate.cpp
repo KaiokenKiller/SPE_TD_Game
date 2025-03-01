@@ -1417,9 +1417,9 @@ namespace JanSordid::SDL_Example {
             int windowWidth, windowHeight;
             SDL_GetRendererOutputSize(renderer(), &windowWidth, &windowHeight);
             infoBackground = new Rect(
-                    windowWidth - (85 * scalingFactor()),
+                    windowWidth - (65 * scalingFactor()),
                     8 * scalingFactor(),
-                    85 * scalingFactor(),
+                    65 * scalingFactor(),
                     42 * scalingFactor());
 
             Rect *towerIconSrc[3] = {
